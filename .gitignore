@@ -1,0 +1,5 @@
+# Ignore Practicas folder
+Practicas/
+
+# But keep the Practicas README tracked
+!Practicas/README.md
