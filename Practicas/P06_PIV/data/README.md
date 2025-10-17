@@ -1,0 +1,1 @@
+Coloca pares A/B en `data/pairs/`. Mantén Δt conocido y formato TIF/PNG sin compresión.

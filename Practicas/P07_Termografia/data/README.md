@@ -1,0 +1,1 @@
+Añade imágenes radiométricas y metadatos (emisividad, T_amb, T_ref) para correcciones.

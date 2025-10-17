@@ -1,5 +1,16 @@
-# Ignore Practicas folder
-Practicas/
+# Ignore Practicas folder by default
+Practicas/**
 
-# But keep the Practicas README tracked
+# Keep the Practicas index README
 !Practicas/README.md
+
+# Allow per-practice directories and code/notebooks
+!Practicas/P**/
+!Practicas/P**/README.md
+!Practicas/P**/notebooks/**
+!Practicas/P**/src/**
+
+# Ignore raw data by default, but keep placeholders/docs
+Practicas/P**/data/**
+!Practicas/P**/data/.gitkeep
+!Practicas/P**/data/README.md

@@ -1,0 +1,1 @@
+Sube `gases.csv` con unidades y condiciones (STP). Añade calibraciones de analizadores.

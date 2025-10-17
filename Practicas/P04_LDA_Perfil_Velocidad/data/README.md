@@ -1,0 +1,1 @@
+Incluye mediciones LDA por posición y (opcional) desviaciones estándar.

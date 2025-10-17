@@ -1,0 +1,3 @@
+# P06 - PIV
+
+Coloca pares de imágenes en `data/pairs/` con nombres A1.tif,B1.tif,...

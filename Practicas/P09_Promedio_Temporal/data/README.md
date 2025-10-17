@@ -1,0 +1,1 @@
+Incluye `signal.csv` (t,x). Documenta si es estacionaria y condiciones de adquisición.

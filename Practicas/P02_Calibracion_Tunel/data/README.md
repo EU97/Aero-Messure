@@ -1,0 +1,1 @@
+Coloca calibraciones (dp, rpm, T, rho). Usa CSV separado por comas, con cabeceras claras.

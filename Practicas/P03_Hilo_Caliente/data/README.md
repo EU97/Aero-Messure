@@ -1,0 +1,1 @@
+Incluye calibration.csv (E,Uref) y signal.csv (t,E). Muestreo alto; registrar fs.
