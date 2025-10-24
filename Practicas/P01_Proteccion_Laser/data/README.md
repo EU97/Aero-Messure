@@ -1,1 +1,0 @@
-Coloca aquí hojas de datos de láseres y gafas; evita datos sensibles. Usa formatos CSV/PNG/PDF según convenga.

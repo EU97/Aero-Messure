@@ -8,3 +8,4 @@ opencv-python
 notebook
 jupyter
 openpiv
+ipywidgets
