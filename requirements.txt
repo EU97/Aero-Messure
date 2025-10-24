@@ -9,3 +9,8 @@ notebook
 jupyter
 openpiv
 ipywidgets
+tqdm
+calib_utils
+pyarrow
+fastparquet
+tabulate
