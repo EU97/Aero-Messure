@@ -1,1 +1,0 @@
-Coloca imágenes de ejemplo (PNG/JPG/TIF). Evita datos personales.
