@@ -12,5 +12,6 @@ Practicas/**
 
 # Ignore raw data by default, but keep placeholders/docs
 Practicas/P**/data/**
+Practicas/PDF
 !Practicas/P**/data/.gitkeep
 !Practicas/P**/data/README.md
