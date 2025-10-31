@@ -15,3 +15,5 @@ pyarrow
 fastparquet
 tabulate
 ipympl
+plotly
+kaleido
