@@ -1,0 +1,253 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+% --- ESTILOS TIKZ ---
+\tikzset{
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20, font=\small},
+    process/.style={rectangle, minimum width=4cm, minimum height=1.5cm, text width=4cm, text centered, draw=black, fill=orange!15, font=\small},
+    decision/.style={diamond, aspect=2.2, minimum width=3.8cm, minimum height=1cm, text centered, draw=black, fill=green!15, font=\small},
+    arrow/.style={thick,->,>=stealth}
+}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \centering
+    {\LARGE Universidad Autónoma de Nuevo León}\\[0.5cm]
+    {\Large Facultad de Ingeniería Mecánica y Eléctrica}\\[2cm]
+    
+    {\Large Laboratorio de Técnicas de Medida en Aeronáutica}\\[1cm]
+    
+    {\Huge Práctica 3}\\[0.5cm]
+    {\Large Anemometría de Hilo Caliente (HWA) y Caracterización de Turbulencia}\\[2cm]
+    
+    Elaborado para el ciclo escolar:\\
+    2026\\[2cm]
+    
+    \vfill
+    
+    Resumen Ejecutivo\\
+    Esta práctica aborda la técnica de anemometría térmica de temperatura constante (CTA). El estudiante analizará series temporales de voltaje para caracterizar flujos gaseosos complejos, aplicando la Ley de King para la conversión de señales eléctricas en magnitudes cinemáticas. El enfoque analítico se centra en la obtención de la intensidad de turbulencia y la evaluación de la respuesta dinámica del sensor ante fluctuaciones rápidas de velocidad.
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% --- NOMENCLATURA ---
+\section*{Nomenclatura}
+\begin{description}
+    \item[$E$] Voltaje de salida del anemómetro [V]
+    \item[$U$] Velocidad media del fluido [m/s]
+    \item[$U_{ref}$] Velocidad de referencia del túnel [mm/s]
+    \item[$TI$] Intensidad de turbulencia [\%]
+    \item[$\beta$, $n$] Exponentes de la Ley de King
+    \item[$R_s$] Resistencia del hilo sensor [\si{\ohm}]
+    \item[$T_s$] Temperatura de operación del hilo [K]
+    \item[$T_f$] Temperatura del fluido [K]
+    \item[$\sigma_E$] Desviación estándar del voltaje [V]
+\end{description}
+
+\section{Introducción}
+La anemometría de hilo caliente (HWA) es una técnica de medición indirecta de velocidad basada en la transferencia de calor por convección forzada. En el ámbito aeronáutico, su alta respuesta en frecuencia la hace indispensable para el estudio de capas límite y micro-estructuras de turbulencia. A diferencia de técnicas intrusivas mecánicas, el HWA utiliza filamentos de pocos micrómetros de diámetro que minimizan la perturbación del flujo, permitiendo una resolución temporal superior.
+
+\section{Objetivos de Aprendizaje}
+\begin{itemize}[label=-]
+    \item Comprender los principios de transferencia de calor aplicados a la medición de velocidad de fluidos.
+    \item Identificar el funcionamiento del circuito de retroalimentación en modo de temperatura constante (CTA).
+    \item Procesar series temporales crudas para descartar transitorios y calcular voltajes promediados estables.
+    \item Determinar los coeficientes de calibración mediante la linealización de la Ley de King modificada.
+    \item Discutir el impacto de la contaminación y la deriva térmica en la precisión de las mediciones aeroespaciales.
+\end{itemize}
+
+\section{Fundamento Teórico}
+
+\subsection{Principio de Operación CTA}
+En un anemómetro de temperatura constante (CTA), el sensor forma parte de un puente de Wheatstone equilibrado por un amplificador de alta ganancia. Cuando el aire enfría el hilo, su resistencia disminuye; el servo-amplificador detecta el desequilibrio y aumenta la corriente para restaurar la temperatura nominal ($T_s$). El voltaje $E$ requerido para este equilibrio es la señal de medida.
+
+\subsection{Ley de King y Linealización}
+La potencia disipada por el hilo se relaciona con la velocidad mediante la Ley de King. Para efectos de esta práctica, utilizaremos la forma modificada para el ajuste de curvas:
+\begin{equation}
+    A \cdot E^2 + B = U^{1/n}
+\end{equation}
+Donde $A$ y $B$ son las constantes de calibración a determinar experimentalmente mediante regresión lineal sobre los datos transformados ($X = E^2$, $Y = U^{1/n}$).
+
+\section{Diseño y Metodología de Análisis}
+
+\subsection{Acondicionamiento Electrónico del Sensor}
+El esquema representa el lazo de control fundamental que permite al sensor responder a fluctuaciones de velocidad en el orden de los kilohercios.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{circuitikz}[scale=1.2]
+        \draw
+        (0,0) node[op amp] (opamp) {}
+        (opamp.-) -- ++(-1,0) to[R, l=$R_1$] ++(0,-2) node[ground] {}
+        (opamp.-) -- ++(0,1.5) to[R, l=$R_s$ (Hilo)] ++(2,0) coordinate (top)
+        (opamp.+) -- ++(-1,0) to[R, l=$R_2$] ++(0,-1.5) node[ground] {}
+        (opamp.+) -- ++(0,1.5) to[R, l=$R_{adj}$] (top)
+        (top) -- (opamp.out)
+        (opamp.out) to[short, -o] ++(1,0) node[anchor=west] {$E_{out}$};
+        \node at (0, -2.5) [font=\scriptsize, text width=6cm, align=center] {El amplificador mantiene el puente equilibrado compensando el enfriamiento convectivo.};
+    \end{circuitikz}
+    \caption{Diagrama esquemático del anemómetro de temperatura constante (CTA).}
+\end{figure}
+
+\subsection{Metodología de Procesamiento de Señal}
+El estudiante debe seguir el siguiente flujo para procesar los datasets proporcionados:
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[node distance=2cm, auto]
+        \node (start) [startstop] {Series Temporales $E(t)$};
+        \node (clean) [process, below=of start] {Descarte de Transitorios (10\% inicial/final)};
+        \node (stats) [process, below=of clean] {Cálculo de $\bar{E}$ y $\sigma_E$ por iteración};
+        \node (ref) [process, below=of stats] {Conversión SD\% a $U_{ref}$ (Calibración Túnel)};
+        \node (king) [process, below=of ref] {Regresión Lineal: $U^{1/3}$ vs $E^2$};
+        \node (valid) [decision, right=of king, xshift=1.5cm] {¿$R^2 > 0.99$?};
+        \node (end) [startstop, above=of valid, yshift=2.5cm] {Reporte AIAA};
+        
+        \draw [arrow] (start) -- (clean);
+        \draw [arrow] (clean) -- (stats);
+        \draw [arrow] (stats) -- (ref);
+        \draw [arrow] (ref) -- (king);
+        \draw [arrow] (king) -- (valid);
+        \draw [arrow] (valid) -- node[anchor=east] {Sí} (end);
+        \draw [arrow] (valid.south) -- ++(0,-0.5) -| node[pos=0.25, below] {No (Revisar Datos)} (king.south);
+    \end{tikzpicture}
+    \caption{Mapa de ruta para el tratamiento de datos de HWA.}
+\end{figure}
+
+\newpage
+\section{Datasets y Casos de Estudio}
+
+\subsection{Dataset de Voltaje HWA}
+Se proporcionan archivos con nomenclatura \texttt{SD\_iteracion.txt} cubriendo un rango de velocidad del accionador (SD) del 15\% al 35\%.
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{@{}lcccc@{}}
+        \toprule
+        Config. SD (\%) & $U_{ref}$ [mm/s] & $E_{avg}$ [V] & $\sigma_E$ [V] & $E^2$ [$V^2$] \\ \midrule
+        15              &                  &               &                &               \\
+        20              &                  &               &                &               \\
+        25              &                  &               &                &               \\
+        30              &                  &               &                &               \\
+        35              &                  &               &                &               \\ \bottomrule
+    \end{tabular}
+    \caption{Tabla resumen de datos promediados para calibración del sensor.}
+\end{table}
+
+\subsection{Aplicación: Medición de Turbulencia}
+Utilizando las fluctuaciones de voltaje ($\sigma_E$) y la sensibilidad local del sensor ($dU/dE$), el estudiante deberá estimar la intensidad de turbulencia en la sección de pruebas.
+
+\section{Actividades a Realizar}
+\begin{enumerate}
+    \item Procesamiento Estadístico: Determine el voltaje promedio para cada valor de SD ignorando las zonas de estabilización de la señal.
+    \item Calibración del Sistema: Aplique la ecuación de calibración del túnel $U_{ref} = 7.6243 \cdot SD - 1.8926$ para obtener las velocidades de referencia.
+    \item Ajuste de Modelo: Realice la regresión lineal de los datos transformados y obtenga los coeficientes $A$ y $B$.
+    \item Generación de Gráficas: Grafique la curva de calibración final $U$ vs $E$ superpuesta a los puntos experimentales.
+\end{enumerate}
+
+\section{Análisis de Resultados y Graficación}
+En el reporte se deben analizar las siguientes situaciones:
+\begin{enumerate}
+    \item Sensibilidad del Sensor: Grafique la derivada $dE/dU$ frente a la velocidad. Discuta por qué el HWA es más preciso a bajas velocidades y pierda resolución conforme aumenta el flujo.
+    \item Análisis de Repetibilidad: Compare los promedios de diferentes iteraciones para un mismo SD. ¿Existe deriva térmica significativa entre mediciones?
+    \item Histogramas de Voltaje: Grafique la distribución de una serie temporal fija. Analice si la señal presenta una distribución gaussiana, típica de turbulencia homogénea.
+\end{enumerate}
+
+\section{Preguntas de Discusión Electrónica}
+\begin{enumerate}
+    \item ¿Por qué la contaminación por polvo sobre el hilo actúa como un aislante térmico y cómo afecta esto al voltaje de salida del puente?
+    \item Relacione la constante de tiempo térmica del hilo con el diámetro del filamento. ¿Por qué no se utilizan hilos más gruesos para aumentar la robustez?
+    \item En el circuito CTA, ¿qué función cumple el servo-amplificador de alta ganancia en términos de la respuesta en frecuencia del sistema?
+    \item Discuta las limitaciones del uso de HWA en flujos con temperatura variable. ¿Cómo compensaría el error introducido por un cambio de $10^\circ C$ en el fluido?
+\end{enumerate}
+
+\section{Lineamientos del Reporte (AIAA)}
+El reporte debe presentar el análisis estadístico completo, justificando el descarte de muestras iniciales por transitorios de la bomba. Se debe incluir la comparación entre el modelo teórico y los datos medidos, discutiendo el error cuadrático medio.
+
+\newpage
+\appendix
+\section{Código de Análisis (Python)}
+Script para el procesamiento de series temporales y ajuste de la Ley de King.
+
+\begin{lstlisting}
+import numpy as np
+import pandas as pd
+from scipy.stats import linregress
+import matplotlib.pyplot as plt
+
+def calcular_calibracion_hwa(directorio, sd_rango):
+    res_final = []
+    for sd in sd_rango:
+        # Carga masiva de iteraciones para un SD fijo
+        voltajes = []
+        for i in range(1, 4): # Ejemplo: 3 iteraciones
+            data = np.loadtxt(f"{directorio}/{sd}_{i}.txt")
+            # Descarte de transitorios (10% buffers)
+            n = len(data)
+            util = data[int(n*0.1):int(n*0.9)]
+            voltajes.append(np.mean(util))
+        
+        e_avg = np.mean(voltajes)
+        u_ref = 7.6243 * sd - 1.8926
+        res_final.append([e_avg, u_ref])
+    
+    # Transformacion para Ley de King (n=3)
+    df = pd.DataFrame(res_final, columns=['E', 'U'])
+    slope, inter, r_val, p, std = linregress(df['E']**2, df['U']**(1/3))
+    
+    return slope, inter, r_val**2
+
+# Uso del script:
+# A, B, R2 = calcular_calibracion_hwa('data/', [15, 20, 25, 30, 35])
+\end{lstlisting}
+
+\section{Referencias}
+\begin{enumerate}
+    \item Bruun, H. H. (1995). Hot-Wire Anemometry: Principles and Signal Analysis.
+    \item Goldstein, R. J. (1983). Fluid Mechanics Measurements.
+    \item Manual de Usuario Dantec Dynamics - Sondas de Hilo Caliente.
+\end{enumerate}
+
+\end{document}

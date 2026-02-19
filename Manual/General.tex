@@ -1,0 +1,200 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+\title{Manual de Laboratorio: Técnicas de Medida en Aeronáutica\\ \Large Programa Académico de Ingeniería Aeronáutica}
+\author{Facultad de Ingeniería Mecánica y Eléctrica (FIME) \\ Universidad Autónoma de Nuevo León}
+\date{Ciclo Escolar 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este documento describe el marco metodológico y evaluativo del laboratorio de Técnicas de Medida en Aeronáutica. El curso ha sido reestructurado para proporcionar una experiencia centrada en el tratamiento, análisis e interpretación de conjuntos de datos (datasets) que reflejan mediciones reales de fenómenos aeroespaciales. Los estudiantes desarrollarán competencias en el procesamiento de señales, validación de modelos teóricos y comunicación técnica bajo los estándares de la industria.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\section{Introducción General}
+El presente curso de Medida en Aeronáutica se centra en las metodologías y herramientas cruciales dentro de la ingeniería aeronáutica contemporánea. A lo largo de estas prácticas, los estudiantes se enfrentarán al desafío de interpretar y analizar datos, simulando los procesos que los ingenieros ejecutan tras la adquisición de información en ensayos y pruebas de sistemas aeroespaciales.
+
+Aunque no se realizarán montajes experimentales físicos complejos, cada sesión está diseñada para la comprensión integral de la metodología subyacente a cada técnica de medida: desde los principios físicos y la instrumentación involucrada, hasta la obtención de datos. El enfoque principal radicará en el tratamiento, análisis e interpretación de conjuntos de datos que reflejan mediciones reales o simuladas de fenómenos y sistemas aeronáuticos.
+
+\section{Habilidades Críticas a Desarrollar}
+\begin{itemize}[label=-]
+    \item Procesamiento y validación de datos: Identificación de anomalías y preparación para un análisis riguroso.
+    \item Aplicación de modelos teóricos y empíricos: Uso de ecuaciones fundamentales para convertir datos crudos en información ingenieril con significado sustantivo.
+    \item Visualización e interpretación de resultados: Generación de gráficas y tablas para visualizar tendencias y patrones en el contexto de aplicaciones aeronáuticas.
+    \item Comprensión del impacto de la incertidumbre: Evaluación de cómo las limitaciones inherentes a cada técnica pueden influir en la toma de decisiones.
+\end{itemize}
+
+\section{Evaluación y Ponderación}
+La acreditación del laboratorio depende de la ejecución analítica de las sesiones y la entrega de reportes técnicos. La ponderación de las prácticas se distribuye de la siguiente manera:
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{lc}
+        \toprule
+        Práctica / Actividad & Ponderación (\%) \\
+        \midrule
+        1. Protección ocular frente a radiación láser & 10\% \\
+        2. Calibración del Túnel de Viento & 15\% \\
+        3. Anemometría de Hilo Caliente (HWA) & 15\% \\
+        4. Anemometría Láser Doppler (LDA) & 10\% \\
+        5. Análisis de Imagen Digital & 10\% \\
+        6. Velocimetría de Partículas por Imagen (PIV) & 10\% \\
+        7. Termografía Infrarroja & 10\% \\
+        8. Análisis de Productos de Combustión & 10\% \\
+        9. Promedio Temporal y Estadística & 10\% \\
+        \midrule
+        Total & 100\% \\
+        \bottomrule
+    \end{tabular}
+    \caption{Esquema de evaluación del curso.}
+\end{table}
+
+\newpage
+\section{Descripción Detallada de las Sesiones Experimentales}
+
+\subsection{Práctica 1. Protección ocular frente a radiación láser}
+Esta práctica se centra en el análisis de los riesgos asociados con diversas fuentes láser utilizadas en técnicas de medición aeronáutica (como LDA, PIV). Aunque se describirán los procedimientos de seguridad y el equipo de protección ocular (EPO), el componente tangible implicará el análisis de hojas de especificaciones de láseres y EPO, el cálculo de la Densidad Óptica (OD) requerida para escenarios aeronáuticos específicos y la justificación de la selección de EPO adecuada basada en estos datos.
+
+\subsection{Práctica 2. Calibración del Túnel de Viento}
+Se explica la importancia y metodología general para calibrar un túnel de viento, esencial para ensayos aerodinámicos. La actividad tangible consiste en analizar un conjunto de datos que relacionen un parámetro de control del túnel con la velocidad del flujo resultante. Los estudiantes procesarán estos datos para generar una curva de calibración, determinar la ecuación de ajuste, y discutir la incertidumbre y el rango operativo útil del túnel en el contexto de pruebas aeronáuticas.
+
+\subsection{Práctica 3. Anemometría de Hilo Caliente (HWA)}
+Se introducen los principios de la HWA para la medición de velocidades de flujo y turbulencia, destacando su aplicación en estudios de capa límite. La práctica se enfoca en el análisis de datos de voltaje obtenidos de un sensor en diferentes condiciones. Los estudiantes aplicarán la ley de King para convertir lecturas de voltaje en velocidades, calcularán promedios e intensidades de turbulencia basándose en los datos provistos.
+
+\subsection{Práctica 4. Anemometría láser por efecto doppler: perfil de velocidades}
+Se describe la técnica de Anemometría Láser Doppler (LDA) y su uso para mediciones no intrusivas de velocidad de flujo. Los estudiantes trabajarán con datasets de mediciones de velocidad tomadas en diferentes puntos de un flujo (ej. estela de un perfil alar). Analizarán estos datos para construir perfiles de velocidad, identificar regiones de interés como máximos o gradientes, y calcular parámetros derivados.
+
+\subsection{Práctica 5. Análisis de imagen}
+Explora los fundamentos del análisis de imágenes digitales y su aplicación en inspección no destructiva (NDT) o metrología. Se proporcionarán imágenes digitales de superficies con posibles defectos o patrones de calibración. Los estudiantes realizarán tareas de identificación de características, mediciones dimensionales a partir de las imágenes con una escala dada y pre-procesamiento básico para mejorar la visualización de información relevante.
+
+\subsection{Práctica 6. Velocimetría de Partículas por Imagen (PIV)}
+Introduce la técnica PIV para la obtención de campos de velocidad instantáneos en un plano. Los estudiantes trabajarán con campos vectoriales ya procesados correspondientes a un flujo aeronáutico característico. La actividad se centra en la interpretación de estos campos de velocidad, la identificación de estructuras de flujo (vórtices, zonas de recirculación) y el cálculo de magnitudes derivadas a partir de los datos vectoriales.
+
+\subsection{Práctica 7. Termografía}
+Explica el uso de la termografía infrarroja como herramienta de diagnóstico sin contacto en aplicaciones como la inspección de motores o estructuras de composites. Los estudiantes analizarán termogramas proporcionados bajo diferentes condiciones operativas. Interpretarán los patrones de temperatura, identificarán puntos calientes o fríos anómalos y relacionarán estas observaciones con posibles fallos.
+
+\subsection{Práctica 8. Análisis de productos de combustión}
+Aborda la importancia del análisis de los gases de escape en motores de reacción para evaluar eficiencia y emisiones. Los estudiantes recibirán datos representativos de la concentración de especies químicas (CO2, CO, O2, NOx) bajo diferentes condiciones. Analizarán estos datos para calcular parámetros como la relación aire/combustible y la eficiencia de combustión, discutiendo el cumplimiento de normativas ambientales.
+
+\subsection{Práctica 9. Promedio temporal}
+Se enfoca en la comprensión y aplicación de promedios temporales y estadísticos en señales fluctuantes. Los estudiantes trabajarán con series temporales de datos de mediciones y calcularán diversas estadísticas descriptivas. Compararán los resultados obtenidos con diferentes métodos de promediado y discutirán cómo la duración del muestreo afecta la interpretación de fenómenos dinámicos o turbulentos.
+
+\newpage
+\section{Lineamientos del Reporte Técnico (Estándar AIAA)}
+Todos los reportes de laboratorio deben seguir estrictamente el formato del American Institute of Aeronautics and Astronautics (AIAA). La estructura obligatoria es la siguiente:
+
+\begin{enumerate}
+    \item Resumen (Abstract): Breve descripción del objetivo de la medida, el método analítico empleado y el hallazgo principal (máximo 200 palabras).
+    \item Nomenclatura: Lista alfabética de todos los símbolos, variables y acrónimos utilizados en el reporte, incluyendo sus unidades en el Sistema Internacional.
+    \item Introducción: Justificación de la técnica de medida en el contexto aeronáutico y descripción del fenómeno físico a estudiar.
+    \item Metodología y Desarrollo:
+    \begin{itemize}
+        \item Descripción de la instrumentación y el principio de operación.
+        \item Presentación de ecuaciones fundamentales (ej. Ley de King, Efecto Doppler).
+        \item Procedimiento seguido para el procesamiento del dataset provisto.
+    \end{itemize}
+    \item Resultados y Discusión:
+    \begin{itemize}
+        \item Presentación de gráficas de alta calidad (ejes rotulados, unidades, leyendas).
+        \item Análisis crítico de las tendencias observadas.
+        \item Comparación de los resultados obtenidos con valores teóricos o de referencia.
+    \end{itemize}
+    \item Análisis de Incertidumbre: Identificación de fuentes de error y cálculo de la propagación de incertidumbre en las magnitudes derivadas.
+    \item Conclusiones: Síntesis de las lecciones aprendidas y evaluación de la utilidad de la técnica para el diseño o mantenimiento aeronáutico.
+    \item Referencias: Citas bibliográficas en formato estándar AIAA.
+\end{enumerate}
+
+\newpage
+\section{Esquemas Técnicos de Referencia}
+
+\subsection{Anemometría de Hilo Caliente: Puente de Wheatstone}
+El sensor de hilo caliente requiere un circuito de control que mantenga la temperatura del filamento constante. El equilibrio del puente es la base para la conversión de voltaje a velocidad de flujo.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{circuitikz}[scale=1, transform shape]
+        \draw
+        (0,0) node[anchor=east] {$V_{in}$}
+        to[short, o-*] (1,0)
+        to[R, l=$R_1$] (1,-2)
+        to[R, l=$R_{sensor}$ (HWA), -*] (1,-4)
+        node[ground] {}
+        (1,0) to[short] (4,0)
+        to[R, l=$R_2$] (4,-2)
+        to[R, l=$R_{variable}$, -*] (4,-4)
+        node[ground] {}
+        (1,-2) to[short, *-] (2,-2)
+        node[op amp, anchor=-] (OA) {}
+        (4,-2) to[short, *-] (OA.+)
+        (OA.out) to[short, -o] (6,-2) node[anchor=west] {$V_{out}$ (Señal)};
+    \end{circuitikz}
+    \caption{Circuito de acondicionamiento para anemometría de temperatura constante.}
+\end{figure}
+
+\subsection{Óptica Láser Doppler (LDA): Volumen de Medida}
+La intersección de dos haces láser coherentes genera un patrón de franjas de interferencia. La frecuencia con la que una partícula cruza estas franjas determina su velocidad local.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Haz laser 1
+        \draw[red, thick] (-4,1) -- (0,0);
+        % Haz laser 2
+        \draw[red, thick] (-4,-1) -- (0,0);
+        % Volumen
+        \draw[fill=yellow!10, draw=orange] (0,0) ellipse (0.5 and 0.8);
+        % Franjas
+        \foreach \x in {-0.3,-0.15,0,0.15,0.3}
+            \draw[red!40, thin] (\x,-0.5) -- (\x,0.5);
+        % Particula
+        \draw[fill=black] (0.15, -0.7) circle (0.06);
+        \draw[->, thick] (0.15, -0.7) -- (0.15, 0.5) node[anchor=south] {$u$};
+        % Etiquetas
+        \node at (-3,0.8) [anchor=south] {Haz A};
+        \node at (-3,-0.8) [anchor=north] {Haz B};
+        \node at (0,1.1) {Volumen de Control};
+    \end{tikzpicture}
+    \caption{Intersección de haces y volumen de medida en LDA.}
+\end{figure}
+
+\end{document}

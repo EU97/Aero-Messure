@@ -1,0 +1,254 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+% --- ESTILOS TIKZ ---
+\tikzset{
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20, font=\small},
+    process/.style={rectangle, minimum width=4cm, minimum height=1.5cm, text width=4cm, text centered, draw=black, fill=orange!15, font=\small},
+    decision/.style={diamond, aspect=2.2, minimum width=3.8cm, minimum height=1cm, text centered, draw=black, fill=green!15, font=\small},
+    arrow/.style={thick,->,>=stealth}
+}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \centering
+    {\LARGE Universidad Autónoma de Nuevo León}\\[0.5cm]
+    {\Large Facultad de Ingeniería Mecánica y Eléctrica}\\[2cm]
+    
+    {\Large Laboratorio de Técnicas de Medida en Aeronáutica}\\[1cm]
+    
+    {\Huge Práctica 2}\\[0.5cm]
+    {\Large Calibración del Túnel de Viento mediante LDA}\\[2cm]
+    
+    Elaborado para el ciclo escolar:\\
+    2026\\[2cm]
+    
+    \vfill
+    
+    Resumen Ejecutivo\\
+    Esta práctica aborda la caracterización funcional de un túnel de viento subsónico. A través del análisis de conjuntos de datos de velocidad obtenidos por Anemometría Láser Doppler (LDA), el estudiante determinará la curva de calibración del sistema, estableciendo la relación entre la frecuencia de operación del motor y la velocidad del aire en la sección de pruebas. Se enfatiza el uso de regresión lineal y el análisis de incertidumbre para la validación de ensayos aerodinámicos.
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% --- NOMENCLATURA ---
+\section*{Nomenclatura}
+\begin{description}
+    \item[$f_{motor}$] Frecuencia del variador de velocidad del motor [Hz]
+    \item[$U$] Velocidad instantánea del flujo [m/s]
+    \item[$\bar{U}$] Velocidad media del aire [m/s]
+    \item[$\sigma_U$] Desviación estándar de la velocidad (Intensidad de turbulencia) [m/s]
+    \item[$R^2$] Coeficiente de determinación
+    \item[$m$] Pendiente de la curva de calibración (Sensibilidad) [(m/s)/Hz]
+    \item[$Re$] Número de Reynolds
+    \item[$\nu$] Viscosidad cinemática del aire [$m^2/s$]
+\end{description}
+
+\section{Introducción}
+Los túneles de viento son herramientas indispensables para el diseño y validación de componentes aeroespaciales. Para que los datos de fuerzas o presiones obtenidos en un ensayo sean válidos, es crítico conocer con precisión la velocidad del flujo en la cámara de pruebas. La calibración establece la relación entre el parámetro de control (frecuencia del motor) y la magnitud física (velocidad), permitiendo operar la instalación en condiciones predecibles y repetibles.
+
+\section{Objetivos de Aprendizaje}
+\begin{itemize}[label=-]
+    \item Comprender la metodología de calibración de instalaciones aerodinámicas.
+    \item Procesar datasets de velocidad instantánea para obtener estadísticas descriptivas ($\bar{U}$, $\sigma_U$).
+    \item Generar curvas de calibración mediante regresión lineal por mínimos cuadrados.
+    \item Evaluar la calidad del ajuste estadístico y predecir puntos de operación del túnel.
+    \item Aplicar el concepto de semejanza de Reynolds en un caso de estudio de escalamiento.
+\end{itemize}
+
+\section{Fundamento Teórico}
+
+\subsection{Arquitectura del Túnel de Viento}
+Un túnel de viento de circuito abierto tipo Eiffel consta de una cámara de aquietamiento, una contracción para uniformizar el flujo, la sección de pruebas, y un difusor acoplado a un ventilador movido por un motor AC controlado por frecuencia.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Cámara de aquietamiento
+        \draw[thick] (0,0) -- (2,0) -- (2,3) -- (0,3) -- cycle;
+        \node at (1,1.5) [font=\tiny, text width=1.2cm, align=center] {Cámara de Aquietamiento};
+        
+        % Contracción
+        \draw[thick] (2,3) -- (4,2.2);
+        \draw[thick] (2,0) -- (4,0.8);
+        
+        % Sección de Pruebas
+        \draw[thick] (4,2.2) -- (7,2.2) -- (7,0.8) -- (4,0.8) -- cycle;
+        \node at (5.5,1.5) [font=\tiny] {Pruebas};
+        
+        % Difusor
+        \draw[thick] (7,2.2) -- (9,3);
+        \draw[thick] (7,0.8) -- (9,0);
+        
+        % Ventilador
+        \draw[thick, fill=gray!20] (9.2,0.2) rectangle (10,2.8);
+        \node at (9.6,1.5) [rotate=90, font=\tiny] {Motor/Vent.};
+        
+        % Flujo
+        \draw[blue, ->] (-1,1.5) -- (0.5,1.5);
+        \node at (-1.5,1.5) {Aire};
+    \end{tikzpicture}
+    \caption{Componentes principales de un túnel de viento subsónico.}
+\end{figure}
+
+\subsection{Anemometría Láser Doppler (LDA)}
+La técnica LDA utiliza el efecto Doppler en luz dispersada por partículas trazadoras. La velocidad $U$ es proporcional a la frecuencia Doppler $f_D$ detectada:
+\begin{equation}
+    U = f_D \cdot \delta_f, \quad \delta_f = \frac{\lambda}{2\sin(\kappa)}
+\end{equation}
+Al ser no intrusiva, es el patrón de referencia ideal para calibrar otros instrumentos como tubos de Pitot.
+
+\subsection{Regresión Lineal y Coeficiente $R^2$}
+Para la calibración, buscamos el modelo:
+\begin{equation}
+    \bar{U} = m \cdot f_{motor} + b
+\end{equation}
+El coeficiente $R^2$ indica qué porcentaje de la variabilidad de la velocidad es explicada por la frecuencia del motor. En un túnel de alta calidad, $R^2 > 0.99$.
+
+\section{Diseño y Metodología de Análisis}
+
+\subsection{Metodología de Procesamiento de Datos}
+El estudiante debe seguir el flujo descrito para transformar los archivos de texto en una curva de ingeniería.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[node distance=1.8cm, auto]
+        \node (load) [startstop] {Carga de Archivos .txt (Frecuencias)};
+        \node (clean) [process, below=of load] {Limpieza y Valor Absoluto $|U|$};
+        \node (stats) [process, below=of clean] {Cálculo de $\bar{U}$ y $\sigma_U$ por frecuencia};
+        \node (regr) [process, below=of stats] {Regresión Lineal: $U = mf + b$};
+        \node (valid) [decision, below=of regr, yshift=-0.2cm] {¿$R^2 \ge 0.98$?};
+        \node (rep) [startstop, right=of valid, xshift=2cm] {Generación de Reporte AIAA};
+        
+        \draw [arrow] (load) -- (clean);
+        \draw [arrow] (clean) -- (stats);
+        \draw [arrow] (stats) -- (regr);
+        \draw [arrow] (regr) -- (valid);
+        \draw [arrow] (valid) -- node[anchor=south] {Sí} (rep);
+        \draw [arrow] (valid.west) -- ++(-1,0) |- node[anchor=east, pos=0.25] {No} (regr.west);
+    \end{tikzpicture}
+    \caption{Proceso de calibración y validación estadística.}
+\end{figure}
+
+\subsection{Análisis de Incertidumbre y Errores}
+Se debe considerar que la frecuencia del motor es una variable controlada, pero la velocidad medida posee una incertidumbre asociada al muestreo aleatorio de las partículas. El error estándar del promedio se define como $SE = \sigma_U / \sqrt{N}$.
+
+\newpage
+\section{Casos de Estudio y Datasets}
+
+\subsection{Dataset de Velocidades LDA}
+Se proporcionan archivos con mediciones a las siguientes frecuencias: 5, 10, 15, 20, 25, 35, 45 y 55 Hz. Nótese que para 35 Hz se disponen de múltiples archivos para evaluar la estabilidad temporal.
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        Frecuencia [Hz] & $\bar{U}$ [m/s] & $\sigma_U$ [m/s] & $I_{turb}$ [\%] & Obs. \\
+        \midrule
+        5  &  &  &  &  \\
+        15 &  &  &  &  \\
+        35 (Archivo 1) &  &  &  &  \\
+        35 (Archivo 2) &  &  &  &  \\
+        55 &  &  &  &  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Tabla de registro para el procesamiento de datos.}
+\end{table}
+
+\subsection{Aplicación Práctica: Semejanza de Reynolds}
+Un automóvil real ($L=4.5$ m) viaja a 30 m/s. Se desea ensayar un modelo a escala 1:10 en el túnel.
+\begin{enumerate}
+    \item Determine la velocidad $U_{tunel}$ requerida para igualar el número de Reynolds.
+    \item Utilizando su ecuación de calibración, calcule la frecuencia $f_{motor}$ necesaria.
+\end{enumerate}
+
+\section{Actividades a Realizar}
+\begin{enumerate}
+    \item Cálculo Estadístico: Procese cada dataset para obtener el promedio de la magnitud de velocidad.
+    \item Gráfica de Calibración: Genere una gráfica de dispersión incluyendo la línea de tendencia, la ecuación y el $R^2$.
+    \item Análisis de Turbulencia: Calcule la intensidad de turbulencia ($T.I. = \sigma_U / \bar{U}$) y discuta si el túnel es apto para estudios de capa límite.
+    \item Verificación Cruzada: Compare el valor de $b$ (ordenada al origen) con el comportamiento físico esperado a frecuencia cero.
+\end{enumerate}
+
+\section{Preguntas de Discusión}
+\begin{enumerate}
+    \item ¿Por qué la velocidad media calculada a partir de LDA suele ser más confiable que una medición puntual con un tubo de Pitot en flujos con alta turbulencia?
+    \item Si la temperatura del laboratorio cambia drásticamente entre el día y la noche, ¿cómo se ve afectada la relación frecuencia-velocidad? Considere cambios en la densidad del aire.
+    \item Explique el significado de un coeficiente $R^2$ bajo en este contexto y mencione dos factores mecánicos que podrían causarlo.
+\end{enumerate}
+
+\section{Lineamientos del Reporte (AIAA)}
+El reporte debe incluir el análisis de regresión detallado, la justificación de la exclusión de datos atípicos (outliers) y la resolución completa del caso de estudio de Reynolds.
+
+\newpage
+\appendix
+\section{Código de Apoyo (Python/Pandas)}
+Este script facilita la lectura masiva de archivos de calibración y el cálculo de parámetros de ajuste.
+
+\begin{lstlisting}
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+def procesar_calibracion(archivos, frecuencias):
+    medias = []
+    for f in archivos:
+        df = pd.read_csv(f, skiprows=5, delimiter='\t')
+        v_abs = np.abs(df['LDA1 [m/s]'])
+        medias.append(v_abs.mean())
+    
+    slope, intercept, r_val, p_val, std_err = stats.linregress(frecuencias, medias)
+    return slope, intercept, r_val**2
+
+# Ejemplo de uso
+# m, b, r2 = procesar_calibracion(['5Hz.txt', '10Hz.txt'], [5, 10])
+\end{lstlisting}
+
+\section{Referencias}
+\begin{enumerate}
+    \item Barlow, J. B., Rae, W. H., \& Pope, A. (1999). Low-Speed Wind Tunnel Testing.
+    \item Durst, F. et al. (1981). Principles and Practice of Laser-Doppler Anemometry.
+\end{enumerate}
+
+\end{document}
