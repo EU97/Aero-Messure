@@ -16,3 +16,27 @@ Practicas/PDF
 !Practicas/P**/data/.gitkeep
 !Practicas/P**/data/README.md
 !Practicas/P08_Productos_Combustion/data/synthetic_example_combustion.csv
+.out
+
+## Core LaTeX auxiliary files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+
+## Bibliography files
+*.bbl
+*.blg
+
+## Document-specific lists
+*.lof
+*.lot
+*.out
+*.toc
+*.bcf
+
+
+## Build directories (if you use tools like latexmk)
+build/
+out/
