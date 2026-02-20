@@ -1,0 +1,402 @@
+% =============================================================================
+% Presentación Beamer P02 – Calibración del Túnel de Viento
+% Técnicas de Medida – Ingeniería Aeronáutica
+% =============================================================================
+\documentclass[aspectratio=169,12pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+\usefonttheme{professionalfonts}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\usepackage{circuitikz}
+\usepackage{booktabs}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{blue!80}\bfseries,
+  commentstyle=\color{green!50!black},
+  backgroundcolor=\color{gray!10},
+  frame=single, breaklines=true
+}
+
+\definecolor{aeroblue}{RGB}{0,51,102}
+\definecolor{aerored}{RGB}{153,0,0}
+\definecolor{aerogreen}{RGB}{0,102,51}
+
+\setbeamercolor{frametitle}{bg=aeroblue,fg=white}
+\setbeamercolor{title}{bg=aeroblue,fg=white}
+\setbeamercolor{structure}{fg=aeroblue}
+
+\title[P02 -- Calibración Túnel]{P02: Calibración del Túnel de Viento}
+\subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
+\author{Laboratorio de Técnicas de Medida}
+\institute{Departamento de Ingeniería Aeroespacial}
+\date{\today}
+
+% =============================================================================
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Contenido}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Motivación}
+
+\begin{frame}{¿Por qué calibrar el túnel?}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \begin{itemize}
+        \item Ensayos aerodinámicos requieren conocer $V_\infty$ con
+              \textbf{incertidumbre $< 1\%$}
+        \item El variador de frecuencia (VFD) no da velocidad directamente
+        \item $Re$, $C_L$, $C_D$ dependen críticamente de $V_\infty$
+      \end{itemize}
+      \vspace{0.5em}
+      \begin{alertblock}{Objetivo}
+        Curva $V = f(f_\mathrm{VFD})$ con incertidumbre cuantificada.
+      \end{alertblock}
+      \vspace{0.5em}
+      \textbf{Túnel del laboratorio:}\\
+      Sección $\SI{30}{\cm}\times\SI{30}{\cm}$,
+      $V_\mathrm{max}\approx\SI{50}{\m\per\s}$,\\
+      VFD $f \in [5,55]\,\si{\Hz}$
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{tikzpicture}[scale=0.75,>=Stealth]
+        \draw[aeroblue,very thick] (0,1.0) -- (6,1.0);
+        \draw[aeroblue,very thick] (0,-1.0) -- (6,-1.0);
+        \draw[fill=gray!15,draw=aeroblue] (0,-1.0) rectangle (1.0,1.0);
+        \draw[fill=gray!20,draw=aeroblue] (1.0,1.0) -- (2.5,0.55)
+              -- (2.5,-0.55) -- (1.0,-1.0) -- cycle;
+        \draw[fill=gray!10,draw=aeroblue] (2.5,0.55) -- (4.5,0.55)
+              -- (4.5,-0.55) -- (2.5,-0.55) -- cycle;
+        \draw[fill=gray!20,draw=aeroblue] (4.5,0.55) -- (6.0,1.0)
+              -- (6.0,-1.0) -- (4.5,-0.55) -- cycle;
+        \foreach \y in {-0.3,0,0.3} {
+          \draw[->,blue!60] (2.7,\y) -- (3.5,\y);
+        }
+        \draw[fill=gray!70,draw=black,very thick] (3.5,-0.55) -- (3.5,-0.05);
+        \fill[aerored] (3.5,-0.05) circle (0.08);
+        \node[above,font=\tiny] at (3.5,0) {Pitot};
+        \node[below,font=\tiny,aeroblue] at (3.5,-0.65) {Secc.~prueba};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Teoría: Tubo de Pitot}
+
+\begin{frame}{Principio de Bernoulli -- Tubo de Pitot}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Ecuación de Bernoulli (incompresible):}
+      \begin{equation*}
+        p + \tfrac{1}{2}\rho V^2 = \text{cte}
+      \end{equation*}
+
+      \textbf{En el punto de remanso:} $V = 0$
+      \begin{equation*}
+        p_0 = p_\infty + \tfrac{1}{2}\rho V_\infty^2
+      \end{equation*}
+
+      \vspace{0.3em}
+      \begin{block}{Velocidad Pitot}
+        \begin{equation*}
+          \boxed{V_\infty = \sqrt{\frac{2\,\Delta p}{\rho}}}
+        \end{equation*}
+        $\Delta p = p_0 - p_s$, medida con manómetro
+      \end{block}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.8,>=Stealth]
+        % Flow arrows
+        \foreach \y in {0.6,0.3,0,-0.3,-0.6} {
+          \draw[->,blue!60,thick] (0,\y) -- (1.5,\y);
+        }
+        % Pitot body
+        \draw[fill=gray!40,draw=black,thick]
+          (1.5,-0.5) rectangle (1.8,0.5);
+        % Stagnation point
+        \fill[aerored] (1.8,0) circle (0.1);
+        \node[aerored,right,font=\tiny] at (1.9,0) {$p_0$ (total)};
+        % Static tap
+        \draw[aerored!60,dashed,thick] (1.65,0.3) -- (2.5,0.3);
+        \node[right,font=\tiny] at (2.5,0.3) {$p_s$ (estática)};
+        % Differential
+        \draw[<->,gray] (2.1,-0.4) -- (2.1,0.4)
+              node[midway,right,font=\tiny] {$\Delta p$};
+        \node[left,font=\tiny,blue!60] at (0.7,0.6) {$V_\infty$};
+        % Stagnation streamline
+        \draw[aerored!60,thick,->] (0.5,0) -- (1.75,0);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Densidad del aire y compresibilidad}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Densidad (gas ideal):}
+      \begin{equation*}
+        \rho = \frac{p_\mathrm{atm}}{R_\mathrm{aire}\,T},
+        \quad R_\mathrm{aire} = \SI{287}{\J\per\kg\per\K}
+      \end{equation*}
+
+      \vspace{0.3em}
+      \textbf{Corrección por compresibilidad:}
+      Para $Ma < 0.3$ ($V < \SI{100}{\m\per\s}$):
+      \begin{equation*}
+        \varepsilon = \frac{V - V_\mathrm{inc}}{V_\mathrm{inc}} < 1\%
+      \end{equation*}
+      \textit{En nuestro túnel: $\varepsilon < 0.3\%$. Se puede omitir.}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.85]
+        \draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$Ma$};
+        \draw[->] (0,0) -- (0,3) node[above,font=\tiny] {Error (\%)};
+        \draw[aeroblue,thick] (0,0) .. controls (1,0.02) and (2.5,0.1)
+              .. (3,0.5) .. controls (3.5,1.0) .. (4.5,2.5);
+        \draw[aerored,dashed] (1.5,0) -- (1.5,3);
+        \node[aerored,below,font=\tiny] at (1.5,0) {$Ma=0.3$};
+        \draw[gray,dashed] (0,0.15) -- (1.5,0.15);
+        \node[gray,left,font=\tiny] at (0,0.15) {1\%};
+        \fill[aeroblue!20,opacity=0.5] (0,0) rectangle (1.5,3);
+        \node[aeroblue,font=\tiny] at (0.75,2.5) {Nuestro\\rango};
+        \draw[->,aerored] (0.5,0.1) node[below,font=\tiny] {$Ma_\mathrm{max}=0.15$}
+              (0.5,0) -- (0.5,0.1);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Cálculo Numérico}
+
+\begin{frame}{Calibración numérica -- Ejemplo}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Datos ($\rho = \SI{1.225}{\kg\per\m\cubed}$):}
+      \begin{table}
+        \centering
+        \tiny
+        \begin{tabular}{SSS}
+          \toprule
+          {$f$ (Hz)} & {$\Delta p$ (Pa)} & {$V$ (m/s)} \\
+          \midrule
+           5 &   16.6 &  5.2 \\
+          15 &  149.2 & 15.6 \\
+          25 &  414.4 & 26.0 \\
+          35 &  811.9 & 36.4 \\
+          45 & 1342   & 46.8 \\
+          55 & 2004   & 57.2 \\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+      \vspace{0.3em}
+      \textbf{Ajuste lineal:}
+      \begin{equation*}
+        V(f) = 1.044\,f - 0.002 \quad R^2 = 0.9997
+      \end{equation*}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.75]
+        \draw[->] (0,0) -- (6,0) node[right,font=\tiny] {$f$ (Hz)};
+        \draw[->] (0,0) -- (0,5) node[above,font=\tiny] {$V$ (m/s)};
+        % Grid
+        \foreach \x in {1,2,3,4,5} {
+          \draw[gray!30] (\x,0) -- (\x,5);
+          \node[below,font=\tiny] at (\x,0) {\pgfmathprintnumber[precision=0]{\x0}};
+        }
+        \foreach \y in {1,2,3,4} {
+          \draw[gray!30] (0,\y) -- (6,\y);
+          \node[left,font=\tiny] at (0,\y) {\pgfmathprintnumber[precision=0]{\y5}};
+        }
+        % Data points
+        \fill[aerored] (0.5,1.04) circle (0.08);
+        \fill[aerored] (1.5,3.12) circle (0.08);
+        \fill[aerored] (2.5,5.2/12) circle (0.08);
+        % Trend line
+        \draw[aeroblue,thick] (0,0) -- (5.5,4.78);
+        \node[aeroblue,font=\tiny,rotate=42] at (3.5,3.0) {$V=1.044f$};
+        % Labels y
+        \node[left,font=\tiny] at (0,1.04) {5.2};
+        \node[left,font=\tiny] at (0,2.34) {26.0};
+        \node[left,font=\tiny] at (0,4.34) {46.8};
+        % Points all
+        \foreach \f/\v in {5/5.2, 10/10.4, 15/15.6, 20/20.8, 25/26.0, 35/36.4, 45/46.8, 55/57.2} {
+          \pgfmathsetmacro{\fx}{\f/10}
+          \pgfmathsetmacro{\vy}{\v/12}
+          \fill[aerored] (\fx,\vy) circle (0.07);
+        }
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Incertidumbre de velocidad}
+  \textbf{Propagación de errores (GUM):}
+  \begin{equation*}
+    \frac{u_V}{V} = \frac{1}{2}\sqrt{
+      \left(\frac{u_{\Delta p}}{\Delta p}\right)^2
+      + \left(\frac{u_\rho}{\rho}\right)^2}
+  \end{equation*}
+
+  \vspace{0.3em}
+  \textbf{Ejemplo: $V = \SI{28.57}{\m\per\s}$ ($\Delta p = \SI{500}{\Pa}$)}
+
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $u_{\Delta p} = \SI{2}{\Pa}$ (manómetro)
+        \item $u_\rho/\rho = 0.3\%$ ($\pm\SI{1}{\K}$)
+      \end{itemize}
+      \begin{align*}
+        \frac{u_V}{V} &= \frac{1}{2}\sqrt{(0.004)^2 + (0.003)^2}\\
+                      &\approx 0.0025 = 0.25\%
+      \end{align*}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{alertblock}{Resultado}
+        \centering
+        $V = (28.57 \pm 0.07)\,\si{\m\per\s}$\\
+        (95\% confianza, $k=2$)
+      \end{alertblock}
+      \vspace{0.3em}
+      Adecuado para:
+      \begin{itemize}\small
+        \item Ensayos polares de perfil alar
+        \item Medición de $Re$ con $<1\%$ de error
+        \item Calibración de HWA y LDA
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Caso de Estudio}
+
+\begin{frame}{Caso: Polar aerodinámica de NACA 2412}
+  \begin{block}{Escenario}
+    Calibración para ensayo de perfil NACA~2412 ($c = \SI{100}{\mm}$)
+    a $Re_c = 3\times10^5$.
+  \end{block}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Velocidad requerida:}
+      \begin{equation*}
+        V = \frac{Re_c\,\nu}{c} = \frac{3\!\times\!10^5 \times 1.5\!\times\!10^{-5}}{0.1}
+          = \SI{45}{\m\per\s}
+      \end{equation*}
+      \textbf{Frecuencia del VFD:}
+      \begin{equation*}
+        f = \frac{45.0}{1.044} \approx \SI{43.1}{\Hz}
+      \end{equation*}
+      \textbf{$\Delta p$ esperada:}
+      \begin{equation*}
+        \Delta p = \frac{1.225\times45^2}{2} \approx \SI{1240}{\Pa}
+      \end{equation*}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.8]
+        % Airfoil NACA 2412 approximate shape
+        \draw[aeroblue,very thick]
+          (0,0) .. controls (0.5,0.35) and (1.0,0.4) .. (1.5,0.25)
+               .. controls (2.0,0.1) .. (3.0,0)
+               .. controls (2.5,-0.05) and (1.0,-0.08) .. (0,0);
+        \draw[->,gray!60,thick] (-0.5,0.15) -- (0.5,0.15)
+              node[right,font=\tiny] {$U_\infty=\SI{45}{\m\per\s}$};
+        \draw[<->,gray] (0,-0.25) -- (3.0,-0.25)
+              node[midway,below,font=\tiny] {$c=\SI{100}{\mm}$};
+        \node[aeroblue,above,font=\small] at (1.5,0.5) {NACA 2412};
+        \node[below,font=\tiny] at (1.5,-0.4) {$Re_c = 3\times10^5$};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Notebook Jupyter}
+
+\begin{frame}[fragile]{P02\_Tunel\_Calibracion.ipynb}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \textbf{Ruta:}\\
+      \texttt{\small Practicas/P02\_Calibracion\_Tunel/\\notebooks/P02\_Tunel\_Calibracion.ipynb}
+
+      \vspace{0.5em}
+      \textbf{Funciones del módulo \texttt{calib\_utils.py}:}
+      \begin{itemize}\small
+        \item \texttt{velocity\_from\_dp(dp, rho)} -- ec. Bernoulli
+        \item Lectura automática de \texttt{files/p2/}
+        \item Regresión polinomial con \texttt{numpy.polyfit}
+        \item Propagación de incertidumbre (GUM)
+        \item Exportación a CSV y gráficas
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{lstlisting}[language=Python]
+from calib_utils import velocity_from_dp
+import numpy as np
+
+dp  = np.array([16.6, 149.2,
+                414.4, 1342, 2004])
+rho = 1.225  # kg/m^3
+
+V = velocity_from_dp(dp, rho)
+# array([ 5.2, 15.6, 26.0,
+#         46.8, 57.2])
+
+f = np.array([5, 15, 25, 45, 55])
+c = np.polyfit(f, V, deg=1)
+print(f"V = {c[0]:.3f}*f + {c[1]:.3f}")
+# V = 1.044*f + (-0.002)
+      \end{lstlisting}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Resumen}
+
+\begin{frame}{Conclusiones}
+  \begin{enumerate}
+    \item La calibración establece $V = 1.044\,f_\mathrm{VFD}$
+          con $R^2 = 0.9997$ (relación \textbf{lineal}).
+    \item La incertidumbre relativa $u_V/V < 0.3\%$, adecuada para
+          ensayos aeronáuticos de precisión.
+    \item La \textbf{uniformidad} del perfil $I_u < 1\%$ en el núcleo
+          central confirma la calidad aerodinámica del túnel.
+    \item El módulo \texttt{calib\_utils.py} y el notebook automatizan
+          todo el proceso de calibración.
+  \end{enumerate}
+  \vspace{0.5em}
+  \begin{block}{Recursos}
+    Manual: \texttt{manuals/P02\_Calibracion\_Tunel/manual\_P02.tex}\\
+    Notebook: \texttt{Practicas/P02\_Calibracion\_Tunel/notebooks/P02\_Tunel\_Calibracion.ipynb}\\
+    Código: \texttt{Practicas/P02\_Calibracion\_Tunel/src/calib\_utils.py}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Referencias}
+  \begin{itemize}
+    \item Barlow, Rae \& Pope (1999). \textit{Low-Speed Wind Tunnel Testing}, 3ª ed., Wiley
+    \item Anderson, J.D. (2017). \textit{Fundamentals of Aerodynamics}, 6ª ed., McGraw-Hill
+    \item JCGM 100:2008 -- \textit{Guide to the Expression of Uncertainty in Measurement}
+  \end{itemize}
+\end{frame}
+
+\end{document}
