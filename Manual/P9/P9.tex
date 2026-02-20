@@ -1,0 +1,257 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+% --- ESTILOS TIKZ ---
+\tikzset{
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20, font=\small},
+    process/.style={rectangle, minimum width=4.5cm, minimum height=1.5cm, text width=4.2cm, text centered, draw=black, fill=orange!15, font=\small},
+    decision/.style={diamond, aspect=2.2, minimum width=3.8cm, minimum height=1cm, text centered, draw=black, fill=green!15, font=\small},
+    arrow/.style={thick,->,>=stealth}
+}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \centering
+    {\LARGE Universidad Autónoma de Nuevo León}\\[0.5cm]
+    {\Large Facultad de Ingeniería Mecánica y Eléctrica}\\[2cm]
+    
+    {\Large Laboratorio de Técnicas de Medida en Aeronáutica}\\[1cm]
+    
+    {\Huge Práctica 9}\\[0.5cm]
+    {\Large Promedio Temporal y Estadística de Señales Fluctuantes}\\[2cm]
+    
+    Elaborado para el ciclo escolar:\\
+    2026\\[2cm]
+    
+    \vfill
+    
+    Resumen Ejecutivo\\
+    Esta práctica final aborda la importancia del método de promediado en el análisis de flujos turbulentos aeronáuticos. Se analizan datos de velocidad obtenidos por LDA, caracterizados por un muestreo aleatorio y no uniforme en el tiempo. El estudiante evaluará la convergencia de los datos comparando el promedio estadístico (aritmético) frente al promedio temporal (ponderado por $\Delta t$). El enfoque analítico se centra en cuantificar el sesgo estadístico y determinar la representatividad de las muestras en función de la tasa de llegada de partículas.
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% --- NOMENCLATURA ---
+\section*{Nomenclatura}
+\begin{description}
+    \item[$u_i$] Velocidad instantánea de la i-ésima partícula [m/s]
+    \item[$AT_i$] Tiempo absoluto de llegada (Absolute Time) [s]
+    \item[$\Delta t_i$] Intervalo de tiempo representativo para la muestra $i$ [s]
+    \item[$\bar{u}_{est}$] Promedio estadístico o de conjunto [m/s]
+    \item[$\bar{u}_{temp}$] Promedio temporal ponderado [m/s]
+    \item[$N$] Número total de mediciones válidas
+    \item[$T_{total}$] Duración total del ensayo [s]
+    \item[$Error_{rel}$] Error relativo entre métodos de promediado [\%]
+\end{description}
+
+\section{Introducción}
+En la ingeniería aeroespacial, el estudio de la turbulencia requiere la captura de fluctuaciones de alta frecuencia. Técnicas como la Anemometría Láser Doppler (LDA) proporcionan datos de velocidad de forma estocástica: solo se obtiene información cuando una partícula cruza el volumen de control. Dado que las partículas no llegan a intervalos regulares, una media aritmética simple puede inducir a errores significativos, especialmente si existen periodos de baja tasa de datos con velocidades extremas. Esta práctica capacita al estudiante para aplicar promedios ponderados por tiempo, garantizando la fidelidad de los modelos de flujo libre y estelas.
+
+\section{Objetivos de Aprendizaje}
+\begin{itemize}[label=-]
+    \item Comprender la diferencia matemática entre promedios de conjunto y promedios temporales para señales discretas.
+    \item Analizar la naturaleza aleatoria de los datos LDA y su impacto en la estadística de la señal.
+    \item Implementar algoritmos de cálculo diferencial de intervalos de tiempo ($\Delta t$) sobre series temporales.
+    \item Cuantificar el error relativo entre métodos de promediado para diversas condiciones de flujo.
+    \item Discutir la convergencia estadística en función de la duración del muestreo y el número de partículas.
+\end{itemize}
+
+\section{Fundamento Teórico}
+
+\subsection{El Desafío del Muestreo No Uniforme}
+En una señal capturada por HWA o presión, el muestreo es periódico ($\Delta t = constante$). En LDA, el muestreo depende de la concentración local de trazadores. Una partícula que tarda mucho tiempo en llegar después de la anterior "representa" el estado del flujo durante un intervalo mayor.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=1.2]
+        % Eje de tiempo
+        \draw[->, thick] (0,0) -- (8,0) node[right] {Tiempo ($AT$)};
+        
+        % Muestras LDA (Rayos verticales)
+        \foreach \x/\val in {0.5/1.2, 0.8/1.5, 3.0/0.8, 3.5/0.9, 7.0/1.3} {
+            \draw[blue, thick] (\x, 0) -- (\x, \val);
+            \draw[fill=blue] (\x, \val) circle (0.05);
+        }
+        
+        % Deltas de tiempo
+        \draw[<->, gray] (0.8, -0.5) -- (3.0, -0.5) node[midway, below] {$\Delta t_i$ grande};
+        \draw[<->, gray] (3.0, -0.8) -- (3.5, -0.8) node[midway, below] {$\Delta t_{i+1}$ pequeño};
+        
+        \node at (4, 2) [font=\scriptsize, text width=6cm, align=center] {La velocidad $u_i$ pondera más en el promedio temporal si $\Delta t_i$ es mayor.};
+    \end{tikzpicture}
+    \caption{Representación conceptual del muestreo estocástico en LDA.}
+\end{figure}
+
+\subsection{Definiciones de Promediado}
+El promedio estadístico ($\bar{u}_{est}$) trata a todas las partículas por igual:
+\begin{equation}
+    \bar{u}_{est} = \frac{1}{N} \sum_{i=1}^{N} u_i
+\end{equation}
+El promedio temporal ($\bar{u}_{temp}$) pondera cada velocidad por el tiempo transcurrido desde la muestra anterior:
+\begin{equation}
+    \bar{u}_{temp} = \frac{\sum_{i=1}^{N} u_i \cdot (AT_i - AT_{i-1})}{AT_N}
+\end{equation}
+Donde se asume $AT_0 = 0$ para el cálculo de la primera muestra.
+
+\section{Metodología de Análisis de Datos}
+
+\subsection{Algoritmo de Procesamiento Estadístico}
+El estudiante debe seguir el flujo lógico para transformar los archivos de validación de velocidad en parámetros de convergencia:
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[node distance=1.7cm, auto]
+        \node (input) [startstop] {Series Temporales LDA ($u_i, AT_i$)};
+        \node (clean) [process, below=of input] {Limpieza de Datos (Conversión ms a s)};
+        \node (dt) [process, below=of clean] {Cálculo de $\Delta t_i$ (Derivada temporal)};
+        \node (avg) [process, below=of dt] {Cálculo de $\bar{u}_{est}$ y $\bar{u}_{temp}$};
+        \node (err) [process, below=of avg] {Determinación de Error Relativo (\%)};
+        \node (rep) [startstop, right=of err, xshift=2cm] {Informe AIAA};
+        
+        \draw [arrow] (input) -- (clean);
+        \draw [arrow] (clean) -- (dt);
+        \draw [arrow] (dt) -- (avg);
+        \draw [arrow] (avg) -- (err);
+        \draw [arrow] (err) -- (rep);
+    \end{tikzpicture}
+    \caption{Flujo metodológico para el análisis comparativo de promedios.}
+\end{figure}
+
+\newpage
+\section{Casos de Estudio y Datasets}
+
+\subsection{Dataset de Velocidades LDA Fluctuantes}
+Se proporcionan archivos de texto con mediciones a diferentes frecuencias de ventilador. Se debe conservar el signo de la velocidad para los cálculos de la media.
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        Archivo & Frecuencia [Hz] & $N$ Muestras & $T_{total}$ [s] & Estado del Flujo \\
+        \midrule
+        5Hz.txt & 5 & ~2000 & ~10 & Baja Turbulencia \\
+        15Hz.txt & 15 & ~5000 & ~15 & Transicional \\
+        35Hz.txt & 35 & ~12000 & ~20 & Turbulento \\
+        55Hz.txt & 55 & ~25000 & ~30 & Alta Potencia \\
+        \bottomrule
+    \end{tabular}
+    \caption{Resumen de los conjuntos de datos proporcionados para el análisis.}
+\end{table}
+
+\section{Actividades a Realizar}
+\begin{enumerate}
+    \item Carga y Conversión: Utilice el script de Python para leer los archivos. Asegúrese de convertir el tiempo de milisegundos a segundos.
+    \item Cálculo de Intervalos: Determine el tiempo entre validaciones sucesivas. Verifique que la suma de todos los $\Delta t_i$ coincida con el tiempo absoluto de la última muestra ($AT_N$).
+    \item Análisis Comparativo: Calcule ambos promedios para todos los archivos. Complete la tabla de resultados del reporte.
+    \item Evaluación de Error: Determine el error relativo porcentual. Identifique en qué regímenes de flujo la diferencia entre métodos es más crítica.
+\end{enumerate}
+
+\section{Análisis de Resultados y Graficación}
+En el reporte AIAA se deben analizar las siguientes situaciones:
+\begin{enumerate}
+    \item Histograma de Tiempos de Llegada: Grafique la distribución de $\Delta t_i$. ¿Sigue una distribución de Poisson? Discuta qué implica esto para la aleatoriedad del sembrado de partículas.
+    \item Gráfica de Convergencia: Para el archivo de 35Hz, grafique el valor del promedio (acumulado) frente al número de muestras. Compare qué tan rápido estabiliza $\bar{u}_{est}$ frente a $\bar{u}_{temp}$.
+    \item Sensibilidad del Error: Analice la relación entre la turbulencia del flujo (estimada en prácticas anteriores) y el error relativo calculado. ¿Es el error mayor en flujos más fluctuantes?
+\end{enumerate}
+
+\section{Preguntas de Discusión Electrónica y Estadística}
+\begin{enumerate}
+    \item ¿Por qué una mayor concentración de partículas (seeding) reduce la diferencia entre el promedio estadístico y el temporal?
+    \item En la instrumentación LDA, ¿cómo afecta el ruido electrónico en el fotodetector a la precisión del tiempo absoluto de llegada ($AT_i$)?
+    \item Si se deseara calcular la "Intensidad de Turbulencia", ¿qué impacto tendría usar la media estadística errónea como valor de referencia para el cálculo de las fluctuaciones $u'$?
+    \item Explique el concepto de "Sesgo de Velocidad" (Velocity Bias) en LDA: ¿Por qué existe una mayor probabilidad de capturar partículas rápidas que lentas en un volumen de control fijo?
+\end{enumerate}
+
+\section{Lineamientos del Reporte (AIAA)}
+El informe debe presentar la tabla comparativa completa para todas las frecuencias. Se debe incluir una interpretación profunda sobre por qué el promedio temporal se considera el "valor real" de referencia y qué consecuencias tendría en el diseño de un perfil alar ignorar este sesgo estadístico en las pruebas de túnel de viento.
+
+\newpage
+\appendix
+\section{Apéndice: Script de Análisis de Promedios (\texttt{analizador\_promedios.py})}
+Script para automatizar la limpieza de datos LDA y el cálculo comparativo de medias.
+
+\begin{lstlisting}[language=Python]
+import pandas as pd
+import numpy as np
+import os
+
+def calcular_promedios_lda(filepath):
+    # 1. Carga de datos saltando cabeceras
+    data = pd.read_csv(filepath, skiprows=5, delimiter='\t')
+    
+    # 2. Extraccion de columnas (Tiempo en s, Velocidad en m/s)
+    t_abs_s = pd.to_numeric(data['AT [ms]'], errors='coerce') / 1000.0
+    u_inst = pd.to_numeric(data['LDA1 [m/s]'], errors='coerce')
+    
+    # 3. Limpieza de NaNs
+    valid = t_abs_s.notna() & u_inst.notna()
+    t = t_abs_s[valid].values
+    u = u_inst[valid].values
+    
+    # 4. Calculo de Delta T (dt_i = t_i - t_{i-1}, con t_0 = 0)
+    dt = np.diff(t, prepend=0)
+    
+    # 5. Promedio Estadistico
+    u_est = np.mean(u)
+    
+    # 6. Promedio Temporal (Suma ponderada)
+    u_temp = np.sum(u * dt) / t[-1]
+    
+    # 7. Error Relativo
+    err = np.abs((u_temp - u_est) / u_temp) * 100
+    
+    return len(u), t[-1], u_est, u_temp, err
+
+# Ejemplo de uso:
+# n, t_total, est, temp, error = calcular_promedios_lda('35Hz.txt')
+\end{lstlisting}
+
+\section{Referencias}
+\begin{enumerate}
+    \item Bendat, J. S., \& Piersol, A. G. (2010). Random Data: Analysis and Measurement Procedures. John Wiley \& Sons.
+    \item Albrecht, H.-E. et al. (2003). Laser Doppler and Phase Doppler Measurement Techniques. Springer-Verlag.
+    \item Durst, F. et al. (1981). Principles and Practice of Laser-Doppler Anemometry. Academic Press.
+\end{enumerate}
+
+\end{document}
