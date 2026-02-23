@@ -1,0 +1,31 @@
+\frametitle{Automatización con Python}
+\begin{columns}
+    \begin{column}{0.55\textwidth}
+      \begin{block}{Contenido del Repositorio}
+        \texttt{Practicas/P01\_Proteccion\_Laser/}
+        \begin{itemize}
+          \item \texttt{src/P01\_Proteccion\_Laser.py}
+          \item \texttt{notebooks/P01\_Proteccion\_Laser.ipynb}
+          \item \texttt{data/epo\_lenses.csv}
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{exampleblock}{Funciones}
+        \begin{itemize}
+          \item \texttt{area\_cm2\_from...()}
+          \item \texttt{h0\_exposure()}
+          \item \texttt{od\_required()}
+          \item \texttt{evaluate\_against\_lenses()}
+          \item \texttt{evaluate\_and\_plot()}
+        \end{itemize}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3cm}
+  \begin{lstlisting}[language=Python]
+A = area_cm2_from_diameter_mm(5.0)  # 0.1963 cm^2
+H0 = 0.2 / A                       # 1.02 J/cm^2
+print(od_required(H0, 5e-7))       # 6.31
+  \end{lstlisting}
