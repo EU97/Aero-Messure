@@ -1,0 +1,622 @@
+% =============================================================================
+% Manual P02 – Calibración del Túnel de Viento
+% Técnicas de Medida – Ingeniería Aeronáutica
+% =============================================================================
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}, group-separator={.}}
+\usepackage{graphicx,xcolor,float,caption,subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
+                decorations.markings,patterns,fit,backgrounds,decorations.pathmorphing}
+\usepackage{circuitikz}
+\usepackage{booktabs,multirow,array}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  backgroundcolor=\color{gray!10},
+  frame=single, breaklines=true,
+  numbers=left, numberstyle=\tiny\color{gray}
+}
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,
+            urlcolor=blue!50!black]{hyperref}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references_P02.bib}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Técnicas de Medida -- Ingeniería Aeronáutica}
+\fancyhead[R]{\small P02: Calibración del Túnel de Viento}
+\fancyfoot[C]{\thepage}
+
+\definecolor{aeroblue}{RGB}{0,51,102}
+\definecolor{aerored}{RGB}{153,0,0}
+\definecolor{aerogreen}{RGB}{0,102,51}
+
+% =============================================================================
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+  {\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
+  {\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA EN INGENIERÍA AERONÁUTICA}\\[0.3cm]
+  {\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
+  {\huge\bfseries P02 -- Calibración del\\[0.3cm]Túnel de Viento}\\[1cm]
+  {\large Manual de Laboratorio}\\[0.5cm]
+  {\large\itshape Ingeniería Aeronáutica}\\[2cm]
+  \begin{tikzpicture}[scale=0.9,>=Stealth]
+    % Wind tunnel schematic
+    \draw[fill=gray!15,draw=aeroblue,very thick]
+      (0,0.8) -- (1.5,0.8) -- (1.5,0.2) -- (0,0.2) -- cycle; % settling
+    \draw[fill=gray!20,draw=aeroblue,very thick]
+      (1.5,0.8) -- (3.5,0.55) -- (3.5,0.45) -- (1.5,0.2) -- cycle; % contraction
+    \draw[fill=gray!10,draw=aeroblue,very thick]
+      (3.5,0.55) -- (6.5,0.55) -- (6.5,0.45) -- (3.5,0.45) -- cycle; % test section
+    \draw[fill=gray!20,draw=aeroblue,very thick]
+      (6.5,0.55) -- (8.5,0.8) -- (8.5,0.2) -- (6.5,0.45) -- cycle; % diffuser
+    % Flow arrows
+    \foreach \y in {0.3,0.4,0.5,0.6,0.7} {
+      \draw[->,blue!60,thick] (3.6,\y) -- (4.4,\y);
+    }
+    % Pitot tube
+    \draw[fill=gray!60,draw=black,very thick] (5.0,0.8) -- (5.0,0.57);
+    \draw[fill=aerored!80,draw=aerored,thick] (5.0,0.57) circle (0.04);
+    \node[above,font=\small] at (5.0,0.82) {Pitot};
+    % Labels
+    \node[below,font=\small,aeroblue] at (0.75,0.1) {Cámara};
+    \node[below,font=\small,aeroblue] at (2.5,0.0) {Contracción};
+    \node[below,font=\small,aeroblue] at (5.0,0.35) {Sección de prueba};
+    \node[below,font=\small,aeroblue] at (7.5,0.1) {Difusor};
+    \draw[<->,gray] (3.5,-0.1) -- (6.5,-0.1) node[midway,below,font=\tiny] {$L_t$};
+  \end{tikzpicture}\\[1.5cm]
+  {\large\textbf{Departamento de Ingeniería Aeroespacial}}\\[0.2cm]
+  {\normalsize Laboratorio de Técnicas de Medida}\\[0.5cm]
+  {\normalsize \today}
+  \vfill
+  {\color{aeroblue}\rule{\linewidth}{2pt}}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% =============================================================================
+\section{Introducción}
+\label{sec:intro}
+
+El túnel de viento es el instrumento central de la experimentación aerodinámica.
+Antes de realizar cualquier ensayo cuantitativo --- ya sea sobre perfiles alares,
+cuerpos romos, superficies de control o geometrías de motor --- es imprescindible
+conocer con precisión la velocidad del flujo en la sección de prueba en función
+de los parámetros de control del túnel (frecuencia del ventilador, apertura de
+compuertas, etc.) \cite{barlow1999}.
+
+La \textbf{calibración} establece la curva $V = f(\text{RPM})$ o
+$V = f(\Delta p_\mathrm{manómetro})$ y cuantifica la uniformidad del perfil de
+velocidades en la sección de prueba.  Una calibración rigurosa es crítica para:
+\begin{itemize}
+  \item Calcular números adimensionales (Reynolds $Re$, Mach $Ma$) con la
+        incertidumbre requerida.
+  \item Garantizar reproducibilidad entre sesiones de ensayo.
+  \item Aplicar correcciones por solidez de maquetas.
+\end{itemize}
+
+\subsection{El túnel de viento del laboratorio}
+
+El laboratorio dispone de un túnel de viento de circuito abierto de baja
+velocidad con las siguientes características nominales:
+
+\begin{table}[H]
+  \centering
+  \caption{Características del túnel de viento del laboratorio.}
+  \label{tab:tunel}
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \midrule
+    Tipo                     & Circuito abierto, flujo inductor \\
+    Sección de prueba        & \SI{30}{\cm} $\times$ \SI{30}{\cm} \\
+    Velocidad máxima         & $\approx\SI{50}{\metre\per\second}$ \\
+    Contracción              & $6{:}1$ \\
+    Motor                    & Trifásico, variador de frecuencia 5--55 Hz \\
+    Instrumentación estándar & Tubo de Pitot-estático, manómetro diferencial \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =============================================================================
+\section{Objetivos}
+\label{sec:objetivos}
+
+\begin{enumerate}
+  \item Obtener la curva de calibración $V = f(f_\mathrm{VFD})$ para el rango
+        de frecuencias del variador de frecuencia (\SIrange{5}{55}{\Hz}).
+  \item Cuantificar la incertidumbre de la velocidad medida incluyendo
+        contribuciones del manómetro, alineación y variaciones de densidad.
+  \item Verificar la uniformidad del perfil de velocidades en la sección de
+        prueba.
+  \item Familiarizarse con el manejo del tubo de Pitot-estático y los sistemas
+        de adquisición de datos.
+  \item Utilizar el notebook Python \texttt{P02\_Tunel\_Calibracion.ipynb} para
+        el análisis automatizado.
+\end{enumerate}
+
+% =============================================================================
+\section{Fundamento Teórico}
+\label{sec:teoria}
+
+\subsection{Principio de Bernoulli y tubo de Pitot}
+
+Para un flujo incompresible, estacionario e invíscido a lo largo de una línea
+de corriente, el teorema de Bernoulli establece:
+\begin{equation}
+  p + \tfrac{1}{2}\rho V^2 + \rho g z = \text{cte}
+  \label{eq:bernoulli}
+\end{equation}
+
+En el tubo de Pitot-estático, la toma total (presión de remanso) y la toma
+estática están separadas sobre el mismo cuerpo.  Evaluando entre el punto de
+remanso (subíndice 0) y el flujo libre (subíndice $\infty$):
+\begin{equation}
+  p_0 = p_\infty + \tfrac{1}{2}\rho V_\infty^2
+  \label{eq:pitot_bernoulli}
+\end{equation}
+
+Despejando la velocidad:
+\begin{equation}
+  \boxed{V_\infty = \sqrt{\frac{2\,\Delta p}{\rho}}}
+  \label{eq:V_pitot}
+\end{equation}
+
+donde $\Delta p = p_0 - p_\infty$ es la diferencia de presión medida por el
+manómetro diferencial.
+
+\subsection{Densidad del aire}
+
+La densidad del aire se calcula a partir de la ley de los gases ideales:
+\begin{equation}
+  \rho = \frac{p_\mathrm{atm}}{R_\mathrm{aire}\,T}
+  \label{eq:rho_ideal}
+\end{equation}
+
+con $R_\mathrm{aire} = \SI{287.058}{\joule\per\kilogram\per\kelvin}$
+y $T$ en kelvin.
+
+\subsection{Número de Reynolds}
+
+\begin{equation}
+  Re = \frac{V L}{\nu} = \frac{\rho V L}{\mu}
+  \label{eq:Reynolds}
+\end{equation}
+
+donde $L$ es la cuerda del modelo y $\nu = \mu/\rho$ la viscosidad cinemática
+del aire ($\nu \approx \SI{1.5e-5}{\metre\squared\per\second}$ a
+\SI{20}{\degreeCelsius}).
+
+\subsection{Corrección por compresibilidad}
+
+Para $V > \SI{0.3}{Ma}$ (aprox.\ $>\SI{100}{\metre\per\second}$ a nivel del
+mar) la ecuación~\eqref{eq:V_pitot} introduce error; se usa la expresión
+isentrópica:
+\begin{equation}
+  V = \sqrt{\frac{2\gamma}{\gamma-1}\frac{p_\infty}{\rho}
+      \left[\left(\frac{p_0}{p_\infty}\right)^{(\gamma-1)/\gamma} - 1\right]}
+  \label{eq:V_compresible}
+\end{equation}
+
+con $\gamma = 1.4$ para aire diatómico.  En el túnel de laboratorio
+($V_\mathrm{max} \approx \SI{50}{\metre\per\second} \approx 0.15\,Ma$) la
+corrección por compresibilidad es inferior al \SI{1}{\percent} y puede omitirse.
+
+\subsection{Diagrama del sistema de medida}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[>=Stealth, scale=1.0]
+    % Tunnel walls
+    \draw[aeroblue,very thick] (0,1.5) -- (8,1.5);
+    \draw[aeroblue,very thick] (0,-1.5) -- (8,-1.5);
+    % Flow direction
+    \foreach \y in {-1.0,-0.5,0,0.5,1.0} {
+      \draw[->,blue!50] (0.3,\y) -- (1.5,\y);
+    }
+    \node[blue!60] at (0.9,0) {\small $U_\infty$};
+    % Pitot tube (vertical, with stem)
+    \draw[fill=gray!70,draw=black,very thick] (4.0,-1.5) -- (4.0,-0.3);
+    \draw[fill=gray!50,draw=black,thick] (3.85,-0.3) -- (3.85,0.4)
+                                          -- (4.15,0.4) -- (4.15,-0.3) -- cycle;
+    % Pitot nose
+    \draw[fill=aerored!80,draw=aerored,thick] (4.0,0.4) ellipse (0.15 and 0.06);
+    \node[right,font=\small] at (4.25,0.15) {Toma total $p_0$};
+    % Static taps
+    \draw[aerored!60,dashed] (3.85,0.0) -- (3.2,0.0);
+    \node[left,font=\small] at (3.2,0.0) {Toma estática $p_s$};
+    % Tubing to manometer
+    \draw[aerored,thick] (4.0,-1.5) -- (4.0,-2.0) -- (6.5,-2.0);
+    \draw[aerored!60,thick] (3.3,-0.05) -- (3.3,-2.0) -- (5.5,-2.0);
+    % Manometer (U-tube representation)
+    \begin{scope}[shift={(5.5,-2.5)}]
+      \draw[fill=blue!20,draw=black] (0,-0.4) -- (0,0.3) -- (0.15,0.3)
+            -- (0.15,-0.1) -- (0.85,-0.1) -- (0.85,0.5) -- (1.0,0.5)
+            -- (1.0,-0.4) -- cycle;
+      \node[below,font=\small] at (0.5,-0.4) {Manómetro $\Delta p$};
+      % Scale
+      \draw[<->,gray,thin] (-0.2,-0.1) -- (-0.2,0.5)
+            node[midway,left,font=\tiny] {$h$};
+    \end{scope}
+    % Pressure differential label
+    \node[aerored,font=\small] at (5.8,-1.7)
+          {$\Delta p = \rho_\mathrm{liq} g h$};
+    % Data acquisition
+    \draw[gray,thick,->] (6.5,-2.5) -- (7.5,-2.5)
+          node[right,font=\small] {DAQ / PC};
+    % Labels
+    \node[above,aeroblue,font=\small] at (1.0,1.6) {Sección de prueba};
+    \draw[<->,gray,thin] (0,1.7) -- (8,1.7) node[midway,above,font=\tiny] {$L_t$};
+  \end{tikzpicture}
+  \caption{Diagrama esquemático del sistema de medida Pitot-estático en el
+           túnel de viento. La diferencia de presión $\Delta p$ se mide con un
+           manómetro diferencial (inclinado o de columna de líquido).}
+  \label{fig:pitot_diagram}
+\end{figure}
+
+\subsection{Sistema de adquisición -- esquema eléctrico}
+
+El transductor de presión diferencial convierte $\Delta p$ en una señal de
+tensión que es adquirida por una tarjeta DAQ.
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.9, transform shape]
+    % Pressure transducer
+    \draw[fill=gray!20] (-2.5,-1) rectangle (2.5,1);
+    \node[font=\small\bfseries] at (0,0) {Transductor $\Delta p$};
+    \node[font=\tiny] at (0,-0.5) {$V_{out} = k\cdot\Delta p + V_0$};
+    % Output leads
+    \draw (2.5,0.3) -- (3.5,0.3) to[R,l=$R_s$] (5.5,0.3) -- (6.5,0.3);
+    \draw (2.5,-0.3) -- (3.5,-0.3) -- (5.5,-0.3) -- (6.5,-0.3);
+    % DAQ block
+    \draw[fill=aeroblue!20] (6.5,-1.2) rectangle (9.5,1.2);
+    \node[font=\small\bfseries,aeroblue] at (8.0,0.4) {DAQ};
+    \node[font=\tiny] at (8.0,-0.1) {NI USB-6009};
+    \node[font=\tiny] at (8.0,-0.5) {$f_s = \SI{1}{\kHz}$};
+    % Amplifier inside DAQ
+    \draw (6.5,0.3) -- (7.0,0.3);
+    \draw (6.5,-0.3) -- (7.0,-0.3);
+    \draw (7.0,0.6) -- (7.0,-0.6) -- (7.6,0) -- cycle; % op-amp triangle
+    \draw (7.6,0) -- (8.5,0);
+    % ADC
+    \draw[fill=gray!30] (8.5,-0.3) rectangle (9.3,0.3);
+    \node[font=\tiny] at (8.9,0) {ADC};
+    % Power supply for transducer
+    \draw (-2.5,0.3) -- (-3.5,0.3) to[battery1,l=$V_{cc}$] (-3.5,-0.3) -- (-2.5,-0.3);
+    % USB to PC
+    \draw[very thick,aeroblue,->] (9.5,0) -- (10.5,0) node[right,font=\small] {USB / PC};
+    % Labels
+    \node[above,font=\tiny] at (5.5,0.3) {$V_{out}$};
+    \draw[<->,gray,thin] (3.5,-0.8) -- (6.5,-0.8)
+          node[midway,below,font=\tiny] {\SIrange{0}{5}{\volt}};
+  \end{circuitikz}
+  \caption{Esquema de adquisición: el transductor diferencial de presión
+           convierte $\Delta p$ en voltaje (\SIrange{0}{5}{\volt}) que se
+           digitaliza con la tarjeta DAQ.}
+  \label{fig:daq_circuit}
+\end{figure}
+
+% =============================================================================
+\section{Incertidumbre de Medida}
+\label{sec:incertidumbre}
+
+\subsection{Propagación de errores en la velocidad}
+
+De ec.~\eqref{eq:V_pitot}, $V = \sqrt{2\Delta p/\rho}$, la incertidumbre
+combinada (método GUM) es:
+
+\begin{align}
+  u_V^2 &= \left(\frac{\partial V}{\partial \Delta p}\right)^2 u_{\Delta p}^2
+           + \left(\frac{\partial V}{\partial \rho}\right)^2 u_\rho^2 \\
+  &= \frac{1}{\rho\Delta p}\,u_{\Delta p}^2
+     + \frac{\Delta p}{\rho^3}\,u_\rho^2
+  \label{eq:uV}
+\end{align}
+
+En términos relativos:
+\begin{equation}
+  \frac{u_V}{V} = \frac{1}{2}\sqrt{
+    \left(\frac{u_{\Delta p}}{\Delta p}\right)^2
+    + \left(\frac{u_\rho}{\rho}\right)^2}
+  \label{eq:uV_relativa}
+\end{equation}
+
+\subsection{Ejemplo numérico de incertidumbre}
+
+Para $\Delta p = \SI{500}{\pascal}$, $\rho = \SI{1.225}{\kilogram\per\metre\cubed}$,
+$u_{\Delta p} = \SI{2}{\pascal}$ (resolución del manómetro), $u_\rho / \rho = 0.3\%$
+(variación de temperatura $\pm \SI{1}{\kelvin}$):
+
+\begin{align}
+  V &= \sqrt{\frac{2\times500}{1.225}} = \sqrt{816.3}
+     \approx \SI{28.57}{\metre\per\second} \\
+  \frac{u_V}{V} &= \frac{1}{2}\sqrt{\left(\frac{2}{500}\right)^2
+                   + (0.003)^2}
+                = \frac{1}{2}\sqrt{1.6\times10^{-5} + 9\times10^{-6}}
+                \approx 0.0016 \\
+  u_V &\approx 0.0016 \times 28.57 \approx \SI{0.046}{\metre\per\second}
+  \label{eq:uV_ejemplo}
+\end{align}
+
+La velocidad se reportaría como $V = (28.57 \pm 0.05)\,\si{\metre\per\second}$
+(\SI{95}{\percent} de confianza, k=2).
+
+% =============================================================================
+\section{Análisis de Regresión y Curva de Calibración}
+\label{sec:regresion}
+
+\subsection{Modelo de ajuste}
+
+Se ajusta la curva $V = f(f_\mathrm{VFD})$ con un polinomio de grado $n$:
+\begin{equation}
+  V(f) = \sum_{k=0}^{n} a_k\, f^k
+  \label{eq:poly_fit}
+\end{equation}
+
+El criterio de calidad del ajuste es el coeficiente de determinación:
+\begin{equation}
+  R^2 = 1 - \frac{\sum_i (V_i - \hat{V}_i)^2}
+                  {\sum_i (V_i - \bar{V})^2}
+  \label{eq:R2}
+\end{equation}
+
+Para la relación lineal del ventilador ($n=1$):
+$V = a_1 f + a_0$,
+con $a_1 \approx \SI{0.82}{\metre\per\second\per\Hz}$ (valor típico de laboratorio).
+
+\subsection{Ejemplo de calibración numérica}
+
+\begin{table}[H]
+  \centering
+  \caption{Datos de calibración representativos (valores típicos del laboratorio).}
+  \label{tab:calibracion}
+  \begin{tabular}{SSSSl}
+    \toprule
+    {$f$ (\si{\Hz})} & {$\Delta p$ (\si{\Pa})} & {$V$ (\si{\m\per\s})} &
+    {$Re \times 10^{-4}$} & \textbf{Notas} \\
+    \midrule
+     5 &  16.6 &  5.2 & 0.10 & Flujo muy lento \\
+    10 &  66.3 & 10.4 & 0.21 & \\
+    15 & 149.2 & 15.6 & 0.31 & \\
+    20 & 265.2 & 20.8 & 0.42 & \\
+    25 & 414.4 & 26.0 & 0.52 & \\
+    35 & 811.9 & 36.4 & 0.73 & Rango PIV \\
+    45 & 1342 & 46.8 & 0.94 & \\
+    55 & 2004 & 57.2 & 1.14 & Máxima velocidad \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Ajuste lineal para los datos de la Tabla~\ref{tab:calibracion}:
+\begin{align}
+  V(f) &= 1.04\,f - 0.0 \quad [\si{\metre\per\second}] \\
+  R^2 &= 0.9997
+  \label{eq:V_lineal}
+\end{align}
+
+% =============================================================================
+\section{Uniformidad del Perfil de Velocidades}
+\label{sec:uniformidad}
+
+La uniformidad se evalúa midiendo el perfil $V(y,z)$ en la sección de prueba
+a la velocidad nominal de calibración.  El índice de uniformidad:
+\begin{equation}
+  I_u = \frac{\max(V) - \min(V)}{\bar{V}} \times 100\%
+  \label{eq:uniformidad}
+\end{equation}
+
+Un túnel de buena calidad aerodinámica presenta $I_u < 1\%$ en la zona central
+(\SI{80}{\percent} del área de la sección).
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=1.2]
+    % Section frame
+    \draw[aeroblue,very thick] (0,0) rectangle (3,3);
+    \node[above,aeroblue] at (1.5,3.1) {\small Sección de prueba (30$\times$30 cm)};
+    % Velocity contours (simulated uniform profile)
+    \foreach \r/\col in {0.3/aeroblue!60, 0.6/aeroblue!40, 0.9/aeroblue!20,
+                          1.2/green!20} {
+      \draw[\col,dashed] (1.5,1.5) ellipse (\r cm and \r cm);
+    }
+    % Measurement points (9x9 grid)
+    \foreach \x in {0.375,0.75,...,2.625} {
+      \foreach \y in {0.375,0.75,...,2.625} {
+        \fill[gray!60] (\x,\y) circle (0.04);
+      }
+    }
+    % Highlighted uniform core
+    \draw[aerogreen,very thick,dashed] (0.6,0.6) rectangle (2.4,2.4);
+    \node[aerogreen,font=\tiny] at (1.5,1.5) {Núcleo\\uniforme};
+    % Legend
+    \fill[aeroblue!60] (3.3,2.7) circle (0.12);
+    \node[right,font=\tiny] at (3.45,2.7) {$V_\mathrm{max}$};
+    \fill[aeroblue!20] (3.3,2.3) circle (0.12);
+    \node[right,font=\tiny] at (3.45,2.3) {$V_\mathrm{min}$};
+    \fill[gray!60] (3.3,1.9) circle (0.06);
+    \node[right,font=\tiny] at (3.45,1.9) {Pto. medida};
+  \end{tikzpicture}
+  \caption{Malla de medida en la sección de prueba y curvas de isovelocidad
+           (valores esquemáticos).  La zona verde indica el núcleo uniforme
+           donde se realizan los ensayos.}
+  \label{fig:contour_section}
+\end{figure}
+
+% =============================================================================
+\section{Caso de Estudio: Calibración para Ensayo de Perfil Alar}
+\label{sec:caso_estudio}
+
+\subsection{Descripción del escenario}
+
+El túnel se calibra para realizar un ensayo de polar aerodinámica de un perfil
+NACA~2412 con cuerda $c = \SI{100}{\mm}$, a un número de Reynolds objetivo:
+\begin{equation}
+  Re_c = 3\times10^5
+  \label{eq:Re_objetivo}
+\end{equation}
+
+\subsection{Velocidad requerida}
+
+\begin{align}
+  V_\mathrm{req} &= \frac{Re_c\,\nu}{c}
+                  = \frac{3\times10^5 \times 1.5\times10^{-5}}{0.1}
+                  = \SI{45}{\metre\per\second}
+  \label{eq:V_requerida}
+\end{align}
+
+\subsection{Frecuencia del variador}
+
+De la curva de calibración ec.~\eqref{eq:V_lineal}:
+\begin{equation}
+  f = \frac{V - 0.0}{1.04} = \frac{45.0}{1.04} \approx \SI{43.3}{\Hz}
+  \label{eq:frecuencia}
+\end{equation}
+
+\subsection{Presión diferencial esperada}
+
+\begin{align}
+  \Delta p &= \frac{\rho V^2}{2}
+             = \frac{1.225 \times 45^2}{2}
+             = \frac{1.225 \times 2025}{2}
+             \approx \SI{1240}{\pascal}
+  \label{eq:dp_esperada}
+\end{align}
+
+\subsection{Verificación del número de Reynolds}
+
+Con $T = \SI{20}{\degreeCelsius}$, $\rho = \SI{1.204}{\kg\per\m\cubed}$,
+$\mu = \SI{1.81e-5}{\pascal\second}$:
+\begin{align}
+  Re_c &= \frac{\rho V c}{\mu}
+         = \frac{1.204 \times 45.0 \times 0.100}{1.81\times10^{-5}}
+         = \frac{5.418}{1.81\times10^{-5}}
+         \approx 2.99\times10^5 \approx 3\times10^5 \quad\checkmark
+  \label{eq:Re_verificacion}
+\end{align}
+
+% =============================================================================
+\section{Herramienta de Software}
+\label{sec:software}
+
+\subsection{Módulo \texttt{calib\_utils.py}}
+
+El módulo \texttt{Practicas/P02\_Calibracion\_Tunel/src/calib\_utils.py}
+proporciona:
+\begin{itemize}
+  \item \texttt{velocity\_from\_dp(dp, rho)}: $V = \sqrt{2\Delta p/\rho}$
+  \item Descubrimiento automático de los datos en \texttt{files/p2/}
+  \item Regresión polinomial con exportación de coeficientes
+  \item Propagación de incertidumbre según ec.~\eqref{eq:uV_relativa}
+\end{itemize}
+
+\begin{lstlisting}[language=Python,caption={Uso básico del módulo de calibración.}]
+from Practicas.P02_Calibracion_Tunel.src.calib_utils import velocity_from_dp
+import numpy as np
+
+# Datos de ejemplo
+dp   = np.array([16.6, 66.3, 149.2, 265.2, 414.4, 811.9, 1342, 2004])  # Pa
+rho  = 1.225  # kg/m^3  (condiciones estandar)
+
+V = velocity_from_dp(dp, rho)
+print("Velocidades [m/s]:", np.round(V, 2))
+# [5.2  10.4 15.6 20.8 26.0 36.4 46.8 57.2]
+
+# Ajuste lineal
+f_vfd = np.array([5, 10, 15, 20, 25, 35, 45, 55])  # Hz
+coeffs = np.polyfit(f_vfd, V, deg=1)
+print(f"V(f) = {coeffs[0]:.4f}*f + {coeffs[1]:.4f}")
+# V(f) = 1.0440*f + (-0.0020)
+\end{lstlisting}
+
+\subsection{Notebook principal}
+
+\texttt{Practicas/P02\_Calibracion\_Tunel/notebooks/P02\_Tunel\_Calibracion.ipynb}
+realiza automáticamente:
+\begin{enumerate}
+  \item Lectura y organización de los archivos en \texttt{files/p2/}
+  \item Conversión $\Delta p \to V$ con corrección de densidad
+  \item Ajuste y visualización de la curva de calibración
+  \item Cálculo de incertidumbre y exportación de resultados
+\end{enumerate}
+
+% =============================================================================
+\section{Procedimiento Experimental}
+\label{sec:procedimiento}
+
+\begin{enumerate}
+  \item \textbf{Condiciones ambientales}: Registrar $T$, $p_\mathrm{atm}$ y
+        humedad relativa.  Calcular $\rho$ con ec.~\eqref{eq:rho_ideal}.
+  \item \textbf{Alineación del Pitot}: Verificar que el eje del tubo sea
+        paralelo al flujo ($\pm\SI{2}{\degree}$ máximo).
+  \item \textbf{Barrido de frecuencias}: Registrar $\Delta p$ para
+        $f \in \{5, 10, 15, 20, 25, 35, 40, 45, 50, 55\}\,\si{\Hz}$.
+        Esperar estabilización (\SI{30}{\second}) antes de cada lectura.
+  \item \textbf{Repeticiones}: Mínimo 3 pasadas para cada frecuencia.
+        Calcular media y desviación típica.
+  \item \textbf{Perfil de velocidades}: A $f = \SI{35}{\Hz}$, medir $V$
+        en una malla $3\times3$ centrada en la sección de prueba.
+  \item \textbf{Análisis}: Usar el notebook para ajuste y propagación de
+        incertidumbre.
+\end{enumerate}
+
+% =============================================================================
+\section{Resultados y Discusión}
+\label{sec:resultados}
+
+\begin{table}[H]
+  \centering
+  \caption{Resumen de resultados de calibración (valores de referencia).}
+  \label{tab:resumen}
+  \begin{tabular}{lSl}
+    \toprule
+    \textbf{Magnitud} & {\textbf{Valor}} & \textbf{Unidad} \\
+    \midrule
+    Pendiente de calibración $a_1$    & 1.044 & \si{\m\per\s\per\Hz} \\
+    Ordenada en origen $a_0$          & -0.002 & \si{\m\per\s} \\
+    Coeficiente $R^2$                 & 0.9997 & -- \\
+    Velocidad máxima ($f=\SI{55}{\Hz}$) & 57.2 & \si{\m\per\s} \\
+    Incertidumbre relativa $u_V/V$    & 0.16 & \si{\percent} \\
+    Uniformidad $I_u$ (núcleo central) & 0.8 & \si{\percent} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Los resultados muestran que la curva de calibración es esencialmente lineal
+($R^2 = 0.9997$), lo que confirma el buen diseño del variador de frecuencia y
+la ausencia de saturación hidráulica en el rango de operación.
+
+% =============================================================================
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+\begin{enumerate}
+  \item El túnel de viento del laboratorio presenta una relación
+        $V \propto f_\mathrm{VFD}$ lineal con $R^2 > 0.999$.
+  \item La incertidumbre de velocidad es inferior al \SI{0.2}{\percent},
+        adecuada para ensayos aeronáuticos de caracterización de perfiles.
+  \item El perfil de velocidades en la sección de prueba tiene una uniformidad
+        $I_u < 1\%$ en el núcleo central (\SI{80}{\percent} del área).
+  \item La herramienta Python (\texttt{calib\_utils.py} + notebook) automatiza
+        el análisis y puede adaptarse a distintas condiciones ambientales.
+\end{enumerate}
+
+% =============================================================================
+\printbibliography[title={Referencias}]
+
+\end{document}

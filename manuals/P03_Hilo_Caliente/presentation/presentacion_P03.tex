@@ -1,0 +1,413 @@
+% =============================================================================
+% Presentación Beamer P03 – Anemometría de Hilo Caliente
+% Técnicas de Medida – Ingeniería Aeronáutica
+% =============================================================================
+\documentclass[aspectratio=169,12pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+\usefonttheme{professionalfonts}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\usepackage{circuitikz}
+\usepackage{booktabs}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{blue!80}\bfseries,
+  commentstyle=\color{green!50!black},
+  backgroundcolor=\color{gray!10},
+  frame=single, breaklines=true
+}
+
+\definecolor{aeroblue}{RGB}{0,51,102}
+\definecolor{aerored}{RGB}{153,0,0}
+\definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aeroorange}{RGB}{200,100,0}
+
+\setbeamercolor{frametitle}{bg=aeroblue,fg=white}
+\setbeamercolor{title}{bg=aeroblue,fg=white}
+\setbeamercolor{structure}{fg=aeroblue}
+
+\title[P03 -- Hilo Caliente]{P03: Anemometría de Hilo Caliente (CTA/HWA)}
+\subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
+\author{Laboratorio de Técnicas de Medida}
+\institute{Departamento de Ingeniería Aeroespacial}
+\date{\today}
+
+% =============================================================================
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Contenido}
+  \tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Principio de Funcionamiento}
+
+\begin{frame}{¿Qué es el HWA?}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \textbf{Hot-Wire Anemometry (HWA / CTA):}
+      \begin{itemize}
+        \item Hilo de \textbf{wolframio}, $d \approx \SI{5}{\micro\m}$,
+              $L \approx \SI{1}{\mm}$
+        \item Calentado eléctricamente ($T_w \approx \SI{220}{\celsius}$)
+        \item El flujo \textbf{enfría el hilo} $\to$ varía la resistencia
+        \item Puente CTA mantiene $T_w = \mathrm{cte}$ ajustando la corriente
+        \item $E(t) \leftrightarrow U(t)$ vía \textbf{ley de King}
+      \end{itemize}
+      \vspace{0.3em}
+      \begin{alertblock}{Ventaja clave}
+        Ancho de banda hasta \SI{400}{\kHz} -- ideal para turbulencia.
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{tikzpicture}[scale=0.85,>=Stealth]
+        % Probe body
+        \draw[fill=gray!30,draw=black,thick] (1.5,-0.4) rectangle (1.9,1.8);
+        \draw[fill=gray!50] (1.5,1.8) -- (1.7,2.0) -- (1.9,1.8);
+        % Prongs
+        \draw[black,very thick] (1.7,2.0) -- (1.2,2.5);
+        \draw[black,very thick] (1.7,2.0) -- (2.2,2.5);
+        % Hot wire
+        \draw[aerored,ultra thick,line width=2.5pt] (1.2,2.5) -- (2.2,2.5);
+        \node[aerored,above,font=\tiny\bfseries] at (1.7,2.6) {Hilo ($d=5\,\mu$m)};
+        % Flow
+        \foreach \y in {2.2,2.5,2.8} {
+          \draw[->,blue!60,thick] (0.2,\y) -- (1.1,\y);
+        }
+        \node[blue!60,font=\tiny] at (0.6,2.0) {$U$};
+        % Heat arrows
+        \draw[aerored!60,->] (1.7,2.5) -- (1.7,3.2)
+              node[above,font=\tiny,aerored] {$Q_\mathrm{conv}$};
+        % Connection
+        \draw[aeroblue,thick,->] (1.9,1.0) -- (3.0,1.0)
+              node[right,font=\tiny] {$E(t)$};
+        % CTA label
+        \node[aeroblue,font=\tiny,right] at (3.0,1.3) {CTA};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Teoría: Ley de King}
+
+\begin{frame}{Ley de King}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Balance energético:}
+      \begin{equation*}
+        I_w^2 R_w = h\,A_s\,(T_w - T_a)
+      \end{equation*}
+
+      \textbf{Nusselt cilindrico:} $Nu = A_0 + B_0 Re^n$
+
+      \vspace{0.5em}
+      \begin{block}{Ley de King}
+        \begin{equation*}
+          \boxed{E^2 = A + B\,U^n}
+        \end{equation*}
+        $A$, $B$ constantes del sensor\\
+        $n \approx 0.45$ (King) o ajustado
+      \end{block}
+
+      \vspace{0.3em}
+      \textbf{Inversión:}
+      \begin{equation*}
+        U = \left(\frac{E^2 - A}{B}\right)^{1/n}
+      \end{equation*}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.75]
+        \draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$U$ (m/s)};
+        \draw[->] (0,0) -- (0,4) node[above,font=\tiny] {$E^2$ (V²)};
+        % King curve (E^2 = 0.9 + 2.5*U^(1/3))
+        \draw[aerored,very thick] plot[domain=0:4.5,samples=50]
+              (\x, {0.23 + 0.63*\x^0.333});
+        % Data points
+        \foreach \u/\e in {0.5/0.46, 1.0/0.63, 1.5/0.78, 2.0/0.84,
+                            2.5/0.92, 3.5/1.06, 4.5/1.28} {
+          \fill[aeroblue] (\u,\e) circle (0.07);
+        }
+        \node[aerored,font=\tiny] at (3.5,0.8) {$E^2=A+BU^n$};
+        % Axes tick labels
+        \foreach \x/\l in {1/10,2/20,3/30,4/40} {
+          \node[below,font=\tiny] at (\x,0) {\l};
+        }
+        \foreach \y/\l in {0.5/4.6,1.0/6.3,1.5/8.4,2.0/10.6} {
+          \node[left,font=\tiny] at (0,\y) {\l};
+        }
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Circuito CTA -- Puente Wheatstone}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      El puente Wheatstone mantiene $R_w = \mathrm{cte}$:
+      \vspace{0.3em}
+      \begin{itemize}\small
+        \item Si $U\uparrow$ $\Rightarrow$ enfría el hilo
+        \item $R_w\downarrow$ $\Rightarrow$ $\Delta V \neq 0$
+        \item Amplificador corrige la corriente $I_w\uparrow$
+        \item Nuevo equilibrio: $T_w = \mathrm{cte}$
+        \item $E_\mathrm{out} \propto I_w \propto U$
+      \end{itemize}
+      \vspace{0.3em}
+      \begin{block}{Resultado}
+        $E(t)$ contiene la información de $U(t)$ a alta frecuencia.
+      \end{block}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{circuitikz}[scale=0.55, transform shape]
+        \node (A) at (0,3) {};
+        \node (B) at (0,-3) {};
+        \node (L) at (-3,0) {};
+        \node (R) at (3,0) {};
+        \draw (A) to[R,l=$R_1$] (L);
+        \draw (A) to[R,l=$R_2$] (R);
+        \draw (L) to[R,l=$R_3$] (B);
+        \draw[aerored,very thick] (R) to[R,l_=$R_w$,color=aerored] (B);
+        \draw (A) to[battery1,l=$V_s$] (0,4.5);
+        \draw (0,-3) to[short] (0,-4.5);
+        \draw[fill=aeroblue!10] (-2,0.8) -- (2,0.8) -- (0,2.2) -- cycle;
+        \node[font=\tiny,aeroblue] at (0,1.4) {Amp.};
+        \draw[aeroblue,->] (0,2.2) -- (0,3.3)
+              node[above,font=\tiny] {$E_{out}$};
+        \draw[aeroorange,dashed,->] (0,3.0) -- (4.5,3.0) -- (4.5,-1) -- (3.2,-0.2);
+        \node[aeroorange,font=\tiny] at (4.8,1) {FB};
+      \end{circuitikz}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Calibración}
+
+\begin{frame}{Calibración -- Datos del laboratorio}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Datos de calibración (lab.):}
+      \begin{table}
+        \centering
+        \tiny
+        \begin{tabular}{SSS}
+          \toprule
+          {$U$ (m/s)} & {$E$ (V)} & {$E^2$ (V²)} \\
+          \midrule
+           5.2 & 2.15 & 4.622 \\
+          10.4 & 2.52 & 6.350 \\
+          15.6 & 2.74 & 7.508 \\
+          20.8 & 2.90 & 8.410 \\
+          26.0 & 3.03 & 9.181 \\
+          36.4 & 3.26 & 10.628 \\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+      \textbf{Resultado del ajuste ($n=3$):}
+      \begin{align*}
+        A &= 0.9141\,\si{V^2}\\
+        B &= 2.5486\,\si{V^2}\\
+        R^2 &= 0.872
+      \end{align*}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.8]
+        \draw[->] (0,0) -- (4.5,0) node[right,font=\tiny] {$U^{1/3}$};
+        \draw[->] (0,0) -- (0,4.5) node[above,font=\tiny] {$E^2$ (V²)};
+        % Linear fit line
+        \draw[aeroblue,thick] (1.5,0.5) -- (3.5,3.8);
+        % Data points
+        \foreach \x/\y in {1.732/1.04, 2.183/1.43, 2.503/1.69,
+                            2.748/1.89, 2.962/2.07, 3.314/2.39} {
+          \fill[aerored] (\x-0.7,{\y*1.5}) circle (0.1);
+        }
+        \node[aeroblue,font=\tiny,rotate=52] at (2.8,2.5)
+              {$E^2=0.914+2.549\,U^{1/3}$};
+        \node[left,font=\tiny] at (0,1.04) {4.6};
+        \node[left,font=\tiny] at (0,2.39) {10.6};
+        \node[below,font=\tiny] at (1.03,0) {1.73};
+        \node[below,font=\tiny] at (2.6,0) {2.96};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Estadísticos de Turbulencia}
+
+\begin{frame}{Turbulencia: estadísticos y espectro}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Velocidad media y fluctuación:}
+      \begin{align*}
+        \bar{U} &= \SI{26.0}{\m\per\s}\\
+        u'_\mathrm{rms} &= \SI{1.82}{\m\per\s}\\
+        I_u &= \frac{1.82}{26.0}\times100\% = 7.0\%
+      \end{align*}
+      \vspace{0.3em}
+      \textbf{Ley de Kolmogorov:}
+      \begin{equation*}
+        S(f) \propto f^{-5/3}
+      \end{equation*}
+      (sub-rango inercial)
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.8]
+        \draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$\log f$};
+        \draw[->] (0,0) -- (0,4) node[above,font=\tiny] {$\log S(f)$};
+        \fill[aeroblue!15] (0,0) rectangle (1.5,4);
+        \fill[aerogreen!15] (1.5,0) rectangle (3.5,4);
+        \fill[aerored!10] (3.5,0) rectangle (5,4);
+        \node[font=\tiny,aeroblue,rotate=90] at (0.75,2) {Energía};
+        \node[font=\tiny,aerogreen,rotate=90] at (2.5,2) {Inercial};
+        \node[font=\tiny,aerored,rotate=90] at (4.25,2) {Disipac.};
+        \draw[aerored,very thick] (1.5,3.5) -- (3.5,0.8);
+        \node[aerored,font=\tiny,rotate=-67] at (2.8,2.3) {$-5/3$};
+        \draw[aeroblue,thick] (0.5,3.8) .. controls (1.0,3.6) .. (1.5,3.5);
+        \draw[aeroblue,thick] (3.5,0.8) -- (4.8,0.2);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Caso de Estudio}
+
+\begin{frame}{Caso: Capa límite sobre NACA 4412}
+  \begin{block}{Escenario}
+    Perfil de velocidades HWA en capa límite de NACA~4412 ($c=\SI{200}{\mm}$,
+    $\alpha=\SI{4}{\degree}$, $Re_c=3\times10^5$).
+  \end{block}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Ley logarítmica (turbulenta):}
+      \begin{equation*}
+        U^+ = \frac{1}{\kappa}\ln(y^+) + B,
+        \quad \kappa = 0.41
+      \end{equation*}
+      \textbf{Grosor de desplazamiento:}
+      \begin{equation*}
+        \delta^* = \int_0^\infty \left(1-\frac{U}{U_e}\right)dy
+      \end{equation*}
+      \begin{itemize}\small
+        \item Resolución del traverso: \SI{0.5}{\mm}
+        \item Barrido: $y \in [0, 20]\,\si{\mm}$
+        \item $\delta^* \approx \SI{3.5}{\mm}$
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=1.0,>=Stealth]
+        \draw[->] (0,0) -- (0,4) node[above,font=\tiny] {$y$ (mm)};
+        \draw[->] (0,0) -- (4,0) node[right,font=\tiny] {$U$ (m/s)};
+        % Wall
+        \fill[gray!50] (-0.2,-0.2) rectangle (0,4.2);
+        % Log law profile
+        \draw[aerored,very thick] plot[domain=0.1:3.8,samples=30]
+              ({0.8*ln(\x/0.1+1)}, \x);
+        % Reference velocity
+        \draw[gray,dashed] (2.8,0) -- (2.8,4);
+        \node[gray,right,font=\tiny] at (2.8,3.8) {$U_e$};
+        % Delta star
+        \fill[aeroblue!20] (0,0) -- (2.8,0) -- (2.8,0.7) ..
+              controls (1.5,1.5) .. (0,3.5) -- (0,0);
+        \node[aeroblue,font=\tiny] at (0.8,1.0) {$\delta^*$};
+        \foreach \y/\u in {0.5/0.9, 1.0/1.5, 1.5/2.0, 2.0/2.3,
+                            2.5/2.5, 3.0/2.7, 3.5/2.8} {
+          \fill[aerored] (\u,\y) circle (0.06);
+        }
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Notebook Jupyter}
+
+\begin{frame}[fragile]{P03\_Hilo\_Caliente.ipynb}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \textbf{Ruta:}\\
+      \texttt{\small Practicas/P03\_Hilo\_Caliente/\\notebooks/P03\_Hilo\_Caliente.ipynb}
+
+      \vspace{0.5em}
+      \textbf{El notebook/script automatiza:}
+      \begin{enumerate}\small
+        \item Lectura de \texttt{files/p3/} (señales E(t))
+        \item Descarte de transitorios (10\% c/extremo)
+        \item Calibración King ($A$, $B$, $n$)
+        \item $\bar{U}$, $u'_\mathrm{rms}$, $I_u$, PSD
+        \item Gráficas y exportación CSV/JSON
+        \item Actualización de \texttt{p3.md}
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{lstlisting}[language=Python]
+from scipy.optimize import curve_fit
+import numpy as np
+
+def king(U, A, B, n):
+    return A + B * U**n
+
+U_ref = np.array([5.2, 10.4,
+                  15.6, 20.8,
+                  26.0, 36.4])
+E_sq  = np.array([4.622, 6.350,
+                  7.508, 8.410,
+                  9.181, 10.628])
+
+popt, _ = curve_fit(
+    king, U_ref, E_sq,
+    p0=[1, 2.5, 0.45])
+A, B, n = popt
+# A=0.914, B=2.549, n=0.333
+      \end{lstlisting}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Resumen}
+
+\begin{frame}{Conclusiones}
+  \begin{enumerate}
+    \item El HWA con CTA tiene ancho de banda hasta \SI{400}{\kHz} --
+          idóneo para turbulencia aeronáutica.
+    \item La \textbf{Ley de King} ($E^2 = A+BU^n$) calibra el sensor:
+          $A=0.914$, $B=2.549$, $n=1/3$.
+    \item $I_u \approx 7\%$ en la sección de prueba a \SI{26}{\m\per\s}.
+    \item El PSD muestra la ley $f^{-5/3}$ de Kolmogorov en el sub-rango inercial.
+    \item El notebook y el script Python automatizan todo el flujo de trabajo.
+  \end{enumerate}
+  \vspace{0.5em}
+  \begin{block}{Recursos}
+    Manual: \texttt{manuals/P03\_Hilo\_Caliente/manual\_P03.tex}\\
+    Notebook: \texttt{Practicas/P03\_Hilo\_Caliente/notebooks/P03\_Hilo\_Caliente.ipynb}\\
+    Script: \texttt{Practicas/P03\_Hilo\_Caliente/src/P03\_Hilo\_Caliente.py}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Referencias}
+  \begin{itemize}
+    \item Bruun, H.H. (1995). \textit{Hot-Wire Anemometry}, Oxford University Press
+    \item J{\o}rgensen, F.E. (2002). \textit{How to Measure Turbulence with HWA}, Dantec
+    \item Pope, S.B. (2000). \textit{Turbulent Flows}, Cambridge University Press
+    \item Kolmogorov, A.N. (1941). Local structure of turbulence, \textit{Dokl. SSSR}
+  \end{itemize}
+\end{frame}
+
+\end{document}

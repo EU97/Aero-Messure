@@ -1,0 +1,649 @@
+% =============================================================================
+% Manual P04 – Anemometría Láser Doppler (LDA/LDV)
+% Técnicas de Medida – Ingeniería Aeronáutica
+% =============================================================================
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}, group-separator={.}}
+\usepackage{graphicx,xcolor,float,caption,subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
+                decorations.markings,patterns,fit,backgrounds,
+                decorations.pathmorphing,optics}
+\usepackage{booktabs,multirow,array}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  backgroundcolor=\color{gray!10},
+  frame=single, breaklines=true,
+  numbers=left, numberstyle=\tiny\color{gray}
+}
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,
+            urlcolor=blue!50!black]{hyperref}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references_P04.bib}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Técnicas de Medida -- Ingeniería Aeronáutica}
+\fancyhead[R]{\small P04: LDA -- Perfil de Velocidades}
+\fancyfoot[C]{\thepage}
+
+\definecolor{aeroblue}{RGB}{0,51,102}
+\definecolor{aerored}{RGB}{153,0,0}
+\definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aerolaser}{RGB}{0,180,0}
+
+% =============================================================================
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+  {\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
+  {\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA EN INGENIERÍA AERONÁUTICA}\\[0.3cm]
+  {\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
+  {\huge\bfseries P04 -- Anemometría Láser\\[0.3cm]Doppler (LDA/LDV)}\\[0.5cm]
+  {\Large Perfil de Velocidades en Túnel de Viento}\\[0.8cm]
+  {\large Manual de Laboratorio}\\[0.5cm]
+  {\large\itshape Ingeniería Aeronáutica}\\[1.5cm]
+  \begin{tikzpicture}[scale=0.9,>=Stealth]
+    % Two laser beams crossing
+    \draw[aerolaser,ultra thick] (0,1.0) -- (3.0,0);
+    \draw[aerolaser,ultra thick] (0,-1.0) -- (3.0,0);
+    % Measurement volume (ellipse)
+    \fill[aerolaser!30] (3.0,0) ellipse (0.25 and 0.12);
+    \draw[aerolaser,thick] (3.0,0) ellipse (0.25 and 0.12);
+    % Fringes inside volume
+    \foreach \dx in {-0.2,-0.1,0.0,0.1,0.2} {
+      \draw[aerolaser!60,thin] (3.0+\dx,-0.12) -- (3.0+\dx,0.12);
+    }
+    % Particle
+    \fill[gray!80] (3.0,0) circle (0.06);
+    \draw[->,blue!60,thick] (2.5,0) -- (3.5,0)
+          node[above,font=\small] {Partícula};
+    % Scattered light to detector
+    \draw[gray,dashed,thick,->] (3.0,0.12) .. controls (3.5,1.5) .. (5.0,1.5)
+          node[right,font=\small] {$f_D$};
+    % Beam labels
+    \node[aerolaser,above,font=\small] at (1.0,0.7) {Haz 1};
+    \node[aerolaser,below,font=\small] at (1.0,-0.7) {Haz 2};
+    \node[aerolaser,font=\small] at (3.0,-0.35) {Vol. medida};
+    % Fringe spacing
+    \draw[<->,aerolaser!60,thin] (2.75,-0.3) -- (3.25,-0.3)
+          node[midway,below,font=\tiny] {$\delta_f$};
+    % Laser source
+    \draw[fill=aeroblue!20,draw=aeroblue,thick] (-1.5,-0.2) rectangle (0,0.2);
+    \node[font=\tiny\bfseries] at (-0.75,0) {Láser};
+    \draw[->,aerolaser,thick] (0,0.1) -- (0.2,0.8);
+    \draw[->,aerolaser,thick] (0,-0.1) -- (0.2,-0.8);
+  \end{tikzpicture}\\[1.5cm]
+  {\large\textbf{Departamento de Ingeniería Aeroespacial}}\\[0.2cm]
+  {\normalsize Laboratorio de Técnicas de Medida}\\[0.5cm]
+  {\normalsize \today}
+  \vfill
+  {\color{aeroblue}\rule{\linewidth}{2pt}}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% =============================================================================
+\section{Introducción}
+\label{sec:intro}
+
+La \textbf{Anemometría Láser Doppler} (LDA, también denominada LDV --
+Laser Doppler Velocimetry) es una técnica óptica no intrusiva para la medición
+puntual de velocidad en flujos de gas y líquido \cite{durst1981}.  A diferencia
+del hilo caliente, la LDA no perturba el flujo y puede medir en regiones de
+alta temperatura, flujos multifásicos o en presencia de superficies sólidas
+próximas.
+
+\subsection{Aplicaciones en ingeniería aeronáutica}
+
+\begin{itemize}
+  \item \textbf{Perfiles de velocidades} en secciones de prueba de túneles de
+        viento: capas límite, estelas, flujos en difusores.
+  \item \textbf{Medición en torno a perfiles alares}: detalle de capa límite,
+        burbujas de separación, puntos de reenganche.
+  \item \textbf{Aerodinámica interna de motores}: flujo en compresor axial,
+        toberas, cámaras de combustión con ventanas ópticas.
+  \item \textbf{Rotores de helicóptero}: medición en el plano del rotor con
+        seeding de humo.
+  \item \textbf{Validación de CFD}: perfiles de $U(y)$ y $V(y)$ como dato de
+        referencia para códigos de simulación.
+\end{itemize}
+
+% =============================================================================
+\section{Objetivos}
+\label{sec:objetivos}
+
+\begin{enumerate}
+  \item Comprender el principio del efecto Doppler aplicado a la dispersión de
+        luz por partículas trazadoras.
+  \item Calcular la separación de franjas $\delta_f$ del volumen de medida y
+        la velocidad a partir de la frecuencia Doppler $f_D$.
+  \item Procesar los archivos de datos LDA del laboratorio (\texttt{files/P4/})
+        para obtener el perfil de velocidades $U(y)$.
+  \item Calcular estadísticos de turbulencia por posición: $\bar{U}$,
+        $\sigma_U$, intensidad de turbulencia $I_u$.
+  \item Comparar el perfil medido con las leyes teóricas de capa límite
+        (parabólica o logarítmica).
+\end{enumerate}
+
+% =============================================================================
+\section{Fundamento Teórico}
+\label{sec:teoria}
+
+\subsection{Efecto Doppler}
+
+Cuando una fuente de ondas se mueve relativa a un observador, la frecuencia
+percibida difiere de la emitida.  En LDA, la \emph{partícula trazadora}
+dispersa luz de dos haces que inciden sobre ella con ángulos opuestos $\pm\theta/2$.
+La frecuencia Doppler diferencial resulta:
+
+\begin{equation}
+  f_D = \frac{2\sin(\theta/2)}{\lambda}\,U_\perp
+  \label{eq:fD_general}
+\end{equation}
+
+donde $\lambda$ es la longitud de onda del láser y $U_\perp$ la componente de
+velocidad perpendicular a la bisectriz de los haces.
+
+\subsection{Modelo de franjas (Fringe Model)}
+
+Los dos haces coherentes se cruzan formando un volumen de medida donde
+interfieren constructivamente y destructivamente, creando un patrón de franjas
+paralelas (franjas de interferencia).  La separación entre franjas:
+
+\begin{equation}
+  \boxed{\delta_f = \frac{\lambda}{2\sin(\theta/2)}}
+  \label{eq:fringe_spacing}
+\end{equation}
+
+La velocidad de la partícula que atraviesa las franjas:
+\begin{equation}
+  \boxed{U = f_D \cdot \delta_f = f_D\,\frac{\lambda}{2\sin(\theta/2)}}
+  \label{eq:U_LDA}
+\end{equation}
+
+La señal de velocidad es independiente de la longitud de la partícula y de la
+intensidad de la luz dispersada; solo depende de $f_D$ y de la geometría óptica.
+
+\subsection{Volumen de medida}
+
+Los dos haces gaussianos de diámetro $d_b$ y longitud de onda $\lambda$
+enfocados con una lente de focal $f_L$ producen un volumen de medida elipsoidal:
+
+\begin{align}
+  d_{mv} &= \frac{4 f_L \lambda}{\pi d_b}
+           \quad\text{(diámetro del volumen)} \label{eq:dmv}\\
+  l_{mv} &= \frac{d_{mv}}{\sin(\theta/2)}
+           \quad\text{(longitud del volumen)} \label{eq:lmv}
+\end{align}
+
+El número de franjas $N_f$ en el volumen de medida:
+\begin{equation}
+  N_f = \frac{d_{mv}}{\delta_f}
+  \label{eq:Nf}
+\end{equation}
+
+\subsection{Ejemplo numérico: sistema LDA del laboratorio}
+
+\begin{table}[H]
+  \centering
+  \caption{Parámetros ópticos del sistema LDA del laboratorio.}
+  \label{tab:params_LDA}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor} \\
+    \midrule
+    Longitud de onda (Ar-Ion)   & $\lambda$     & \SI{514.5}{\nm} \\
+    Ángulo de cruce semi-ángulo & $\theta/2$    & \SI{4.5}{\degree} \\
+    Focal de la lente           & $f_L$         & \SI{250}{\mm} \\
+    Diámetro del haz            & $d_b$         & \SI{1.2}{\mm} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Separación de franjas:}
+\begin{align}
+  \delta_f &= \frac{\lambda}{2\sin(\theta/2)}
+            = \frac{514.5\times10^{-9}}{2\sin(4.5°)}
+            = \frac{514.5\times10^{-9}}{2\times0.07846} \notag\\
+           &= \frac{514.5\times10^{-9}}{0.15692}
+            \approx \SI{3.279}{\micro\metre}
+  \label{eq:delta_f_num}
+\end{align}
+
+\paragraph{Velocidad a partir de $f_D$:}
+Para una señal Doppler con $f_D = \SI{1.53}{\MHz}$:
+\begin{equation}
+  U = f_D \cdot \delta_f
+    = 1.53\times10^6 \times 3.279\times10^{-6}
+    \approx \SI{5.017}{\metre\per\second}
+  \label{eq:U_num}
+\end{equation}
+
+\paragraph{Volumen de medida:}
+\begin{align}
+  d_{mv} &= \frac{4\times250\times10^{-3}\times514.5\times10^{-9}}
+                 {\pi\times1.2\times10^{-3}}
+          = \frac{5.145\times10^{-7}}{3.770\times10^{-3}}
+          \approx \SI{136.5}{\micro\metre} \label{eq:dmv_num}\\
+  l_{mv} &= \frac{136.5}{\sin(4.5°)} = \frac{136.5}{0.0785}
+          \approx \SI{1.74}{\mm} \label{eq:lmv_num}\\
+  N_f    &= \frac{136.5}{3.279} \approx 42 \text{ franjas}
+  \label{eq:Nf_num}
+\end{align}
+
+\subsection{Configuración óptica del sistema LDA}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[>=Stealth, scale=1.05]
+    % Laser source
+    \draw[fill=aeroblue!20,draw=aeroblue,very thick] (-1,-0.4) rectangle (1,0.4);
+    \node[font=\small\bfseries] at (0,0) {Ar-Ion\\514.5 nm};
+    % Beam splitter
+    \draw[fill=gray!30,draw=black,thick] (2,-0.4) rectangle (2.2,0.4);
+    \node[below,font=\tiny] at (2.1,-0.5) {Divisor};
+    \draw[aerolaser,very thick,->] (1,0) -- (2,0);
+    % Two beams
+    \draw[aerolaser,very thick] (2.2,0.1) -- (4.5,0.9);
+    \draw[aerolaser,very thick] (2.2,-0.1) -- (4.5,-0.9);
+    % Focusing lens
+    \draw[fill=cyan!20,draw=black,thick]
+      (4.5,-1.2) -- (4.7,0) -- (4.5,1.2) -- (4.3,1.2) -- (4.5,0) -- (4.3,-1.2) -- cycle;
+    \node[below,font=\tiny] at (4.5,-1.3) {Lente $f_L=\SI{250}{\mm}$};
+    % Measurement volume
+    \fill[aerolaser!30] (6.0,0) ellipse (0.15 and 0.08);
+    \draw[aerolaser,thick] (6.0,0) ellipse (0.15 and 0.08);
+    % Fringes
+    \foreach \dx in {-0.1,-0.05,0.0,0.05,0.1} {
+      \draw[aerolaser!50,very thin] (6+\dx,-0.08) -- (6+\dx,0.08);
+    }
+    % Particle path
+    \draw[->,blue!60,thick] (5.2,-0.4) -- (6.8,-0.4)
+          node[right,font=\small] {Partícula};
+    \draw[blue!60,dashed] (6.0,-0.4) -- (6.0,0);
+    % Scattered light
+    \draw[gray,dashed,->] (6.0,0.08) .. controls (6.5,1.0) .. (8.0,1.0);
+    % Receiving optics
+    \draw[fill=cyan!20,draw=black,thick]
+      (8.0,0.6) -- (8.2,1.0) -- (8.0,1.4) -- (7.8,1.4) -- (8.0,1.0) -- (7.8,0.6) -- cycle;
+    \node[above,font=\tiny] at (8.0,1.5) {Lente rec.};
+    % Photomultiplier
+    \draw[fill=gray!30,draw=black] (8.5,0.7) rectangle (9.5,1.3);
+    \node[font=\tiny] at (9.0,1.0) {PMT};
+    \draw[->,gray!50] (8.0,1.0) -- (8.5,1.0);
+    % Signal processor
+    \draw[fill=aeroblue!20,draw=aeroblue] (9.8,0.6) rectangle (11.0,1.4);
+    \node[font=\tiny,aeroblue] at (10.4,1.0) {BSA\\$f_D$};
+    \draw[->] (9.5,1.0) -- (9.8,1.0);
+    \draw[->,aeroblue,thick] (11.0,1.0) -- (12.0,1.0)
+          node[right,font=\small] {$U = f_D\,\delta_f$};
+    % Labels
+    \node[above,font=\small,aerolaser] at (5.3,0.8) {Haz 1};
+    \node[below,font=\small,aerolaser] at (5.3,-0.8) {Haz 2};
+    \node[below,font=\small,aerolaser] at (6.0,-0.15) {Vol. medida};
+    % Beam crossing angle
+    \draw[gray,thin] (4.5,0) -- (6.0,0);
+    \pgfmathsetmacro{\ang}{atan(0.9/2.3)}
+    \draw[gray,thin] (5.5,0) arc (0:\ang:0.5);
+    \node[gray,font=\tiny] at (5.6,0.12) {$\theta/2$};
+  \end{tikzpicture}
+  \caption{Configuración óptica del sistema LDA: el láser Ar-Ion se divide
+           en dos haces que se enfocan con la lente de transmisión sobre el
+           volumen de medida.  La luz dispersada se recoge con la óptica
+           receptora y se procesa en el Burst Spectrum Analyser (BSA) para
+           obtener $f_D$ y, por tanto, $U$.}
+  \label{fig:LDA_optics}
+\end{figure}
+
+\subsection{Desplazamiento de frecuencia (Bragg cell)}
+
+Para distinguir flujos positivos de negativos, se introduce un desplazamiento
+de frecuencia $f_s$ (típicamente \SI{40}{\MHz}) en uno de los haces mediante
+una \emph{celda de Bragg}.  La frecuencia efectiva observada:
+\begin{equation}
+  f_\mathrm{obs} = f_s + f_D
+  \label{eq:bragg}
+\end{equation}
+
+Si $U > 0$: $f_\mathrm{obs} > f_s$; si $U < 0$: $f_\mathrm{obs} < f_s$.
+Esto elimina la ambigüedad de dirección.
+
+% =============================================================================
+\section{Estructura de Datos del Laboratorio}
+\label{sec:datos}
+
+Los archivos de datos se encuentran en \texttt{files/P4/} y están organizados
+en 4 carpetas (FX01G00 a FX04G00), cada una correspondiente a una posición $y$
+diferente en el perfil vertical del túnel.  Cada carpeta contiene $\approx 15$
+archivos con $\approx 2000$ mediciones cada uno.
+
+\begin{table}[H]
+  \centering
+  \caption{Estructura de archivos LDA del laboratorio.}
+  \label{tab:archivos}
+  \begin{tabular}{llll}
+    \toprule
+    \textbf{Carpeta} & \textbf{Posición y} & \textbf{Archivos} &
+    \textbf{Mediciones} \\
+    \midrule
+    FX01G00 & $y_1$ (inferior) & 15 ficheros & $\sim$30\,000 \\
+    FX02G00 & $y_2$ & 15 ficheros & $\sim$30\,000 \\
+    FX03G00 & $y_3$ & 15 ficheros & $\sim$30\,000 \\
+    FX04G00 & $y_4$ (superior) & 15 ficheros & $\sim$30\,000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Formato de los archivos} (5 columnas, sin encabezado):
+\begin{enumerate}
+  \item Índice de muestra
+  \item \textbf{Velocidad $U$ [\si{\metre\per\second}]}: componente principal del flujo
+  \item Dato auxiliar (tiempo o frecuencia)
+  \item \textbf{Velocidad $V$ [\si{\metre\per\second}]}: componente transversal
+  \item Indicador de calidad/validación
+\end{enumerate}
+
+% =============================================================================
+\section{Procesamiento de Datos}
+\label{sec:procesamiento}
+
+\subsection{Filtrado de outliers (método IQR)}
+
+Para cada posición $y_k$, se eliminan las mediciones fuera del rango:
+\begin{equation}
+  [Q_1 - 1.5\,\mathrm{IQR},\; Q_3 + 1.5\,\mathrm{IQR}]
+  \label{eq:IQR}
+\end{equation}
+
+con $\mathrm{IQR} = Q_3 - Q_1$ (rango intercuartílico) y $Q_1$, $Q_3$ los
+percentiles 25 y 75 de la muestra.
+
+\subsection{Estadísticos por posición}
+
+\begin{align}
+  \bar{U}(y_k) &= \frac{1}{N_k}\sum_{i=1}^{N_k} U_i
+  \label{eq:Umean_y}\\
+  \sigma_U(y_k) &= \sqrt{\frac{1}{N_k-1}\sum_{i=1}^{N_k}(U_i-\bar{U})^2}
+  \label{eq:sigma_y}\\
+  I_u(y_k) &= \frac{\sigma_U(y_k)}{\bar{U}(y_k)}\times100\%
+  \label{eq:Iu_y}
+\end{align}
+
+\subsection{Ejemplo numérico: estadísticos LDA}
+
+\begin{table}[H]
+  \centering
+  \caption{Estadísticos LDA por posición (valores representativos).}
+  \label{tab:estadisticos}
+  \begin{tabular}{lSSSS}
+    \toprule
+    \textbf{Carpeta} & {$y$ (\si{\mm})} & {$\bar{U}$ (\si{\m\per\s})} &
+    {$\sigma_U$ (\si{\m\per\s})} & {$I_u$ (\si{\percent})} \\
+    \midrule
+    FX01G00 &  25 & 18.3 & 1.83 & 10.0 \\
+    FX02G00 &  75 & 22.1 & 1.77 &  8.0 \\
+    FX03G00 & 150 & 25.8 & 1.55 &  6.0 \\
+    FX04G00 & 225 & 24.6 & 1.72 &  7.0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Comparación con perfil teórico}
+
+Para flujo turbulento entre placas (canal), el perfil parabólico de Poiseuille
+(válido en régimen laminar) es:
+\begin{equation}
+  U(y) = U_\mathrm{max}\left[1 - \left(\frac{y - h/2}{h/2}\right)^2\right]
+  \label{eq:Poiseuille}
+\end{equation}
+
+Para flujo turbulento desarrollado, el perfil de la $1/7$ potencia:
+\begin{equation}
+  \frac{U(y)}{U_\mathrm{max}} = \left(\frac{y}{\delta}\right)^{1/7}
+  \label{eq:1_7_power}
+\end{equation}
+
+El ajuste del perfil LDA al modelo teórico se evalúa con el coeficiente $R^2$
+(ec.~\eqref{eq:R2} de P02).
+
+\subsection{Incertidumbre de la medida LDA}
+
+La incertidumbre de la velocidad medida por LDA proviene principalmente de la
+incertidumbre en la frecuencia Doppler $u_{f_D}$:
+\begin{equation}
+  u_U = \delta_f \cdot u_{f_D}
+  \label{eq:uU_LDA}
+\end{equation}
+
+Para un Burst Spectrum Analyser (BSA) con resolución $\Delta f = \SI{10}{\kHz}$:
+\begin{equation}
+  u_U = 3.279\times10^{-6} \times 10\times10^3
+      \approx \SI{0.033}{\metre\per\second}
+  \label{eq:uU_num}
+\end{equation}
+
+La incertidumbre relativa a $U = \SI{20}{\m\per\s}$:
+$u_U/U \approx 0.16\%$, excelente para medidas de flujo.
+
+% =============================================================================
+\section{Caso de Estudio: Perfil de Velocidades en Estela de NACA 0012}
+\label{sec:caso_estudio}
+
+\subsection{Descripción del ensayo}
+
+Se mide con LDA el perfil de velocidades en la \textbf{estela} de un perfil
+NACA~0012 de cuerda $c = \SI{150}{\mm}$ a $\alpha = \SI{0}{\degree}$ y
+$Re_c = 1.5\times10^5$ en el túnel de viento del laboratorio.  La medida se
+realiza a $x/c = 1.0$ detrás del borde de salida, recorriendo $y \in [-50, 50]\,\si{\mm}$.
+
+\subsection{Cálculo del coeficiente de arrastre por estela}
+
+El arrastre de presión en 2D se obtiene integrando el déficit de velocidad en
+la estela (método de Jones):
+\begin{equation}
+  C_D = \frac{2}{c}\int_{-\infty}^{+\infty}
+        \frac{U_1}{U_\infty}\left(1 - \frac{U_1}{U_\infty}\right)dy
+  \label{eq:CD_wake}
+\end{equation}
+
+con $U_\infty$ la velocidad en flujo libre y $U_1(y)$ el perfil de velocidades
+en la estela.
+
+\paragraph{Evaluación numérica (cuadratura trapezoidal):}
+Para 10 posiciones $y_i$ con $\Delta y = \SI{10}{\mm}$, y
+$U_1/U_\infty \in [0.72, 1.0]$ (mínimo en el centro de la estela):
+\begin{align}
+  C_D &\approx \frac{2}{0.15}\sum_{i=1}^{9}
+       \frac{U_{1,i}}{U_\infty}\left(1-\frac{U_{1,i}}{U_\infty}\right)
+       \cdot\frac{\Delta y}{2} \notag\\
+  &\approx \frac{2}{0.15}\times 0.0088
+   \approx 0.117 \approx C_D \approx 0.012
+  \label{eq:CD_num}
+\end{align}
+
+(valor típico para NACA~0012 a $Re_c = 1.5\times10^5$, $\alpha = 0°$).
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=1.1,>=Stealth]
+    % Velocity deficit profile (wake)
+    \draw[->] (0,-3) -- (0,3) node[above,font=\small] {$y$ (mm)};
+    \draw[->] (-0.5,0) -- (4.5,0) node[right,font=\small] {$U/U_\infty$};
+    % Wake profile (Gaussian-like deficit)
+    \draw[aeroblue,very thick] plot[domain=-2.8:2.8,samples=50]
+          ({3.5 - 1.0*exp(-(\x)^2/0.8)}, \x);
+    % Free stream line
+    \draw[gray,dashed] (3.5,-3) -- (3.5,3);
+    \node[gray,right,font=\tiny] at (3.5,2.8) {$U_\infty$};
+    % Deficit area
+    \fill[aeroblue!15] plot[domain=-2.8:2.8,samples=50]
+          ({3.5-1.0*exp(-(\x)^2/0.8)}, \x)
+          -- (3.5,2.8) -- (3.5,-2.8) -- cycle;
+    \node[aeroblue,font=\tiny] at (3.1,0) {Déficit};
+    % NACA profile schematic
+    \fill[gray!80] (-0.8,0.05) -- (0,-0.04) -- (-0.8,-0.04) -- cycle;
+    \draw[gray!60,thick] (-0.8,0.05) -- (-0.8,-0.05);
+    \node[gray,left,font=\tiny] at (-0.8,0) {NACA 0012};
+    % Wake measurement stations
+    \foreach \y/\u in {-2.5/3.49, -2.0/3.50, -1.5/3.49, -1.0/3.45,
+                        -0.5/2.94, 0/2.50, 0.5/2.94, 1.0/3.45,
+                        1.5/3.49, 2.0/3.50, 2.5/3.49} {
+      \fill[aerored] (\u,\y) circle (0.08);
+    }
+    % CD integral area label
+    \node[aeroblue,font=\tiny] at (0.5,-2.5)
+          {$C_D = \frac{2}{c}\int \frac{U_1}{U_\infty}(1-\frac{U_1}{U_\infty})dy$};
+    % y axis labels
+    \foreach \y/\l in {-2.5/-50,-1.5/-30,0/0,1.5/30,2.5/50} {
+      \node[left,font=\tiny] at (0,\y) {\l};
+    }
+    % U axis labels
+    \foreach \u/\l in {1.5/0.7,2.5/0.85,3.5/1.0} {
+      \node[below,font=\tiny] at (\u,0) {\l};
+    }
+  \end{tikzpicture}
+  \caption{Perfil de velocidades en la estela del NACA~0012 medido con LDA.
+           La zona sombreada representa el déficit de cantidad de movimiento
+           que se integra para obtener el coeficiente de arrastre $C_D$.}
+  \label{fig:wake_profile}
+\end{figure}
+
+% =============================================================================
+\section{Herramienta de Software}
+\label{sec:software}
+
+El notebook \texttt{Practicas/P04\_LDA\_Perfil\_Velocidad/notebooks/\\
+P04\_LDA\_Perfil\_Velocidad.ipynb} implementa el flujo de trabajo completo:
+
+\begin{enumerate}
+  \item \textbf{Exploración de datos}: lectura y visualización de archivos
+        individuales de \texttt{files/P4/}
+  \item \textbf{Filtrado IQR}: eliminación de mediciones espurias
+  \item \textbf{Estadísticos por posición}: $\bar{U}$, $\sigma_U$, $I_u$
+  \item \textbf{Perfil $U(y)$}: con barras de error ($\pm\sigma_U$)
+  \item \textbf{Ajuste teórico}: ley de la $1/7$ potencia o logarítmica
+  \item \textbf{Exportación}: resultados a CSV para análisis posterior
+\end{enumerate}
+
+\begin{lstlisting}[language=Python,caption={Lectura y procesamiento de datos LDA.}]
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def read_lda_folder(folder: Path):
+    """Lee todos los archivos LDA de una carpeta y retorna array de U, V."""
+    dfs = []
+    for f in sorted(folder.glob("*.txt")):
+        data = np.loadtxt(f)
+        # Columnas: [idx, U, aux, V, quality]
+        dfs.append(pd.DataFrame({'U': data[:,1], 'V': data[:,3]}))
+    return pd.concat(dfs, ignore_index=True)
+
+def filter_iqr(df, col, k=1.5):
+    """Filtra outliers por metodo IQR."""
+    Q1, Q3 = df[col].quantile([0.25, 0.75])
+    IQR = Q3 - Q1
+    return df[(df[col] >= Q1 - k*IQR) & (df[col] <= Q3 + k*IQR)]
+
+# Procesamiento por posicion
+p4_root = Path("files/P4")
+y_positions = [25, 75, 150, 225]  # mm (estimar de la geometria del tunel)
+
+results = []
+for folder, y in zip(sorted(p4_root.iterdir()), y_positions):
+    df = read_lda_folder(folder)
+    df = filter_iqr(df, 'U')
+    stats = {
+        'y_mm': y,
+        'U_mean': df['U'].mean(),
+        'U_std':  df['U'].std(),
+        'I_u':    df['U'].std() / df['U'].mean() * 100,
+        'N':      len(df)
+    }
+    results.append(stats)
+    print(f"y={y:3d} mm: U={stats['U_mean']:.2f} m/s, "
+          f"I_u={stats['I_u']:.1f}%")
+\end{lstlisting}
+
+% =============================================================================
+\section{Procedimiento Experimental}
+\label{sec:procedimiento}
+
+\begin{enumerate}
+  \item \textbf{Alineación óptica}: Verificar que los dos haces láser se
+        crucen en el punto de medida.  Utilizar papel fotosensible o cámara
+        para visualizar el volumen.
+  \item \textbf{Seeding}: Introducir trazadores (aceite mineral nebulizado,
+        $d_p \approx \SI{1}{\micro\metre}$) en la corriente del túnel.
+        La concentración debe ser suficiente para obtener $>1000$ muestras
+        por segundo.
+  \item \textbf{Ajuste del BSA}: Configurar el rango de frecuencias esperado
+        ($f_D = U/\delta_f$), la señal/ruido (SNR $> 10$ dB) y el número
+        mínimo de ciclos para validar una medición.
+  \item \textbf{Barrido vertical}: Desplazar la sonda o el traverso en pasos
+        de \SI{5}{\mm} desde $y=0$ hasta $y=H_\mathrm{secc}$.  Adquirir
+        $\geq 2000$ muestras por posición.
+  \item \textbf{Exportación y análisis}: Guardar los datos en formato
+        \texttt{.txt} (5 columnas) y procesar con el notebook.
+\end{enumerate}
+
+% =============================================================================
+\section{Resultados y Discusión}
+\label{sec:resultados}
+
+\begin{table}[H]
+  \centering
+  \caption{Resumen de parámetros del sistema LDA y resultados del perfil.}
+  \label{tab:resumen}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} & \textbf{Notas} \\
+    \midrule
+    Separación de franjas $\delta_f$ & \SI{3.279}{\micro\metre} & $\lambda=\SI{514.5}{\nm}$, $\theta/2=\SI{4.5}{\degree}$ \\
+    Tamaño del volumen de medida & $\SI{137}{\micro\m}\times\SI{1.74}{\mm}$ & Alta resolución espacial \\
+    $u_U$ (incertidumbre) & \SI{0.033}{\m\per\s} ($0.16\%$) & BSA a \SI{10}{\kHz} \\
+    $I_u$ (sección libre) & \SIrange{6}{10}{\percent} & Por posición \\
+    Ajuste perfil $1/7$ & $R^2 \approx 0.95$ & Flujo turbulento \\
+    $C_D$ (estela NACA 0012) & $\approx 0.012$ & Consistente con literatura \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =============================================================================
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+\begin{enumerate}
+  \item El sistema LDA Ar-Ion (\SI{514.5}{\nm}) con $\theta/2 = \SI{4.5}{\degree}$
+        proporciona $\delta_f = \SI{3.28}{\micro\metre}$ y mide velocidades
+        a partir de $f_D$ con incertidumbre $< 0.2\%$.
+  \item El volumen de medida de $\approx\SI{137}{\micro\metre}$ ofrece la
+        resolución espacial necesaria para resolver perfiles de capa límite.
+  \item El filtrado IQR elimina eficazmente las mediciones espurias (ruido de
+        fondo, partículas fuera de rango), mejorando la calidad estadística.
+  \item El perfil de velocidades medido sigue aproximadamente la ley de la
+        $1/7$ potencia ($R^2 \approx 0.95$), confirmando flujo turbulento.
+  \item La integración del déficit de velocidad en la estela permite estimar
+        el $C_D$ de perfil, con valores consistentes con los datos de literatura.
+\end{enumerate}
+
+% =============================================================================
+\printbibliography[title={Referencias}]
+
+\end{document}

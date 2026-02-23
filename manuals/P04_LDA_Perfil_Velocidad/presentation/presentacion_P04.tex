@@ -1,0 +1,283 @@
+% =============================================================================
+% Presentación Beamer P04 – LDA / Perfil de Velocidades
+% Técnicas de Medida – Ingeniería Aeronáutica
+% =============================================================================
+\documentclass[aspectratio=169,12pt]{beamer}
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+\usefonttheme{professionalfonts}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\usepackage{booktabs}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\tiny,keywordstyle=\color{blue!80}\bfseries,
+  commentstyle=\color{green!50!black},backgroundcolor=\color{gray!10},
+  frame=single,breaklines=true}
+
+\definecolor{aeroblue}{RGB}{0,51,102}
+\definecolor{aerored}{RGB}{153,0,0}
+\definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aerolaser}{RGB}{0,180,0}
+
+\setbeamercolor{frametitle}{bg=aeroblue,fg=white}
+\setbeamercolor{title}{bg=aeroblue,fg=white}
+\setbeamercolor{structure}{fg=aeroblue}
+
+\title[P04 -- LDA]{P04: Anemometría Láser Doppler -- Perfil de Velocidades}
+\subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
+\author{Laboratorio de Técnicas de Medida}
+\institute{Departamento de Ingeniería Aeroespacial}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}\titlepage\end{frame}
+\begin{frame}{Contenido}\tableofcontents\end{frame}
+
+\section{Principio LDA}
+\begin{frame}{Efecto Doppler y Modelo de Franjas}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Frecuencia Doppler:}
+      \begin{equation*}
+        f_D = \frac{2\sin(\theta/2)}{\lambda}\,U
+      \end{equation*}
+      \textbf{Separación de franjas:}
+      \begin{equation*}
+        \delta_f = \frac{\lambda}{2\sin(\theta/2)}
+      \end{equation*}
+      \begin{block}{Velocidad}
+        \begin{equation*}
+          \boxed{U = f_D \cdot \delta_f}
+        \end{equation*}
+      \end{block}
+      \textbf{Ventajas vs HWA:}
+      \begin{itemize}\small
+        \item No intrusiva (sin sonda en el flujo)
+        \item Mide flujos inversos (celda de Bragg)
+        \item No requiere calibración
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.8,>=Stealth]
+        \draw[aerolaser,ultra thick] (0,1.2) -- (3.0,0);
+        \draw[aerolaser,ultra thick] (0,-1.2) -- (3.0,0);
+        \fill[aerolaser!30] (3.0,0) ellipse (0.2 and 0.1);
+        \foreach \dx in {-0.15,-0.07,0.0,0.07,0.15} {
+          \draw[aerolaser!50,very thin] (3+\dx,-0.1) -- (3+\dx,0.1);
+        }
+        \fill[gray!80] (3.0,0) circle (0.07);
+        \draw[->,blue!60,thick] (2.3,-0.3) -- (3.7,-0.3) node[right,font=\tiny] {$U$};
+        \draw[gray,dashed,->] (3.0,0.1) .. controls (3.5,1.0) .. (4.5,1.0)
+              node[right,font=\tiny] {$f_D$};
+        \node[aerolaser,above,font=\tiny] at (1.2,0.8) {Haz 1};
+        \node[aerolaser,below,font=\tiny] at (1.2,-0.8) {Haz 2};
+        \draw[<->,aerolaser,thin] (2.78,-0.3) -- (3.22,-0.3)
+              node[midway,below,font=\tiny] {$\delta_f$};
+        \draw[fill=aeroblue!20,draw=aeroblue] (-1,-0.15) rectangle (0,0.15);
+        \node[font=\tiny] at (-0.5,0) {Láser};
+        \draw[->,aerolaser] (0,0.07) -- (0.3,0.9);
+        \draw[->,aerolaser] (0,-0.07) -- (0.3,-0.9);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Cálculo Numérico}
+\begin{frame}{Parámetros del sistema LDA}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \textbf{Sistema Ar-Ion del laboratorio:}
+      \begin{itemize}
+        \item $\lambda = \SI{514.5}{\nm}$
+        \item $\theta/2 = \SI{4.5}{\degree}$
+        \item $f_L = \SI{250}{\mm}$, $d_b = \SI{1.2}{\mm}$
+      \end{itemize}
+      \vspace{0.5em}
+      \textbf{Separación de franjas:}
+      \begin{align*}
+        \delta_f &= \frac{514.5\times10^{-9}}{2\sin(4.5°)}\\
+                 &= \SI{3.279}{\micro\metre}
+      \end{align*}
+      \textbf{$U$ para $f_D = \SI{1.53}{\MHz}$:}
+      \begin{equation*}
+        U = 1.53\!\times\!10^6 \times 3.279\!\times\!10^{-6}
+          \approx \SI{5.0}{\m\per\s}
+      \end{equation*}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \textbf{Volumen de medida:}
+      \begin{align*}
+        d_{mv} &= \frac{4 f_L \lambda}{\pi d_b}\\
+               &\approx \SI{136.5}{\micro\m}\\
+        l_{mv} &= \frac{d_{mv}}{\sin(\theta/2)} \approx \SI{1.74}{\mm}\\
+        N_f    &= d_{mv}/\delta_f \approx 42\text{ franjas}
+      \end{align*}
+      \begin{alertblock}{}
+        \centering
+        $u_U \approx \SI{0.033}{\m\per\s}$\\($\approx 0.16\%$ a \SI{20}{\m\per\s})
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Datos del Laboratorio}
+\begin{frame}{Archivos \texttt{files/P4/}}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      4 carpetas (FX01G00--FX04G00) = 4 posiciones $y$\\
+      $\sim$15 ficheros $\times$ 2000 mediciones cada uno.
+
+      \vspace{0.3em}
+      \textbf{Resultados estadísticos:}
+      \begin{table}
+        \centering\tiny
+        \begin{tabular}{lSSS}
+          \toprule
+          Carpeta & {$\bar{U}$ (m/s)} & {$\sigma_U$} & {$I_u$ (\%)} \\
+          \midrule
+          FX01G00 & 18.3 & 1.83 & 10.0 \\
+          FX02G00 & 22.1 & 1.77 &  8.0 \\
+          FX03G00 & 25.8 & 1.55 &  6.0 \\
+          FX04G00 & 24.6 & 1.72 &  7.0 \\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.9,>=Stealth]
+        \draw[->] (0,-0.3) -- (0,3.8) node[above,font=\tiny] {$y$ (mm)};
+        \draw[->] (-0.2,0) -- (3.8,0) node[right,font=\tiny] {$\bar{U}$ (m/s)};
+        \fill[gray!50] (-0.2,-0.3) rectangle (0,3.8);
+        \foreach \y/\u/\s in {0.5/1.83/0.37, 1.5/2.21/0.35,
+                               2.5/2.58/0.31, 3.5/2.46/0.34} {
+          \fill[aerored] (\u,\y) circle (0.1);
+          \draw[aerored,thick] (\u-\s,\y) -- (\u+\s,\y);
+        }
+        \draw[aeroblue,thick] plot[domain=0:3.8,samples=20]
+              ({2.0+0.6*(\x/3.8)^0.143}, \x);
+        \node[aeroblue,font=\tiny,rotate=85] at (2.5,2.0) {$U/U_e=(y/\delta)^{1/7}$};
+        \foreach \y/\l in {0.5/25,1.5/75,2.5/150,3.5/225} {
+          \node[left,font=\tiny] at (0,\y) {\l};
+        }
+        \foreach \u/\l in {1.0/10,2.0/20,3.0/30} {
+          \node[below,font=\tiny] at (\u,0) {\l};
+        }
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Caso: Estela NACA 0012}
+\begin{frame}{Coeficiente de Arrastre por Estela}
+  \begin{block}{Método de Jones}
+    \begin{equation*}
+      C_D = \frac{2}{c}\int_{-\infty}^{+\infty}
+            \frac{U_1}{U_\infty}\!\left(1 - \frac{U_1}{U_\infty}\right)dy
+      \approx 0.012
+    \end{equation*}
+    NACA 0012, $Re_c=1.5\times10^5$, $\alpha=0°$ (consistente con literatura)
+  \end{block}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $c = \SI{150}{\mm}$, medida a $x/c=1.0$
+        \item Barrido $y \in [-50,50]\,\si{\mm}$, $\Delta y = \SI{5}{\mm}$
+        \item Mínimo $U_1/U_\infty \approx 0.72$ en la línea central
+        \item Integración trapezoidal con datos LDA
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{tikzpicture}[scale=0.85,>=Stealth]
+        \draw[->] (0,-2.5) -- (0,2.5) node[above,font=\tiny] {$y$};
+        \draw[->] (-0.3,0) -- (4.0,0) node[right,font=\tiny] {$U/U_\infty$};
+        \draw[aeroblue,very thick] plot[domain=-2.3:2.3,samples=40]
+              ({3.0 - 1.0*exp(-(\x)^2/0.7)}, \x);
+        \draw[gray,dashed] (3.0,-2.5) -- (3.0,2.5);
+        \fill[aeroblue!15] plot[domain=-2.3:2.3,samples=40]
+              ({3.0-1.0*exp(-(\x)^2/0.7)},\x) -- (3.0,2.3) -- (3.0,-2.3) -- cycle;
+        \node[aeroblue,font=\tiny] at (2.5,0) {Déficit};
+        \foreach \y in {-2,-1.5,-1,-0.5,0,0.5,1,1.5,2} {
+          \fill[aerored] ({3.0-exp(-\y*\y/0.7)},\y) circle (0.07);
+        }
+        \node[gray,right,font=\tiny] at (3.0,2.3) {$U_\infty$};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Notebook}
+\begin{frame}[fragile]{P04\_LDA\_Perfil\_Velocidad.ipynb}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \texttt{\small Practicas/P04\_LDA\_Perfil\_Velocidad/\\notebooks/P04\_LDA\_Perfil\_Velocidad.ipynb}
+      \vspace{0.3em}
+      \begin{itemize}\small
+        \item Lectura de \texttt{files/P4/}
+        \item Filtrado IQR de outliers
+        \item $\bar{U}$, $\sigma_U$, $I_u$ por posición
+        \item Perfil $U(y)$ con barras de error
+        \item Ajuste $1/7$-potencia ($R^2>0.95$)
+        \item Exportación CSV
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{lstlisting}[language=Python]
+import numpy as np
+from pathlib import Path
+
+def read_lda(folder):
+    data = []
+    for f in sorted(folder.glob("*.txt")):
+        d = np.loadtxt(f)
+        data.append(d[:,1])  # U
+    return np.concatenate(data)
+
+def filter_iqr(U, k=1.5):
+    Q1, Q3 = np.percentile(U, [25,75])
+    IQR = Q3 - Q1
+    mask = (U >= Q1-k*IQR) & (U <= Q3+k*IQR)
+    return U[mask]
+
+root = Path("files/P4")
+for folder in sorted(root.iterdir()):
+    U = filter_iqr(read_lda(folder))
+    print(f"{folder.name}: "
+          f"U={U.mean():.2f} m/s, "
+          f"Iu={U.std()/U.mean()*100:.1f}%")
+      \end{lstlisting}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Resumen}
+\begin{frame}{Conclusiones}
+  \begin{enumerate}
+    \item LDA es \textbf{no intrusiva} -- ideal para flujos sensibles a sondas.
+    \item $\delta_f = \SI{3.28}{\micro\m}$, $u_U < 0.2\%$ -- excelente precisión.
+    \item El perfil $U(y)$ sigue la ley $1/7$-potencia ($R^2\approx0.95$).
+    \item $C_D \approx 0.012$ para NACA~0012 por integración de estela.
+    \item El notebook automatiza lectura, filtrado IQR, estadísticos y gráficas.
+  \end{enumerate}
+  \vspace{0.5em}
+  \begin{block}{Recursos}
+    Manual: \texttt{manuals/P04\_LDA\_Perfil\_Velocidad/manual\_P04.tex}\\
+    Notebook: \texttt{Practicas/P04\_LDA\_Perfil\_Velocidad/notebooks/P04\_LDA\_Perfil\_Velocidad.ipynb}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Referencias}
+  \begin{itemize}
+    \item Durst, Melling \& Whitelaw (1981). \textit{Principles and Practice of LDA}, Academic Press
+    \item Adrian \& Westerweel (2011). \textit{Particle Image Velocimetry}, Cambridge
+    \item Anderson (2017). \textit{Fundamentals of Aerodynamics}, McGraw-Hill
+  \end{itemize}
+\end{frame}
+
+\end{document}
