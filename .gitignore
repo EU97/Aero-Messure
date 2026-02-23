@@ -35,6 +35,10 @@ Practicas/PDF
 *.out
 *.toc
 *.bcf
+*.xdv
+*.nav
+*.snm
+*.vrb
 
 
 ## Build directories (if you use tools like latexmk)

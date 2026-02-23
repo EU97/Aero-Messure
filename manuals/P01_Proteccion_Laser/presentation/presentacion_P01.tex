@@ -1,6 +1,7 @@
 % =============================================================================
 % Presentación Beamer P01 – Protección Ocular frente a Radiación Láser
 % Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode presentacion_P01.tex
 % =============================================================================
 \documentclass[aspectratio=169,12pt]{beamer}
 
@@ -9,21 +10,23 @@
 \usefonttheme{professionalfonts}
 
 % ---- Encoding & Language ----
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\usepackage{fontspec}
 \usepackage[spanish]{babel}
 
 % ---- Math & Physics ----
 \usepackage{amsmath,amssymb}
+\usepackage{mathtools}
 \usepackage{siunitx}
 \sisetup{output-decimal-marker={,}}
 
 % ---- TikZ ----
 \usepackage{tikz}
+\usetikzlibrary{babel}
 \usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,decorations.markings}
 
 % ---- Tables ----
 \usepackage{booktabs}
+\usepackage{colortbl}
 
 % ---- Code ----
 \usepackage{listings}
@@ -41,402 +44,560 @@
 \definecolor{aerored}{RGB}{153,0,0}
 \definecolor{aerogreen}{RGB}{0,102,51}
 \definecolor{aeroyellow}{RGB}{204,153,0}
+\definecolor{aerogreendark}{RGB}{0,80,40}
+\definecolor{aerogreenlight}{RGB}{0,140,70}
 
-\setbeamercolor{frametitle}{bg=aeroblue,fg=white}
-\setbeamercolor{title}{bg=aeroblue,fg=white}
-\setbeamercolor{structure}{fg=aeroblue}
+% ---- GREEN THEME ----
+\setbeamercolor{frametitle}{bg=aerogreen,fg=white}
+\setbeamercolor{title}{bg=aerogreen,fg=white}
+\setbeamercolor{structure}{fg=aerogreen}
+\setbeamercolor{palette primary}{bg=aerogreen,fg=white}
+\setbeamercolor{palette secondary}{bg=aerogreenlight,fg=white}
+\setbeamercolor{palette tertiary}{bg=aerogreendark,fg=white}
+\setbeamercolor{palette quaternary}{bg=aerogreendark,fg=white}
+\setbeamercolor{section in toc}{fg=aerogreen}
+\setbeamercolor{subsection in toc}{fg=aerogreendark}
+\setbeamercolor{block title}{bg=aerogreen,fg=white}
+\setbeamercolor{block body}{bg=aerogreen!10,fg=black}
+\setbeamercolor{block title alerted}{bg=aerored,fg=white}
+\setbeamercolor{block body alerted}{bg=aerored!10,fg=black}
+\setbeamercolor{block title example}{bg=aerogreenlight,fg=white}
+\setbeamercolor{block body example}{bg=aerogreenlight!10,fg=black}
+\setbeamercolor{item}{fg=aerogreen}
+\setbeamercolor{itemize item}{fg=aerogreen}
+\setbeamercolor{enumerate item}{fg=aerogreen}
 
 % ---- Title Info ----
 \title[P01 -- Protección Láser]{P01: Protección Ocular frente a\\Radiación Láser}
 \subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
 \author{Laboratorio de Técnicas de Medida}
-\institute{Departamento de Ingeniería Aeroespacial}
 \date{\today}
 
 % =============================================================================
 \begin{document}
 
 \begin{frame}
-  \titlepage
+	\titlepage
 \end{frame}
 
-% ----------
-\begin{frame}{Contenido}
-  \tableofcontents
+\begin{frame}{Índice}
+	\tableofcontents
 \end{frame}
 
 % =============================================================================
-\section{Motivación y Contexto}
+\section{Introducción}
+% =============================================================================
 
-\begin{frame}{¿Por qué protección láser en aeronáutica?}
-  \begin{columns}
-    \begin{column}{0.55\textwidth}
-      \textbf{Aplicaciones láser en laboratorios aeronáuticos:}
-      \begin{itemize}
-        \item \textcolor{aeroblue}{\textbf{PIV}} -- Nd:YAG 532 nm, 200 mJ/pulso
-        \item \textcolor{aeroblue}{\textbf{LDA/LDV}} -- Ar-Ion 488/514 nm, 5 W
-        \item \textbf{Alineación} -- He-Ne 632.8 nm, 1 mW
-        \item \textbf{LIDAR} -- 1064/532 nm, alta energía
-      \end{itemize}
-      \vspace{0.5em}
-      \begin{alertblock}{Riesgo}
-        El ojo humano puede concentrar un haz colimado en una mancha de
-        \textbf{$\leq$\SI{10}{\micro\metre}} en la retina $\Rightarrow$
-        lesión irreversible.
-      \end{alertblock}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{tikzpicture}[scale=0.85]
-        \draw[fill=aeroblue!20,draw=aeroblue,thick] (0,0) rectangle (1.2,0.5);
-        \node[font=\tiny\bfseries] at (0.6,0.25) {LÁSER};
-        \draw[aerored,ultra thick,->] (1.2,0.25) -- (4.0,0.25);
-        \draw[aerored!40] (1.2,0.25) -- (4.0,0.7);
-        \draw[aerored!40] (1.2,0.25) -- (4.0,-0.2);
-        \draw[fill=gray!30,draw=black] (4.0,-0.15) ellipse (0.3 and 0.5);
-        \draw[aerogreen,very thick] (3.7,0) -- (4.3,0) -- (4.3,0.5) -- (3.7,0.5) -- cycle;
-        \node[aerogreen,font=\tiny\bfseries] at (4.0,0.25) {OD};
-        \node[below,font=\tiny,aerored] at (2.6,0.0) {$\lambda,P,\theta$};
-      \end{tikzpicture}
-      \vspace{0.2em}
-      {\footnotesize Sistema PIV con protección ocular OD}
-    \end{column}
-  \end{columns}
+\begin{frame}{¿Por qué Seguridad Láser?}
+	\begin{columns}
+		\begin{column}{0.55\textwidth}
+			\begin{itemize}
+				\item Láseres: herramientas clave en ingeniería aeronáutica
+				      \begin{itemize}
+					      \item PIV (Velocimetría por Imagen de Partículas)
+					      \item LDA (Anemometría Láser Doppler)
+					      \item Metrología y ensayos no destructivos
+				      \end{itemize}
+				\item Radiación coherente, colimada y de alta irradiancia
+				\item \textbf{Riesgo ocular irreversible} incluso con exposiciones breves
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			\begin{tikzpicture}[scale=0.7]
+				\draw[fill=aerogreen!20,draw=aerogreen,thick] (0,0) rectangle (1.5,0.6);
+				\node at (0.75,0.3) {\tiny\bfseries LÁSER};
+				\draw[aerored,ultra thick,->] (1.5,0.3) -- (4.5,0.3);
+				\draw[aerored!30,thin] (1.5,0.3) -- (4.5,0.7);
+				\draw[aerored!30,thin] (1.5,0.3) -- (4.5,-0.1);
+				\draw[fill=gray!30] (4.5,-0.1) ellipse (0.25 and 0.45);
+				\draw[aerogreen,very thick] (4.2,0) rectangle (4.8,0.5);
+				\node[aerogreen,font=\tiny\bfseries] at (4.5,0.25) {OD};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Objetivos de la Práctica}
+	\begin{enumerate}
+		\item Identificar peligros de radiación láser en el laboratorio
+		\item Aplicar clasificación de seguridad (IEC~60825 / ANSI~Z136.1)
+		\item Calcular la Exposición Potencial ($H_0$) y la OD requerida
+		\item Seleccionar EPO adecuado para \textbf{3 escenarios láser}
+		\item Analizar un caso de estudio con exposición prolongada
+		\item Usar herramientas Python para automatizar los cálculos
+	\end{enumerate}
 \end{frame}
 
 % =============================================================================
 \section{Fundamentos Teóricos}
+% =============================================================================
 
-\begin{frame}{Clasificación de peligro -- IEC 60825-1}
-  \begin{table}
-    \centering
-    \small
-    \begin{tabular}{cll}
-      \toprule
-      \textbf{Clase} & \textbf{Descripción} & \textbf{Ejemplo aeronáutico} \\
-      \midrule
-      1   & Seguro en condiciones normales & Sensores integrados \\
-      2   & Visible, reflex palpebral protege & Punteros alineación \\
-      3R  & Riesgo bajo con vista directa & Diodo $<$5 mW \\
-      3B  & Peligroso visión directa & LDA 50 mW \\
-      \rowcolor{aerored!20}
-      \textbf{4} & \textbf{Peligroso reflexiones difusas} & \textbf{PIV 200 mJ} \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-  \vspace{0.3em}
-  \begin{block}{El laboratorio PIV usa láseres \textbf{Clase 4}}
-    Requieren los controles más estrictos: cabina, interlock, LSO, EPP.
-  \end{block}
+\begin{frame}{Propiedades del Láser}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{4 Propiedades Clave}
+				\begin{enumerate}
+					\item \textbf{Monocromaticidad} \\ $\lambda$ única
+					\item \textbf{Coherencia} \\ Ondas en fase
+					\item \textbf{Direccionalidad} \\ Baja divergencia
+					\item \textbf{Alta Irradiancia} \\ Gran energía en área reducida
+				\end{enumerate}
+			\end{block}
+		\end{column}
+		\begin{column}{0.45\textwidth}
+			\begin{alertblock}{Consecuencia}
+				$\rightarrow$ Concentración de $10^5$ en la retina para $\lambda = 400$--$1400$~nm
+			\end{alertblock}
+			\vspace{0.3cm}
+			\begin{exampleblock}{Zona Crítica}
+				Nuestros 3 láseres (514,5 / 532 / 635~nm) caen en la \textbf{zona visible de máximo riesgo retiniano}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\begin{frame}{Exposición Máxima Permisible (MPE)}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      La MPE es el nivel de irradiancia u exposición radiante al que puede
-      estar expuesto el ojo \textbf{sin daño}.
+\begin{frame}{Clasificación de Seguridad Láser}
+	\centering
+	\small
+	\begin{tabular}{clll}
+		\toprule
+		\textbf{Clase} & \textbf{Riesgo}                       & \textbf{Ejemplo}           & \textbf{Controles}        \\
+		\midrule
+		1              & Seguro normal                         & Sensores encapsulados      & Ninguno                   \\
+		2              & Visible, reflejo palpebral            & Puntero                    & Señalización              \\
+		\rowcolor{aeroyellow!30}
+		3R             & Riesgo bajo directa                   & \textbf{Diodo alineación}  & Señalización + precaución \\
+		3B             & Peligroso directa                     & LDA baja $P$               & EPO frecuente             \\
+		\rowcolor{aerored!25}
+		\textbf{4}     & \textbf{Directa + especular + difusa} & \textbf{PIV, LDA alta $P$} & \textbf{EPO obligatorio}  \\
+		\bottomrule
+	\end{tabular}
 
-      \vspace{0.5em}
-      Para $\lambda = \SI{532}{\nm}$, $t = \SI{6}{\ns}$:
-      \begin{equation*}
-        \mathrm{MPE} = \SI{5e-3}{\joule\per\metre\squared}
-      \end{equation*}
-      (IEC 60825-1:2014, Tabla A.1)
-
-      \vspace{0.5em}
-      Depende de:
-      \begin{itemize}
-        \item Longitud de onda $\lambda$
-        \item Duración exposición $t$
-        \item Ángulo de subtensa $\alpha$
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.75]
-        % Axes
-        \draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$\lambda$ (nm)};
-        \draw[->] (0,0) -- (0,4) node[above,font=\tiny] {MPE (J/m²)};
-        % UV region
-        \fill[violet!20] (0,0) rectangle (1.5,4);
-        \node[font=\tiny,rotate=90] at (0.75,2) {UV};
-        % Visible
-        \fill[yellow!20] (1.5,0) rectangle (3.2,4);
-        \node[font=\tiny,rotate=90] at (2.35,2) {Visible};
-        % IR
-        \fill[red!10] (3.2,0) rectangle (5,4);
-        \node[font=\tiny,rotate=90] at (4.1,2) {IR};
-        % MPE curve (schematic)
-        \draw[aeroblue,thick] (0,3.5) -- (1.0,1.0) -- (1.5,0.5)
-              -- (3.2,0.8) -- (4.0,1.5) -- (5.0,3.0);
-        % 532nm marker
-        \draw[aerored,dashed] (2.1,0) -- (2.1,0.65);
-        \fill[aerored] (2.1,0.65) circle (0.08);
-        \node[aerored,font=\tiny,right] at (2.1,0.65) {532nm};
-        % MPE value
-        \draw[gray,dashed] (0,0.65) -- (2.1,0.65);
-        \node[gray,font=\tiny,left] at (0,0.65) {\SI{5e-3}{}};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+	\vspace{0.5cm}
+	\begin{tikzpicture}
+		\draw[->,very thick,aerogreen!60!black] (0,0) -- (10,0);
+		\foreach \x/\lab in {0.5/1, 2/2, 4/3R, 6/3B, 8.5/4} {
+				\fill[aerogreen!\x 0!red] (\x,0) circle (0.2);
+				\node[above,font=\scriptsize\bfseries] at (\x,0.25) {\lab};
+			}
+		\node[font=\tiny,left] at (0,0) {Seguro};
+		\node[font=\tiny,right] at (10,0) {Máximo peligro};
+	\end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Densidad Óptica (OD)}
-  \begin{block}{Definición}
-    \begin{equation*}
-      \boxed{OD = \log_{10}\!\left(\frac{H_0}{H_{\mathrm{MPE}}}\right)}
-    \end{equation*}
-    \begin{itemize}
-      \item $H_0$ = exposición incidente [\si{\joule\per\metre\squared}]
-      \item $H_{\mathrm{MPE}}$ = MPE para $\lambda$ y $t$
-    \end{itemize}
-  \end{block}
+\begin{frame}{Interacción Láser -- Ojo}
+	\begin{tikzpicture}[scale=0.75]
+		% Spectrum
+		\fill[violet!40] (0,0) rectangle (1.5,0.8);
+		\fill[yellow!40] (1.5,0) rectangle (4,0.8);
+		\fill[red!20]    (4,0) rectangle (6.5,0.8);
+		\node[font=\tiny,rotate=90] at (0.75,0.4) {UV};
+		\node[font=\tiny,rotate=90] at (2.75,0.4) {Vis+IR-A};
+		\node[font=\tiny,rotate=90] at (5.25,0.4) {IR-B/C};
+		% Danger
+		\draw[aerored,very thick] (0,1.2) -- (1.5,2.2) -- (2.75,3) -- (4,2) -- (6.5,1);
+		\node[aerored,font=\tiny,above] at (2.75,3) {Máx. peligro retiniano};
+		% Lasers
+		\draw[blue!70,dashed] (2.4,0) -- (2.4,2.6);
+		\node[blue!70,font=\tiny,left] at (2.4,2.6) {514,5};
+		\draw[green!60!black,dashed] (2.6,0) -- (2.6,2.8);
+		\node[green!60!black,font=\tiny,right] at (2.6,2.8) {532};
+		\draw[red!70,dashed] (3.2,0) -- (3.2,2.5);
+		\node[red!70,font=\tiny,right] at (3.2,2.5) {635};
+		% Axis
+		\draw[->] (0,0) -- (7,0) node[right,font=\tiny] {$\lambda$ (nm)};
+		\node[font=\tiny] at (0,-0.2) {100};
+		\node[font=\tiny] at (1.5,-0.2) {400};
+		\node[font=\tiny] at (4,-0.2) {1400};
+	\end{tikzpicture}
 
-  \vspace{0.3em}
-  \textbf{Exposición del haz gaussiano:}
-  \begin{equation*}
-    H_0 = \frac{Q}{\pi w_0^2}
-  \end{equation*}
+	\vspace{0.3cm}
+	\begin{itemize}
+		\item \textbf{UV (100--400~nm):} córnea/cristalino $\rightarrow$ fotoqueratitis
+		\item \textbf{Visible + IR-A (400--1400~nm):} retina $\rightarrow$ \alert{daño irreversible}
+		\item \textbf{IR-B/C ($>$1400~nm):} córnea $\rightarrow$ quemaduras
+	\end{itemize}
+\end{frame}
 
-  \vspace{0.3em}
-  \textbf{Transmitancia del filtro:} $T = 10^{-OD}$
-  \begin{equation*}
-    H_{\mathrm{trans}} = H_0 \cdot 10^{-OD} \leq H_{\mathrm{MPE}}
-    \quad \Rightarrow \quad
-    OD \geq \log_{10}\!\left(\frac{H_0}{H_{\mathrm{MPE}}}\right)
-  \end{equation*}
+\begin{frame}{Parámetros Clave y Ecuaciones}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Parámetros}
+				\begin{itemize}
+					\item $\lambda$ -- longitud de onda (nm)
+					\item $P$ -- potencia CW (W)
+					\item $E$ -- energía/pulso (J)
+					\item $a$ -- diámetro haz (mm)
+					\item MPE -- Exposición Máx. Permisible
+				\end{itemize}
+			\end{block}
+		\end{column}
+		\begin{column}{0.45\textwidth}
+			\begin{block}{Ecuaciones}
+				Área del haz:
+				$A = \dfrac{\pi\,a^2}{4}$
+				\vspace{0.2cm}
+
+				Exposición potencial:
+				$H_0 = \dfrac{P \text{ o } E}{A}$
+				\vspace{0.2cm}
+
+				\textbf{Densidad óptica:}
+				\[\boxed{OD = \log_{10}\!\left(\frac{H_0}{H_{\mathrm{MPE}}}\right)}\]
+			\end{block}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % =============================================================================
-\section{Cálculo Numérico}
+\section{Escenarios Láser}
+% =============================================================================
 
-\begin{frame}{Ejemplo: PIV con Nd:YAG 532 nm}
-  \begin{columns}
-    \begin{column}{0.45\textwidth}
-      \textbf{Datos del sistema:}
-      \begin{itemize}
-        \item $Q = \SI{200}{\milli\joule}$
-        \item $\tau = \SI{6}{\ns}$
-        \item $w_0 = \SI{5}{\mm}$
-        \item $\phi = \SI{3}{\milli\radian}$
-        \item $f_\mathrm{rep} = \SI{10}{\Hz}$
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.52\textwidth}
-      \textbf{Paso 1 -- Exposición incidente:}
-      \begin{align*}
-        H_0 &= \frac{0.200}{\pi (5\times10^{-3})^2}\\
-            &\approx \SI{2547}{\joule\per\metre\squared}
-      \end{align*}
-
-      \textbf{Paso 2 -- MPE:} $\SI{5e-3}{\joule\per\metre\squared}$
-
-      \textbf{Paso 3 -- OD:}
-      \begin{align*}
-        OD &= \log_{10}\!\left(\frac{2547}{5\times10^{-3}}\right)\\
-           &= \log_{10}(5.09\times10^5) \approx 5.71
-      \end{align*}
-      \begin{alertblock}{}
-        \centering \textbf{OD requerido = 6}\\
-        Marcado: \texttt{I 532 L6}
-      \end{alertblock}
-    \end{column}
-  \end{columns}
+\begin{frame}{Tres Escenarios de la Práctica}
+	\centering
+	\small
+	\begin{tabular}{lccc}
+		\toprule
+		               & \textbf{Láser 1 (PIV)} & \textbf{Láser 2 (LDA)} & \textbf{Láser 3 (Alin.)} \\
+		\midrule
+		Tipo           & Nd:YAG $2\omega$       & Argón Ion CW           & Diodo CW                 \\
+		$\lambda$ (nm) & 532                    & 514,5                  & 635                      \\
+		Modo           & Pulsado                & CW                     & CW                       \\
+		$E$ (mJ)       & 200                    & {--}                   & {--}                     \\
+		$P$ (W)        & {--}                   & 1,5                    & 0,0045                   \\
+		$\tau$ (ns)    & 8                      & {--}                   & {--}                     \\
+		$f$ (Hz)       & 15                     & {--}                   & {--}                     \\
+		$a$ (mm)       & 5                      & 1,2                    & 3                        \\
+		\rowcolor{aerored!15}
+		\textbf{Clase} & \textbf{4}             & \textbf{4}             & \textbf{3R}              \\
+		\bottomrule
+	\end{tabular}
 \end{frame}
 
-\begin{frame}{Zona Nominal de Peligro (NHZ)}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \begin{equation*}
-        r_{\mathrm{NHZ}} = \frac{1}{\phi}
-          \sqrt{\frac{4P_\mathrm{pico}}{\pi E_\mathrm{MPE}}}
-      \end{equation*}
+\begin{frame}{Catálogo de Gafas EPO}
+	\centering
+	\small
+	\begin{tabular}{llll}
+		\toprule
+		\textbf{ID} & \textbf{Lente}  & \textbf{OD Especificada}               & \textbf{VLT} \\
+		\midrule
+		EPO-001     & Naranja         & OD~5+ @ 190--540~nm                    & 40\%         \\
+		EPO-002     & Verde           & OD~2+ @ 630--670~nm                    & 55\%         \\
+		EPO-003     & Azul Cobalto    & OD~7+ @ 190--400~nm; OD~6+ @ 532~nm    & 15\%         \\
+		EPO-004     & Transparente    & OD~2+ @ 10\,600~nm (CO$_2$)            & 90\%         \\
+		EPO-005     & Multi-$\lambda$ & OD~7 @ 190--534~nm; OD~6 @ 800--820~nm & 30\%         \\
+		\bottomrule
+	\end{tabular}
 
-      \vspace{0.3em}
-      $P_\mathrm{pico} = Q/\tau = 0.2/6\!\times\!10^{-9}
-       = \SI{3.33e7}{\watt}$
-
-      \begin{align*}
-        r_{\mathrm{NHZ}} &= \frac{1}{3\!\times\!10^{-3}}
-          \sqrt{\frac{4\!\times\!3.33\!\times\!10^7}
-                     {\pi\!\times\!8.33\!\times\!10^5}}\\
-        &\approx \textbf{\SI{2376}{\metre}}
-      \end{align*}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.72]
-        \fill[aerored!15] (0,0) -- (5,1.0) -- (5,-1.0) -- cycle;
-        \draw[fill=aeroblue!30,draw=aeroblue,thick] (-0.9,-0.3) rectangle (0,0.3);
-        \node[font=\tiny\bfseries] at (-0.45,0) {L};
-        \draw[aerored,ultra thick,->] (0,0) -- (5.8,0);
-        \draw[aerored,thick] (0,0.03) -- (5,1.0);
-        \draw[aerored,thick] (0,-0.03) -- (5,-1.0);
-        \draw[aerored!70,dashed,thick] (5,1.1) arc(90:-90:1.1);
-        \draw[<->,gray,thin] (0,-1.5) -- (5,-1.5)
-              node[midway,below,font=\tiny] {$r_{\mathrm{NHZ}}\approx\SI{2.4}{\km}$};
-        \node[aerored,font=\tiny,rotate=12] at (2.5,0.4) {\bfseries NHZ};
-        \node[aerogreen,font=\tiny] at (5.8,0.3) {Seguro};
-        \node[fill=aeroyellow,draw=black,font=\tiny,
-              minimum width=0.5cm,minimum height=0.5cm] at (2.5,-0.7) {!};
-      \end{tikzpicture}
-      \vspace{0.3em}
-      {\footnotesize Se requiere cabina + interlock.}
-    \end{column}
-  \end{columns}
+	\vspace{0.5cm}
+	\begin{block}{Valores de MPE}
+		\begin{itemize}
+			\item \textbf{L1} (532~nm, pulsado): $H_\mathrm{MPE} = 5{,}0\times10^{-7}$ J/cm$^2$
+			\item \textbf{L2} (514,5~nm, CW 0,25~s): $H_\mathrm{MPE} = 2{,}5\times10^{-3}$ W/cm$^2$
+			\item \textbf{L3} (635~nm, CW 0,25~s): $H_\mathrm{MPE} = 2{,}5\times10^{-3}$ W/cm$^2$
+		\end{itemize}
+	\end{block}
 \end{frame}
 
 % =============================================================================
-\section{Evaluación de Riesgos}
+\section{Cálculos de Protección}
+% =============================================================================
 
-\begin{frame}{Matriz de Riesgos}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \begin{tikzpicture}[scale=0.65]
-        \foreach \x in {0,...,4} {
-          \foreach \y in {0,...,4} {
-            \pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
-            \pgfmathparse{\risk < 5 ? "green!40" : (\risk < 13 ? "yellow!60" : "red!50")}
-            \edef\fillcol{\pgfmathresult}
-            \fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
-            \draw[gray] (\x,\y) rectangle (\x+1,\y+1);
-            \node[font=\tiny] at (\x+0.5,\y+0.5)
-              {\pgfmathprintnumber[fixed,precision=0]{\risk}};
-          }
-        }
-        \fill[blue,opacity=0.9] (3.5,3.5) circle (0.25);
-        \node[white,font=\tiny\bfseries] at (3.5,3.5) {PIV};
-        \foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
-          \node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.05) {\l};
-        }
-        \foreach \y/\l in {0/Insignif.,1/Menor,2/Moderado,3/Mayor,4/Catastróf.} {
-          \node[font=\tiny,anchor=east] at (-0.05,\y+0.5) {\l};
-        }
-        \node[font=\tiny\bfseries,rotate=90] at (-1.2,2.5) {Severidad};
-        \node[font=\tiny\bfseries] at (2.5,-1.1) {Probabilidad};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \textbf{Jerarquía de controles:}
-      \begin{enumerate}\small
-        \item \textcolor{aerogreen}{\textbf{Eliminación/Sustitución}}\\
-              Usar láseres de clase inferior
-        \item \textcolor{aeroblue}{\textbf{Ingeniería}}\\
-              Interlock, cabina, obturador
-        \item \textcolor{aeroyellow}{\textbf{Administrativo}}\\
-              LSO, señalización, procedimientos
-        \item \textcolor{aerored}{\textbf{EPP}}\\
-              Gafas \texttt{I 532 L6}
-      \end{enumerate}
-    \end{column}
-  \end{columns}
+\begin{frame}{Láser 1: PIV -- Nd:YAG 532~nm (Clase~4)}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Cálculo}
+				$a = 5~\text{mm} = 0{,}5~\text{cm}$
+				\[A = \frac{\pi (0{,}5)^2}{4} = 0{,}1963~\text{cm}^2\]
+				$E = 200~\text{mJ} = 0{,}2~\text{J}$
+				\[H_0 = \frac{0{,}2}{0{,}1963} \approx 1{,}02~\text{J/cm}^2\]
+				\[OD_\mathrm{req} = \log_{10}\!\left(\frac{1{,}02}{5\times10^{-7}}\right) \approx \mathbf{6{,}31}\]
+			\end{block}
+		\end{column}
+		\begin{column}{0.45\textwidth}
+			\begin{alertblock}{Selección EPO}
+				\begin{itemize}
+					\item EPO-001: OD~5+ \textcolor{aerored}{\textbf{$\times$ Insuf.}}
+					\item EPO-003: OD~6+ \textcolor{aerored}{\textbf{$\times$ Insuf.}}
+					\item EPO-005: OD~7 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}}
+				\end{itemize}
+			\end{alertblock}
+			\vspace{0.2cm}
+			$\Rightarrow$ \textbf{EPO-005} (VLT 30\%)
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Láser 2: LDA -- Ar-Ion 514,5~nm (Clase~4)}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Cálculo}
+				$a = 1{,}2~\text{mm} = 0{,}12~\text{cm}$
+				\[A = \frac{\pi (0{,}12)^2}{4} = 0{,}01131~\text{cm}^2\]
+				$P = 1{,}5~\text{W}$
+				\[H_0 = \frac{1{,}5}{0{,}01131} \approx 132{,}6~\text{W/cm}^2\]
+				\[OD_\mathrm{req} = \log_{10}\!\left(\frac{132{,}6}{2{,}5\times10^{-3}}\right) \approx \mathbf{4{,}72}\]
+			\end{block}
+		\end{column}
+		\begin{column}{0.45\textwidth}
+			\begin{exampleblock}{Selección EPO}
+				\begin{itemize}
+					\item EPO-001: OD~5+ \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 40\%)
+					\item EPO-005: OD~7 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 30\%)
+				\end{itemize}
+			\end{exampleblock}
+			\vspace{0.2cm}
+			$\Rightarrow$ \textbf{EPO-001} (mejor VLT: 40\%)
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Láser 3: Alineación -- Diodo 635~nm (Clase~3R)}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Cálculo}
+				$a = 3~\text{mm} = 0{,}3~\text{cm}$
+				\[A = \frac{\pi (0{,}3)^2}{4} = 0{,}07069~\text{cm}^2\]
+				$P = 4{,}5~\text{mW} = 0{,}0045~\text{W}$
+				\[H_0 = \frac{0{,}0045}{0{,}07069} \approx 0{,}0637~\text{W/cm}^2\]
+				\[OD_\mathrm{req} = \log_{10}\!\left(\frac{0{,}0637}{2{,}5\times10^{-3}}\right) \approx \mathbf{1{,}41}\]
+			\end{block}
+		\end{column}
+		\begin{column}{0.45\textwidth}
+			\begin{exampleblock}{Selección EPO}
+				\begin{itemize}
+					\item EPO-002: OD~2+ @ 630--670~nm \textcolor{aerogreen}{\textbf{$\checkmark$ OK}}
+				\end{itemize}
+			\end{exampleblock}
+			\vspace{0.2cm}
+			$\Rightarrow$ \textbf{EPO-002} (VLT 55\%)
+
+			\vspace{0.3cm}
+			\begin{block}{Nota}
+				Clase~3R: protección recomendada pero no estrictamente obligatoria.
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Resumen de Resultados}
+	\centering
+	\begin{tabular}{lcccc}
+		\toprule
+		\textbf{Láser (Clase)}   & $\boldsymbol{\lambda}$         & $\boldsymbol{H_0}$
+		                         & $\boldsymbol{OD_\mathrm{req}}$ & \textbf{EPO}                        \\
+		\midrule
+		\rowcolor{aerored!15}
+		1 -- PIV (\textbf{4})    & 532~nm                         & 1,02 J/cm$^2$      & 6,31 & EPO-005 \\
+		\rowcolor{aerored!10}
+		2 -- LDA (\textbf{4})    & 514,5~nm                       & 132,6 W/cm$^2$     & 4,72 & EPO-001 \\
+		\rowcolor{aeroyellow!15}
+		3 -- Alin. (\textbf{3R}) & 635~nm                         & 0,064 W/cm$^2$     & 1,41 & EPO-002 \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.5cm}
+	\begin{tikzpicture}
+		\node[draw=aerogreen,thick,rounded corners,fill=aerogreen!10,
+			text width=10cm,align=center,font=\small] {
+			\textbf{Regla:} OD\textsubscript{gafa} $\ge$ OD\textsubscript{req} a la $\lambda$ del láser.\\
+			Si varias cumplen $\Rightarrow$ preferir la de mayor VLT.
+		};
+	\end{tikzpicture}
 \end{frame}
 
 % =============================================================================
 \section{Caso de Estudio}
+% =============================================================================
 
-\begin{frame}{Caso: PIV sobre NACA 0012 en túnel de viento}
-  \begin{block}{Escenario}
-    Medición PIV para estudiar transición laminar-turbulenta sobre ala NACA~0012
-    a $\mathrm{Re} = 3\times10^5$ en túnel $\SI{0.5}{\m}\times\SI{0.5}{\m}$.
-  \end{block}
-
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Sistema PIV:}
-      \begin{itemize}\small
-        \item Nd:YAG 532 nm, 200 mJ/pulso
-        \item $\tau = \SI{6}{\ns}$, $f = \SI{10}{\Hz}$
-        \item Lente cilíndrica $f = -\SI{25}{\mm}$
-        \item CCD 2 Mpx, $\Delta t = \SI{50}{\micro\second}$
-        \item Seeding: aceite nebulizado \SI{1}{\micro\metre}
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \textbf{Resultados:}
-      \begin{itemize}\small
-        \item $H_0 = \SI{2547}{\joule\per\metre\squared}$
-        \item $\mathrm{MPE} = \SI{5e-3}{\joule\per\metre\squared}$
-        \item $OD_{\min} = 5.71 \Rightarrow$ \textbf{OD = 6}
-        \item NHZ libre $\approx \SI{2.4}{\km}$
-        \item NHZ lámina $\approx \SI{71}{\m}$
-      \end{itemize}
-      \vspace{0.3em}
-      \begin{alertblock}{}
-        \centering \texttt{I 532 L6} + Interlock
-      \end{alertblock}
-    \end{column}
-  \end{columns}
+\begin{frame}{Caso: LDA con Exposición Prolongada ($>$10~s)}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{alertblock}{Escenario}
+				Operador trabaja cerca del haz LDA durante $>$10~s.\\
+				Reflejo de aversión (0,25~s) no aplica.
+			\end{alertblock}
+			\vspace{0.2cm}
+			\begin{block}{MPE reducida}
+				$H_\mathrm{MPE} = 1{,}0\times10^{-3}$ W/cm$^2$\\
+				(antes: $2{,}5\times10^{-3}$)
+			\end{block}
+		\end{column}
+		\begin{column}{0.45\textwidth}
+			\begin{block}{Recálculo OD}
+				\[OD = \log_{10}\!\left(\frac{132{,}6}{1{,}0\times10^{-3}}\right) \approx \mathbf{5{,}12}\]
+			\end{block}
+			\vspace{0.2cm}
+			\begin{itemize}
+				\item EPO-001 (OD~5+): \textcolor{aeroyellow}{\textbf{Marginal}}
+				\item EPO-005 (OD~7): \textcolor{aerogreen}{\textbf{$\checkmark$ Segura}}
+			\end{itemize}
+			$\Rightarrow$ \textbf{EPO-005} (margen = 1,88)
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % =============================================================================
-\section{Herramienta Jupyter}
+\section{Controles de Seguridad}
+% =============================================================================
 
-\begin{frame}[fragile]{Notebook: P01\_Proteccion\_Laser.ipynb}
-  \begin{columns}
-    \begin{column}{0.55\textwidth}
-      \textbf{Ruta:}\\
-      \texttt{\small Practicas/P01\_Proteccion\_Laser/\\notebooks/P01\_Proteccion\_Laser.ipynb}
+\begin{frame}{Jerarquía de Controles}
+	\begin{tikzpicture}[scale=0.8,every node/.style={font=\small}]
+		% Pyramid layers
+		\fill[aerogreen!80!black] (0,0) -- (5,0) -- (4.2,1) -- (0.8,1) -- cycle;
+		\fill[aerogreen!60] (0.8,1) -- (4.2,1) -- (3.4,2) -- (1.6,2) -- cycle;
+		\fill[aeroyellow!80] (1.6,2) -- (3.4,2) -- (2.8,3) -- (2.2,3) -- cycle;
+		\fill[aerored!60] (2.2,3) -- (2.8,3) -- (2.5,3.8) -- cycle;
+		% Labels
+		\node[white,font=\small\bfseries] at (2.5,0.5) {Eliminación / Sustitución};
+		\node[white,font=\small\bfseries] at (2.5,1.5) {Ingeniería};
+		\node[font=\small\bfseries] at (2.5,2.5) {Admin.};
+		\node[white,font=\small\bfseries] at (2.5,3.3) {EPP};
+		% Right labels
+		\node[right,font=\scriptsize,text width=5cm] at (5.5,0.5)
+		{Usar láseres de clase inferior si es posible};
+		\node[right,font=\scriptsize,text width=5cm] at (5.5,1.5)
+		{Interlock, obturador, cabina, cortinas};
+		\node[right,font=\scriptsize,text width=5cm] at (5.5,2.5)
+		{LSO, SOPs, señalización, registro};
+		\node[right,font=\scriptsize,text width=5cm] at (5.5,3.3)
+		{Gafas EN~207 con OD y VLT adecuados};
+		% Arrow
+		\draw[->,very thick,gray] (5.8,4) -- (5.8,-0.3);
+		\node[gray,font=\tiny,rotate=90] at (6.2,2) {Más efectivo};
+	\end{tikzpicture}
+\end{frame}
 
-      \vspace{0.5em}
-      \textbf{Funcionalidades:}
-      \begin{itemize}\small
-        \item Cálculo interactivo de OD para distintos láseres
-        \item Verificación automática contra catálogo EPO
-        \item Cálculo de NHZ con parámetros modificables
-        \item Generación de informe de seguridad
-        \item Visualización de zonas de peligro
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{lstlisting}[language=Python]
-import numpy as np
+\begin{frame}{Matriz de Riesgos}
+	\centering
+	\begin{tikzpicture}[scale=0.65]
+		\foreach \x in {0,...,4} {
+				\foreach \y in {0,...,4} {
+						\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+						\pgfmathparse{\risk < 5 ? "aerogreen!40" : (\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+						\edef\fillcol{\pgfmathresult}
+						\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+						\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+						\node[font=\tiny] at (\x+0.5,\y+0.5)
+						{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+					}
+			}
+		\foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+				\node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.1) {\l};
+			}
+		\foreach \y/\l in {0/Insignif.,1/Menor,2/Moder.,3/Mayor,4/Catastrófico} {
+				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+			}
+		\node[font=\tiny\bfseries,rotate=90] at (-1.3,2.5) {Severidad};
+		\node[font=\tiny\bfseries] at (2.5,-1) {Probabilidad};
+		% Markers
+		\fill[blue,opacity=0.8] (3.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (3.5,3.5) {PIV};
+		\fill[blue!70,opacity=0.8] (2.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (2.5,3.5) {LDA};
+		\fill[orange,opacity=0.8] (0.5,1.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (0.5,1.5) {Alin.};
+	\end{tikzpicture}
 
-def calcular_OD(Q, w0, MPE):
-    H0 = Q / (np.pi * w0**2)
-    OD = np.log10(H0 / MPE)
-    return OD, H0
-
-# Nd:YAG 532nm PIV
-OD, H0 = calcular_OD(
-    Q=0.200,    # 200 mJ
-    w0=5e-3,    # 5 mm
-    MPE=5e-3    # J/m^2
-)
-print(f"OD_min = {OD:.2f}")
-# OD_min = 5.71
-      \end{lstlisting}
-    \end{column}
-  \end{columns}
+	\vspace{0.2cm}
+	\small PIV y LDA (\textbf{Clase~4}): zona roja. Alineación (\textbf{3R}): zona verde.
 \end{frame}
 
 % =============================================================================
-\section{Resumen}
+\section{Herramientas de Software}
+% =============================================================================
+
+\begin{frame}[fragile]{Automatización con Python}
+	\begin{columns}
+		\begin{column}{0.55\textwidth}
+			\begin{block}{Contenido del Repositorio}
+				\texttt{Practicas/P01\_Proteccion\_Laser/}
+				\begin{itemize}
+					\item \texttt{src/P01\_Proteccion\_Laser.py}
+					\item \texttt{notebooks/P01\_Proteccion\_Laser.ipynb}
+					\item \texttt{data/epo\_lenses.csv}
+				\end{itemize}
+			\end{block}
+		\end{column}
+		\begin{column}{0.4\textwidth}
+			\begin{exampleblock}{Funciones}
+				\begin{itemize}
+					\item \texttt{area\_cm2\_from...()}
+					\item \texttt{h0\_exposure()}
+					\item \texttt{od\_required()}
+					\item \texttt{evaluate\_against\_lenses()}
+					\item \texttt{evaluate\_and\_plot()}
+				\end{itemize}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+
+	\vspace{0.3cm}
+	\begin{lstlisting}[language=Python]
+A = area_cm2_from_diameter_mm(5.0)  # 0.1963 cm^2
+H0 = 0.2 / A                       # 1.02 J/cm^2
+print(od_required(H0, 5e-7))       # 6.31
+  \end{lstlisting}
+\end{frame}
+
+% =============================================================================
+\section{Cuestionario y Formato}
+% =============================================================================
+
+\begin{frame}{Preguntas de Discusión}
+	\begin{enumerate}
+		\item ¿Qué significa «OD~5+ @ 190--540~nm»? ¿En cuánto reduce la intensidad?
+		\item ¿Por qué un Clase~4 es peligroso con reflexiones difusas?
+		\item ¿Qué 3 parámetros se necesitan para calcular $OD_\mathrm{req}$?
+		\item Entre dos gafas con igual OD, una VLT~45\% y otra 20\%: ¿cuál elegir?
+		\item ¿Gafas para 1064~nm protegen a 532~nm del mismo Nd:YAG?
+		\item ¿Qué es un LSO?
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Formato del Informe (AIAA)}
+	\begin{enumerate}
+		\item \textbf{Resumen:} máx. 200 palabras
+		\item \textbf{Introducción}
+		\item \textbf{Fundamento Teórico:} propiedades, clasificación, MPE, OD
+		\item \textbf{Metodología}
+		\item \textbf{Resultados:} 3 láseres + caso de estudio
+		\item \textbf{Discusión:} (incluir cuestionario)
+		\item \textbf{Conclusiones:} 4--6 puntos
+		\item \textbf{Referencias} (IEEE/AIAA)
+		\item \textbf{Apéndice A:} gráficas del script Python
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Conclusiones}
+% =============================================================================
 
 \begin{frame}{Conclusiones}
-  \begin{enumerate}
-    \item El PIV con Nd:YAG \SI{532}{\nm} es \textbf{Clase 4} -- máximo peligro.
-    \item Se requiere \textbf{OD = 6} ($H_0/\mathrm{MPE} \approx 5\times10^5$),
-          marcado \texttt{I 532 L6} (EN 207).
-    \item La \textbf{NHZ} para el haz libre supera los \SI{2}{\km} --
-          controles de ingeniería son obligatorios.
-    \item La \textbf{jerarquía de controles}: ingeniería $>$ administrativo $>$ EPP.
-    \item El \textbf{notebook Python} automatiza los cálculos y permite adaptar
-          la evaluación a cualquier configuración.
-  \end{enumerate}
+	\begin{enumerate}
+		\item PIV (Nd:YAG 532~nm, \textbf{Clase~4}): $OD \ge 6{,}31$ $\Rightarrow$ \textbf{EPO-005}
+		\item LDA (Ar-Ion 514,5~nm, \textbf{Clase~4}): $OD \ge 4{,}72$ (0,25~s) o $\ge 5{,}12$ (prolongada)
+		\item Alineación (Diodo 635~nm, \textbf{Clase~3R}): $OD \ge 1{,}41$ $\Rightarrow$ \textbf{EPO-002}
+		\item Jerarquía de controles: eliminación $>$ ingeniería $>$ admin. $>$ EPP
+		\item Script Python automatiza $H_0$, OD y selección del catálogo EPO
+	\end{enumerate}
 
-  \vspace{0.5em}
-  \begin{block}{Práctica completa}
-    Manual completo: \texttt{manuals/P01\_Proteccion\_Laser/manual\_P01.tex}\\
-    Notebook: \texttt{Practicas/P01\_Proteccion\_Laser/notebooks/P01\_Proteccion\_Laser.ipynb}
-  \end{block}
+	\vspace{0.5cm}
+	\centering
+	\begin{tikzpicture}
+		\node[draw=aerogreen,very thick,rounded corners,fill=aerogreen!10,
+			text width=8cm,align=center,font=\normalsize\bfseries] {
+			Nunca trabaje con láseres Clase~3B/4\\sin protección ocular verificada.
+		};
+	\end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Referencias}
-  \begin{itemize}
-    \item IEC 60825-1:2014 -- Safety of laser products
-    \item EN 207:2017 -- Filtros y protectores oculares (láser)
-    \item ANSI Z136.1-2022 -- Safe Use of Lasers
-    \item Svelto, O. (2010). \textit{Principles of Lasers}, 5ª ed., Springer
-    \item Henderson \& Schulmeister (2004). \textit{Laser Safety}, Taylor \& Francis
-  \end{itemize}
+\begin{frame}{}
+	\centering
+	\vspace{2cm}
+	{\Huge\color{aerogreen}\bfseries ¿Preguntas?}\\[1cm]
+	{\large P01 -- Protección Ocular frente a Radiación Láser}\\[0.5cm]
+	{\small Técnicas de Medida -- Ingeniería Aeronáutica}
 \end{frame}
 
 \end{document}

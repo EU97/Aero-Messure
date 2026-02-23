@@ -1,31 +1,34 @@
 % =============================================================================
 % Manual P01 – Protección Ocular frente a Radiación Láser
 % Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode manual_P01.tex
 % =============================================================================
 \documentclass[12pt,a4paper]{article}
 
 % ---- Encoding & Language ----
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\usepackage{fontspec}
 \usepackage[spanish]{babel}
 
 % ---- Page Layout ----
-\usepackage[top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\setlength{\headheight}{14.5pt}
 
 % ---- Math & Physics ----
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
 \usepackage{siunitx}
 \sisetup{output-decimal-marker={,}, group-separator={.}}
 
 % ---- Graphics & Color ----
 \usepackage{graphicx}
-\usepackage{xcolor}
+\usepackage[table]{xcolor}
 \usepackage{float}
 \usepackage{caption}
 \usepackage{subcaption}
 
 % ---- TikZ ----
 \usepackage{tikz}
+\usetikzlibrary{babel}
 \usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,decorations.pathmorphing,
                 decorations.markings,patterns,fit,backgrounds}
 
@@ -33,6 +36,10 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{longtable}
 
 % ---- Code Listings ----
 \usepackage{listings}
@@ -74,37 +81,28 @@
 \begin{document}
 
 \begin{titlepage}
-  \centering
-  \vspace*{1cm}
-  {\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
-  {\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA EN INGENIERÍA AERONÁUTICA}\\[0.3cm]
-  {\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
-  {\huge\bfseries P01 -- Protección Ocular\\[0.3cm]
-   frente a Radiación Láser}\\[1cm]
-  {\large Manual de Laboratorio}\\[0.5cm]
-  {\large\itshape Ingeniería Aeronáutica}\\[2cm]
-  \begin{tikzpicture}
-    % Laser source
-    \draw[fill=aeroblue!20,draw=aeroblue,thick] (0,0) rectangle (1.5,0.6);
-    \node at (0.75,0.3) {\small\bfseries LÁSER};
-    % Beam
-    \draw[aerored,ultra thick,->] (1.5,0.3) -- (5.5,0.3);
-    % Beam divergence cone
-    \draw[aerored!40,thin] (1.5,0.3) -- (5.5,0.8);
-    \draw[aerored!40,thin] (1.5,0.3) -- (5.5,-0.2);
-    % Eye with protection
-    \draw[fill=gray!30,draw=black,thick] (5.5,0) ellipse (0.5 and 0.7);
-    \draw[aerogreen,very thick] (5.0,-0.1) -- (6.0,-0.1) -- (6.0,0.7) -- (5.0,0.7) -- cycle;
-    \node[aerogreen] at (5.5,0.3) {\small OD};
-    % Labels
-    \node[below,aerored] at (3.5,-0.1) {\small $\lambda,\,P,\,\theta$};
-    \node[above] at (5.5,0.85) {\small Protección};
-  \end{tikzpicture}\\[2cm]
-  {\large\textbf{Departamento de Ingeniería Aeroespacial}}\\[0.2cm]
-  {\normalsize Laboratorio de Técnicas de Medida}\\[0.5cm]
-  {\normalsize \today}
-  \vfill
-  {\color{aeroblue}\rule{\linewidth}{2pt}}
+	\centering
+	\vspace*{1cm}
+	{\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
+	{\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA EN INGENIERÍA AERONÁUTICA}\\[0.3cm]
+	{\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
+	{\huge\bfseries P01 -- Protección Ocular\\[0.3cm]
+	frente a Radiación Láser}\\[1cm]
+	{\large Manual de Laboratorio}\\[0.5cm]
+	{\large\itshape Ingeniería Aeronáutica}\\[2cm]
+	\begin{tikzpicture}
+		\draw[fill=aeroblue!20,draw=aeroblue,thick] (0,0) rectangle (1.5,0.6);
+		\node at (0.75,0.3) {\small\bfseries LÁSER};
+		\draw[aerored,ultra thick,->] (1.5,0.3) -- (5.5,0.3);
+		\draw[aerored!40,thin] (1.5,0.3) -- (5.5,0.8);
+		\draw[aerored!40,thin] (1.5,0.3) -- (5.5,-0.2);
+		\draw[fill=gray!30,draw=black] (5.5,-0.15) ellipse (0.35 and 0.55);
+		\draw[aerogreen,very thick] (5.1,0) rectangle (5.9,0.6);
+		\node[aerogreen,font=\tiny\bfseries] at (5.5,0.3) {OD};
+		\node[below,font=\footnotesize,aerored] at (3.5,-0.1) {$\lambda,\; P,\; E$};
+	\end{tikzpicture}\\[2cm]
+	{\small\today}\\[0.5cm]
+	{\color{aeroblue}\rule{\linewidth}{1pt}}
 \end{titlepage}
 
 \tableofcontents
@@ -114,572 +112,887 @@
 \section{Introducción}
 \label{sec:intro}
 
-En los laboratorios de ingeniería aeronáutica los sistemas láser se utilizan
-de forma rutinaria en técnicas de medida de alta precisión: velocimetría por
-imagen de partículas (PIV), anemometría láser Doppler (LDA/LDV), LIDAR
-aerotransportado y sistemas de alineación óptica.
-La presencia de fuentes coherentes de alta irradiancia implica riesgos
-oculares severos, pues la retina puede concentrar la energía de un haz
-colimado en una mancha de apenas \SI{10}{\micro\metre} de diámetro, causando
-lesiones irreversibles con pulsos de nanosegundos \cite{svelto2010}.
+Los láseres (Amplificación de Luz por Emisión Estimulada de Radiación) son
+herramientas fundamentales en numerosos campos de la ingeniería aeronáutica,
+especialmente en laboratorios de investigación y desarrollo para técnicas de
+medición avanzadas como la Anemometría Láser Doppler (LDA), la Velocimetría
+por Imagen de Partículas (PIV), la metrología de precisión y los ensayos no
+destructivos~\cite{svelto2010}.
 
-El presente manual aborda el marco normativo, el cálculo cuantitativo
-de la Densidad Óptica (OD) necesaria y la evaluación de la Zona Nominal de
-Peligro (NHZ), aplicados a los sistemas láser presentes en el laboratorio.
+La naturaleza altamente concentrada y coherente de la radiación láser, si bien
+es ventajosa para estas aplicaciones, representa un riesgo significativo para la
+seguridad, particularmente para la visión~\cite{henderson2004}.
 
-\subsection{Sistemas láser en aeronáutica}
-
-\begin{table}[H]
-  \centering
-  \caption{Sistemas láser habituales en laboratorios aeronáuticos.}
-  \label{tab:lasers_aero}
-  \begin{tabular}{lllSS}
-    \toprule
-    \textbf{Técnica} & \textbf{Tipo} & $\lambda$ (\si{\nm}) &
-    {\textbf{Potencia/Energía}} & {\textbf{Clase}} \\
-    \midrule
-    PIV             & Nd:YAG (2$\omega$) & 532 & \SI{200}{\milli\joule}/pulso & 4 \\
-    LDA/LDV         & Ar-Ion / DPSS      & 488/514 & \SI{5}{\watt} & 4 \\
-    Alineación      & He-Ne              & 632.8 & \SI{1}{\milli\watt} & 2 \\
-    LIDAR aerotrans.& Nd:YAG             & 1064/532 & \SI{100}{\milli\joule}/pulso & 4 \\
-    Perfilometría   & Diodo              & 650--690 & \SI{5}{\milli\watt} & 3R \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+Esta práctica introduce los principios fundamentales de la seguridad láser, con
+un enfoque en la comprensión analítica de los riesgos asociados a diferentes
+tipos de láseres comúnmente empleados en el contexto aeronáutico. Se abordará
+la selección y especificación del Equipo de Protección Ocular (EPO) adecuado,
+a través del análisis de datos técnicos, el cálculo de parámetros de seguridad
+críticos y la toma de decisiones informada.
 
 % =============================================================================
-\section{Objetivos}
+\section{Objetivos de Aprendizaje}
 \label{sec:objetivos}
 
+Al finalizar esta práctica, el estudiante será capaz de:
 \begin{enumerate}
-  \item Identificar la clasificación de peligro de los láseres de laboratorio
-        según IEC~60825-1 \cite{iec60825}.
-  \item Calcular la Exposición Máxima Permisible (EMP/MPE) para la longitud de
-        onda y duración de exposición pertinentes.
-  \item Determinar la Densidad Óptica mínima requerida para las gafas de
-        protección.
-  \item Calcular la Zona Nominal de Peligro (NHZ) del sistema PIV del
-        laboratorio.
-  \item Diseñar la matriz de riesgos y las medidas de control para un sistema
-        PIV en túnel de viento.
+	\item Identificar y describir los peligros asociados a la radiación láser en
+	      técnicas de medida y aplicaciones aeronáuticas.
+	\item Comprender y aplicar la clasificación de seguridad láser según
+	      ANSI~Z136.1~\cite{ansi2014} e IEC~60825-1~\cite{iec60825}.
+	\item Analizar cualitativamente la interacción de la radiación láser con el
+	      tejido ocular en función de la longitud de onda.
+	\item Calcular la Exposición Potencial ($H_0$) a partir de los parámetros
+	      de una fuente láser.
+	\item Calcular la Densidad Óptica (OD) mínima requerida, dados los
+	      parámetros del láser y la Exposición Máxima Permisible (MPE).
+	\item Seleccionar el equipo de protección ocular apropiado de un catálogo
+	      de 12 lentes, justificando la elección mediante cálculos.
+	\item Describir los elementos fundamentales de un programa de seguridad
+	      láser en un entorno de laboratorio aeronáutico.
 \end{enumerate}
 
 % =============================================================================
-\section{Fundamento Teórico}
+\section{Fundamentos Teóricos}
 \label{sec:teoria}
 
-\subsection{Propiedades de la radiación láser}
+\subsection{Principios de la Radiación Láser}
 
-El término \textit{láser} proviene del inglés \textit{Light Amplification by
-Stimulated Emission of Radiation}.  A diferencia de las fuentes incoherentes,
-la radiación láser posee:
+La radiación láser se distingue de la luz convencional por cuatro propiedades
+fundamentales~\cite{svelto2010,saleh2007}:
 
-\begin{itemize}
-  \item \textbf{Monocromaticidad}: emisión en una estrecha banda espectral
-        ($\Delta\lambda$ típico $<\SI{0.1}{\nm}$).
-  \item \textbf{Coherencia}: espacial y temporal, lo que permite interferencia
-        y enfoque difractivo.
-  \item \textbf{Colimación}: divergencia $\theta$ muy pequeña (\si{\milli\radian}).
-  \item \textbf{Alta irradiancia}: $E_e = P / A$ puede superar
-        \SI{e12}{\watt\per\metre\squared} en el foco.
-\end{itemize}
+\begin{enumerate}
+	\item \textbf{Monocromaticidad:} luz de una única longitud de onda.
+	\item \textbf{Coherencia:} ondas en fase espacial y temporalmente.
+	\item \textbf{Direccionalidad (Colimación):} baja divergencia.
+	\item \textbf{Alta Irradiancia:} gran concentración energética.
+\end{enumerate}
 
-\subsection{Clasificación de peligro (IEC~60825-1)}
+\subsection{Clasificación de Seguridad Láser}
+
+Los estándares ANSI~Z136.1~\cite{ansi2014} e IEC~60825-1~\cite{iec60825}
+clasifican los láseres según su potencial de causar daño
+(Tabla~\ref{tab:clases}).
 
 \begin{table}[H]
-  \centering
-  \caption{Clases de peligro láser según IEC~60825-1:2014.}
-  \label{tab:clases}
-  \begin{tabular}{cll}
-    \toprule
-    \textbf{Clase} & \textbf{Descripción} & \textbf{Ejemplo aeronáutico} \\
-    \midrule
-    1   & Seguro en condiciones normales & Sensores ópticos integrados \\
-    1M  & Seguro sin óptica adicional    & Telémetros láser \\
-    2   & Visible, protección por reflejo palpebral & Punteros de alineación \\
-    2M  & Visible con óptica             & Sistemas de alineación \\
-    3R  & Riesgo bajo con contacto ocular & Láseres de diodo ($<\SI{5}{\milli\watt}$) \\
-    3B  & Peligroso con visión directa    & LDA \SI{50}{\milli\watt} \\
-    4   & Peligroso reflexiones difusas   & PIV Nd:YAG \SI{200}{\milli\joule} \\
-    \bottomrule
-  \end{tabular}
+	\centering
+	\caption{Clasificación de seguridad láser (IEC~60825-1 / ANSI~Z136.1).}
+	\label{tab:clases}
+	\small
+	\begin{tabularx}{\textwidth}{c l l X}
+		\toprule
+		\textbf{Clase} & \textbf{Riesgo}                              & \textbf{Ejemplo}           & \textbf{Controles}        \\
+		\midrule
+		1              & Seguro en uso normal                         & Sensores encapsulados      & Ninguno especial          \\
+		1M             & Seguro a simple vista                        & Fibra óptica con lente     & Sin óptica de aumento     \\
+		2              & Visible, reflejo palpebral ($P<\SI{1}{\mW}$) & Puntero                    & Señalización              \\
+		2M             & Como Clase~2, sin óptica de aumento          & {--}                       & Señalización              \\
+		3R             & Riesgo bajo directa ($P<\SI{5}{\mW}$)        & Diodo metrología           & Señalización + precaución \\
+		3B             & Peligroso directa ($P<\SI{500}{\mW}$)        & LDA 50~mW                  & EPO frecuente             \\
+		\rowcolor{aerored!20}
+		\textbf{4}     & \textbf{Directa, especular y difusa}         & \textbf{PIV, LDA alta $P$} & \textbf{EPO obligatorio}  \\
+		\bottomrule
+	\end{tabularx}
 \end{table}
+
+\subsection{Interacción Láser–Tejido Ocular}
+
+El daño ocular depende críticamente de la longitud de onda~\cite{henderson2004}:
+
+\begin{itemize}
+	\item \textbf{UV (100--400~nm):} córnea/cristalino $\rightarrow$ fotoqueratitis.
+	\item \textbf{Visible + IR-A (400--1400~nm):} retina con factor $\sim\!10^5$
+	      $\rightarrow$ \textbf{zona de máximo peligro retiniano}.
+	\item \textbf{IR-B/C ($>$1400~nm):} córnea $\rightarrow$ quemaduras.
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=0.9]
+		\fill[violet!40] (0,0) rectangle (2,1);
+		\fill[yellow!40] (2,0) rectangle (5,1);
+		\fill[red!20]    (5,0) rectangle (8,1);
+		\node[font=\footnotesize,rotate=90] at (1,0.5) {UV};
+		\node[font=\footnotesize,rotate=90] at (3.5,0.5) {Visible + IR-A};
+		\node[font=\footnotesize,rotate=90] at (6.5,0.5) {IR-B / IR-C};
+		\draw[aerored,very thick] (0,1.5) -- (1,1.2) -- (2,2.5) -- (3.5,3.5)
+		-- (5,2.5) -- (6,1.5) -- (8,1.2);
+		\node[aerored,font=\footnotesize,above] at (3.5,3.5) {Máximo peligro retiniano};
+		\draw[->] (0,0) -- (8.5,0) node[right,font=\footnotesize] {$\lambda$~(nm)};
+		\node[font=\tiny] at (0,-0.3) {100};
+		\node[font=\tiny] at (2,-0.3) {400};
+		\node[font=\tiny] at (5,-0.3) {1400};
+		\node[font=\tiny] at (8,-0.3) {$10^6$};
+		\draw[aerored,dashed,thick] (3.2,0) -- (3.2,3.0);
+		\fill[aerored] (3.2,3.0) circle (0.08);
+		\node[aerored,font=\tiny,right] at (3.2,3.0) {532~nm (PIV)};
+		\draw[blue!70,dashed,thick] (3.0,0) -- (3.0,2.8);
+		\fill[blue!70] (3.0,2.8) circle (0.08);
+		\node[blue!70,font=\tiny,left] at (3.0,2.8) {514,5~nm (LDA)};
+		\draw[red!70,dashed,thick] (3.8,0) -- (3.8,3.3);
+		\fill[red!70] (3.8,3.3) circle (0.08);
+		\node[red!70,font=\tiny,right] at (3.8,3.2) {635~nm (Alin.)};
+	\end{tikzpicture}
+	\caption{Absorción espectral en el ojo humano y ubicación de los tres láseres
+		de esta práctica.}
+	\label{fig:espectro}
+\end{figure}
 
 \subsection{Exposición Máxima Permisible (MPE)}
 
-La MPE es el nivel de irradiancia o exposición radiante al que puede estar
-expuesto el ojo humano sin sufrir daño \cite{ansi2014}. Depende de:
-$\lambda$, duración de exposición $t$, y el ángulo de subtensa de la fuente $\alpha$.
+La MPE es el nivel de radiación láser al cual una persona puede estar expuesta
+sin sufrir efectos adversos~\cite{iec60825,ansi2014}. Depende de $\lambda$,
+duración de exposición y tejido expuesto.
 
-Para la córnea y el cristalino (radiación UV), la MPE se expresa en
-\si{\joule\per\metre\squared}. Para la retina (visible e IR próximo), la MPE se
-aplica sobre la pupila de entrada y también en \si{\joule\per\metre\squared}.
-
-Ejemplo de MPE para $\lambda = \SI{532}{\nm}$ y $t = \SI{e-8}{\second}$ (pulso
-de \SI{10}{\ns}):
-\begin{equation}
-  \mathrm{MPE} = \SI{5e-3}{\joule\per\metre\squared}
-  \quad (\text{según tabla IEC~60825-1, grupo 2})
-  \label{eq:mpe_ejemplo}
-\end{equation}
-
-\subsection{Densidad Óptica requerida}
-
-La \textbf{Densidad Óptica} (OD) cuantifica la atenuación logarítmica que debe
-proporcionar la protección ocular:
+\subsection{Densidad Óptica (OD)}
+\label{sec:OD_teoria}
 
 \begin{equation}
-  \boxed{OD = \log_{10}\!\left(\frac{H_0}{H_{\mathrm{MPE}}}\right)}
-  \label{eq:OD}
+	\boxed{OD = \log_{10}\!\left(\frac{H_0}{H_{\mathrm{MPE}}}\right)}
+	\label{eq:OD}
 \end{equation}
+donde $H_0$ es la exposición potencial sin protección y $H_{\mathrm{MPE}}$ la
+MPE. Una OD de $N$ atenúa por factor $10^N$.
 
-donde:
-\begin{itemize}
-  \item $H_0$ = exposición radiante incidente sobre la protección
-        [\si{\joule\per\metre\squared}]
-  \item $H_{\mathrm{MPE}}$ = MPE para la longitud de onda y duración en cuestión
-        [\si{\joule\per\metre\squared}]
-\end{itemize}
+\subsection{Transmisión de Luz Visible (VLT)}
 
-Para un haz de sección circular con radio $w$ y energía por pulso $Q$:
-\begin{equation}
-  H_0 = \frac{Q}{\pi w^2}
-  \label{eq:H0}
-\end{equation}
-
-\subsubsection{Derivación completa del OD}
-
-Partiendo de la definición de transmitancia:
-\begin{align}
-  T &= 10^{-OD} \label{eq:transmitancia}\\
-  H_{\mathrm{trans}} &= H_0 \cdot T = H_0 \cdot 10^{-OD}
-  \label{eq:H_transmitida}
-\end{align}
-
-Para que la protección sea efectiva: $H_{\mathrm{trans}} \le H_{\mathrm{MPE}}$,
-es decir:
-\begin{equation}
-  H_0 \cdot 10^{-OD} \le H_{\mathrm{MPE}}
-  \implies 10^{OD} \ge \frac{H_0}{H_{\mathrm{MPE}}}
-  \implies OD \ge \log_{10}\!\left(\frac{H_0}{H_{\mathrm{MPE}}}\right)
-  \label{eq:OD_derivacion}
-\end{equation}
-
-\subsection{Zona Nominal de Peligro (NHZ)}
-
-La NHZ es la región del espacio donde la irradiancia supera la MPE sin
-protección.  Para un haz gaussiano con divergencia $\phi$ (\si{\radian}):
-
-\begin{equation}
-  \boxed{r_{\mathrm{NHZ}} = \frac{1}{\phi}
-         \sqrt{\frac{4 \cdot P}{\pi \cdot \mathrm{MPE}}} - \frac{a^2}{\phi^2}}
-  \label{eq:NHZ}
-\end{equation}
-
-donde $P$ es la potencia de pico (o energía/duración de pulso), $a$ el radio
-del haz en la fuente y $\phi$ la divergencia de campo completo.
-
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[scale=1.1]
-    % NHZ region
-    \fill[aerored!15] (0,0) -- (7,1.4) -- (7,-1.4) -- cycle;
-    % Laser
-    \draw[fill=aeroblue!30,draw=aeroblue,thick] (-1.2,-0.4) rectangle (0,0.4);
-    \node at (-0.6,0) {\small\bfseries L};
-    % Beam axis
-    \draw[aerored,ultra thick,->] (0,0) -- (8,0);
-    % Beam envelope
-    \draw[aerored,thick] (0,0.05) -- (7,1.4);
-    \draw[aerored,thick] (0,-0.05) -- (7,-1.4);
-    % NHZ arc
-    \draw[aerored!70,dashed,thick] (7,1.6) arc (90:-90:1.6);
-    % Beam waist label
-    \draw[<->,gray] (0,-1.8) -- (7,-1.8) node[midway,below] {$r_{\mathrm{NHZ}}$};
-    % Divergence angle
-    \draw[gray,thin] (0,0) -- (3,0.6);
-    \node[gray] at (2.5,0.15) {\small $\phi/2$};
-    % Hazard label
-    \node[aerored,rotate=15] at (3.5,0.5) {\small\bfseries ZONA DE PELIGRO (NHZ)};
-    % Safe zone
-    \node[aerogreen] at (7.8,0) {\small\bfseries Zona\\segura};
-    % Warning sign
-    \node[fill=aeroyellow,draw=black,minimum width=0.6cm,minimum height=0.6cm]
-          at (3.5,-1.0) {\small !};
-  \end{tikzpicture}
-  \caption{Diagrama de la Zona Nominal de Peligro (NHZ) para un haz láser gaussiano.}
-  \label{fig:NHZ}
-\end{figure}
+VLT (\%) = porcentaje de luz visible (400--700~nm) transmitida. Mayor VLT =
+mejor visibilidad en laboratorio. Existe compromiso OD↑ $\Leftrightarrow$
+VLT↓.
 
 % =============================================================================
-\section{Normativa Aplicable}
-\label{sec:normativa}
+\section{Escenarios Láser y Datos de la Práctica}
+\label{sec:escenarios}
 
-\begin{itemize}
-  \item \textbf{IEC~60825-1:2014} -- Seguridad de productos láser. Clasificación
-        y requisitos de fabricantes.
-  \item \textbf{EN~207:2017} -- Filtros y protectores oculares para uso con
-        equipos láser (protección de usuario).
-  \item \textbf{EN~208:2009} -- Protectores de ajuste de láser.
-  \item \textbf{ANSI~Z136.1-2022} -- Safe Use of Lasers (referencia americana,
-        usada en certificación de equipos importados).
-  \item \textbf{Real Decreto 486/2010} -- Exposición a radiaciones ópticas
-        artificiales (transposición de Dir.~2006/25/CE).
-\end{itemize}
+\subsection{Fuentes Láser}
 
-La norma EN~207 establece el marcado de las gafas con el código:
-\texttt{[Modo de operación][longitud de onda nm] L[OD]}, p.ej.:
-\texttt{D 532 L5} (continuo, 532 nm, OD $\ge 5$).
-
-% =============================================================================
-\section{Geometría del Haz y Diagrama Óptico}
-\label{sec:geometria}
-
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[scale=1.0,>=Stealth]
-    % Laser source
-    \draw[fill=aeroblue!20,draw=aeroblue,very thick] (0,-0.5) rectangle (1.5,0.5);
-    \node[font=\small\bfseries] at (0.75,0) {Nd:YAG};
-    % Output coupler
-    \draw[fill=gray!40,draw=black] (1.5,-0.3) rectangle (1.65,0.3);
-    % Beam propagation
-    \draw[aerored,very thick] (1.65,0) -- (3.5,0);
-    % Beam expander (2 lenses)
-    \draw[fill=cyan!20,draw=black] (3.5,-0.6) -- (3.65,0.0) -- (3.5,0.6) -- (3.35,0.6) -- (3.5,0.0) -- (3.35,-0.6) -- cycle;
-    \node[below,font=\tiny] at (3.5,-0.7) {Exp.};
-    \draw[aerored,very thick] (3.65,0) -- (5.0,0);
-    % Sheet forming optic (cylindrical lens)
-    \draw[fill=cyan!20,draw=black,thick] (5.0,-0.8) -- (5.15,0) -- (5.0,0.8) -- (4.85,0.8) -- (5.0,0) -- (4.85,-0.8) -- cycle;
-    \node[below,font=\tiny] at (5.0,-0.9) {Cil.};
-    % Laser sheet (vertical)
-    \fill[aerored!20] (5.15,-1.2) rectangle (5.35,1.2);
-    \draw[aerored,thick] (5.15,-1.2) -- (5.15,1.2);
-    \draw[aerored,thick] (5.35,-1.2) -- (5.35,1.2);
-    \node[aerored,rotate=90,font=\small] at (5.6,0) {Lámina};
-    % Wind tunnel
-    \draw[gray!60,very thick] (5.5,-1.5) rectangle (8.5,1.5);
-    \node[gray,font=\small] at (7.0,1.8) {Túnel de viento};
-    % Flow arrow
-    \draw[->,blue!60,thick] (5.7,0) -- (8.3,0);
-    \node[blue!60,font=\small] at (7.0,0.25) {$U_\infty$};
-    % Airfoil
-    \fill[gray!80] (6.8,-0.15) -- (7.5,0) -- (6.8,0.12) -- (6.5,0) -- cycle;
-    \node[font=\tiny,below] at (7.0,-0.25) {NACA 0012};
-    % Camera
-    \draw[fill=gray!30,draw=black,thick] (7.5,-2.2) rectangle (8.5,-1.7);
-    \draw[fill=gray!40] (7.8,-1.7) -- (8.0,-1.5) -- (8.2,-1.7) -- cycle;
-    \node[font=\tiny] at (8.0,-2.4) {Cámara CCD};
-    % Annotations
-    \node[aeroblue,font=\tiny] at (0.75,-0.8) {532 nm, 200 mJ};
-    \draw[->,gray,thin] (1.7,0.6) node[above,font=\tiny] {$a_0$} -- (1.7,0.2);
-    \draw[<->,gray,thin] (2.5,-0.4) -- node[below,font=\tiny] {$z$} (3.4,-0.4);
-  \end{tikzpicture}
-  \caption{Sistema PIV típico en laboratorio aeronáutico con lámina láser sobre
-           perfil NACA~0012.  El haz Nd:YAG (\SI{532}{\nm}) pasa por un
-           expansor de haz y una lente cilíndrica antes de iluminar el campo de
-           medida.}
-  \label{fig:piv_setup}
-\end{figure}
-
-% =============================================================================
-\section{Cálculo Cuantitativo del OD}
-\label{sec:calculo_OD}
-
-\subsection{Datos del sistema PIV (Nd:YAG, \SI{532}{\nm})}
+Se analizan tres escenarios representativos (Tabla~\ref{tab:lasers}).
 
 \begin{table}[H]
-  \centering
-  \caption{Parámetros del láser Nd:YAG doble frecuencia para PIV.}
-  \label{tab:params_laser}
-  \begin{tabular}{lll}
-    \toprule
-    \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor} \\
-    \midrule
-    Longitud de onda       & $\lambda$     & \SI{532}{\nm} \\
-    Energía por pulso      & $Q$           & \SI{200}{\milli\joule} \\
-    Duración del pulso     & $\tau$        & \SI{6}{\ns} \\
-    Radio del haz (cintura)& $w_0$         & \SI{5}{\mm} \\
-    Divergencia (campo total)& $\phi$      & \SI{3}{\milli\radian} \\
-    Tasa de repetición     & $f_\mathrm{rep}$ & \SI{10}{\Hz} \\
-    Potencia media         & $\bar{P}$     & \SI{2}{\watt} \\
-    \bottomrule
-  \end{tabular}
+	\centering
+	\caption{Parámetros de las fuentes láser de la práctica.}
+	\label{tab:lasers}
+	\small
+	\begin{tabular}{l c c c}
+		\toprule
+		\textbf{Parámetro} & \textbf{L1 -- PIV} & \textbf{L2 -- LDA} & \textbf{L3 -- Alin.} \\
+		\midrule
+		Tipo               & Nd:YAG $2\omega$   & Argón Ion CW       & Diodo CW             \\
+		$\lambda$ (nm)     & 532                & 514,5              & 635                  \\
+		Modo               & Pulsado            & CW                 & CW                   \\
+		$E$ (mJ/pulso)     & 200                & {--}               & {--}                 \\
+		$P$ (W)            & {--}               & 1,5                & 0,0045               \\
+		$\tau$ (ns)        & 8                  & {--}               & {--}                 \\
+		$f$ (Hz)           & 15                 & {--}               & {--}                 \\
+		$a$ (mm)           & 5                  & 1,2                & 3                    \\
+		\rowcolor{aerored!15}
+		\textbf{Clase}     & \textbf{4}         & \textbf{4}         & \textbf{3R}          \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
-\subsection{Paso 1: Cálculo de $H_0$}
+\subsection{Catálogo de Gafas EPO (12 lentes)}
+\label{sec:catalogo}
 
-La exposición radiante del haz en la cintura ($w_0 = \SI{5}{\mm}$):
-\begin{align}
-  H_0 &= \frac{Q}{\pi w_0^2}
-       = \frac{\SI{200e-3}{\joule}}
-              {\pi \cdot (\SI{5e-3}{\metre})^2} \notag\\
-      &= \frac{0.2}{\pi \cdot 25 \times 10^{-6}}
-       = \frac{0.2}{7.854 \times 10^{-5}} \notag\\
-  \Aboxed{H_0 &\approx \SI{2547}{\joule\per\metre\squared}}
-  \label{eq:H0_num}
-\end{align}
+El catálogo ampliado incluye 12 modelos de gafas de protección ocular
+(Tabla~\ref{tab:epo}). Para cada lente se indica la banda de protección
+(rango $\lambda$), la OD en esa banda y la transmisión de luz visible.
 
-\subsection{Paso 2: MPE para \SI{532}{\nm} y \SI{6}{\ns}}
+\begin{table}[H]
+	\centering
+	\caption{Catálogo completo de gafas de protección ocular (12 lentes).}
+	\label{tab:epo}
+	\small
+	\begin{tabularx}{\textwidth}{c l l X c}
+		\toprule
+		\textbf{ID} & \textbf{Marca/Modelo}                                & \textbf{Lente}
+		            & \textbf{Bandas de protección (OD @ $\lambda$)}
+		            & \textbf{VLT}                                                           \\
+		\midrule
+		L-01        & Thorlabs LG1                                         & Naranja
+		            & OD~5+ @ 190--540~nm
+		            & 40\%                                                                   \\
+		L-02        & Thorlabs LG7                                         & Verde
+		            & OD~2+ @ 630--670~nm; OD~4+ @ 800--1100~nm
+		            & 55\%                                                                   \\
+		L-03        & Laservision F18                                      & Azul cobalto
+		            & OD~7+ @ 190--400~nm; OD~6+ @ 532~nm; OD~5+ @ 1064~nm
+		            & 15\%                                                                   \\
+		L-04        & Kentek KXL-62C                                       & Transparente
+		            & OD~2+ @ 10\,600~nm (CO$_2$)
+		            & 90\%                                                                   \\
+		L-05        & Laservision P1H03                                    & Multi-$\lambda$
+		            & OD~7 @ 190--534~nm; OD~6 @ 800--820~nm
+		            & 30\%                                                                   \\
+		L-06        & Thorlabs LG3                                         & Ámbar
+		            & OD~3+ @ 190--532~nm
+		            & 50\%                                                                   \\
+		L-07        & NoIR LaserShields                                    & Rojo oscuro
+		            & OD~4+ @ 488--540~nm
+		            & 35\%                                                                   \\
+		L-08        & Honeywell GPT                                        & Gris
+		            & OD~3+ @ 630--694~nm; OD~5+ @ 800--1100~nm
+		            & 25\%                                                                   \\
+		L-09        & Uvex 9116                                            & Naranja claro
+		            & OD~2+ @ 315--532~nm; OD~4+ @ 808--1100~nm
+		            & 45\%                                                                   \\
+		L-10        & Kentek KXL-55A                                       & Verde jade
+		            & OD~6+ @ 190--540~nm
+		            & 20\%                                                                   \\
+		L-11        & NoIR DI2                                             & Rosa
+		            & OD~1+ @ 585--650~nm
+		            & 60\%                                                                   \\
+		L-12        & Laservision R14T1C04                                 & Multi-$\lambda$
+		            & OD~4+ @ 190--534~nm; OD~5+ @ 630--700~nm
+		            & 22\%                                                                   \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
 
-Según IEC~60825-1:2014, tabla A.1, para $\SI{400}{\nm} < \lambda \le \SI{700}{\nm}$
-y $t < \SI{18}{\micro\second}$ (régimen de pulso único):
-\begin{equation}
-  \mathrm{MPE} = \SI{5e-3}{\joule\per\metre\squared}
-  \label{eq:mpe_532}
-\end{equation}
+\textbf{Nota:} los archivos \texttt{data/epo\_lenses.csv} y
+\texttt{src/P01\_Proteccion\_Laser.py} (§\ref{sec:software}) permiten evaluar
+automáticamente las 12 lentes contra cualquier escenario láser.
 
-\subsection{Paso 3: OD requerido}
+\subsection{Valores de MPE de Referencia}
 
-\begin{align}
-  OD &= \log_{10}\!\left(\frac{H_0}{\mathrm{MPE}}\right)
-       = \log_{10}\!\left(\frac{2547}{5 \times 10^{-3}}\right) \notag\\
-     &= \log_{10}(509400) \notag\\
-  \Aboxed{OD &\approx 5.71}
-  \label{eq:OD_num}
-\end{align}
-
-\textbf{Conclusión:} Se requieren gafas con \textbf{OD $\ge 6$} a \SI{532}{\nm}
-(estándar de seguridad redondea al entero superior).  El marcado EN~207 será:
-\texttt{I/R 532 L6}.
-
-\subsection{Verificación: transmitancia residual}
-
-Con OD = 6:
-\begin{equation}
-  H_{\mathrm{trans}} = H_0 \cdot 10^{-6}
-  = 2547 \times 10^{-6} = \SI{2.55e-3}{\joule\per\metre\squared}
-  < \mathrm{MPE} = \SI{5e-3}{\joule\per\metre\squared} \quad \checkmark
-  \label{eq:verificacion}
-\end{equation}
+\begin{itemize}
+	\item \textbf{L1} (532~nm, 8~ns, pulsado):
+	      $H_{\mathrm{MPE}} = \SI{5.0e-7}{\joule\per\centi\metre\squared}$
+	      (pulso único).
+	\item \textbf{L2} (514,5~nm, CW, 0,25~s):
+	      $H_{\mathrm{MPE}} = \SI{2.5e-3}{\watt\per\centi\metre\squared}$.
+	      Exposición prolongada ($>$10~s):
+	      $H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$.
+	\item \textbf{L3} (635~nm, CW, 0,25~s):
+	      $H_{\mathrm{MPE}} = \SI{2.5e-3}{\watt\per\centi\metre\squared}$.
+\end{itemize}
 
 % =============================================================================
-\section{Cálculo de la Zona Nominal de Peligro (NHZ)}
-\label{sec:NHZ}
+\section{Metodología de Cálculo}
+\label{sec:metodologia}
 
-\subsection{Para el haz sin expandir (mayor peligro)}
+\subsection{Paso 1: Área del Haz}
+\begin{equation}
+	A = \frac{\pi\, a^2}{4} \quad\text{($a$ en cm $\Rightarrow$ $A$ en cm$^2$)}
+	\label{eq:area}
+\end{equation}
 
-Potencia de pico: $P_\mathrm{pico} = Q / \tau = 0.2 / 6 \times 10^{-9}
-= \SI{3.33e7}{\watt}$.
+\subsection{Paso 2: Exposición Potencial}
+\begin{itemize}
+	\item CW: $H_0 = P/A$ \;[\si{\watt\per\centi\metre\squared}]
+	\item Pulsado: $H_0 = E/A$ \;[\si{\joule\per\centi\metre\squared}]
+\end{itemize}
 
-Usando la ecuación~\ref{eq:NHZ} con MPE en irradiancia:
-$E_\mathrm{MPE} = \mathrm{MPE}/\tau = 5\times10^{-3}/6\times10^{-9}
-= \SI{8.33e5}{\watt\per\metre\squared}$:
+\subsection{Paso 3: OD Requerida}
+\begin{equation}
+	OD_{\mathrm{req}} = \log_{10}\!\left(\frac{H_0}{H_{\mathrm{MPE}}}\right)
+	\label{eq:OD_req}
+\end{equation}
 
+\subsection{Paso 4: Selección de EPO}
+OD de la gafa $\ge OD_{\mathrm{req}}$ a la $\lambda$ del láser. Si varias
+cumplen, preferir mayor VLT.
+
+% =============================================================================
+\section{Ejemplo Resuelto: Tres Escenarios Base}
+\label{sec:calculos}
+
+\subsection{L1: PIV -- Nd:YAG 532~nm (Clase~4)}
+
+$a = \SI{5}{\mm} = \SI{0.5}{\cm}$ $\Rightarrow$
+$A = \pi(0{,}5)^2/4 = \SI{0.1963}{\centi\metre\squared}$
+
+$E = \SI{200}{\mJ} = \SI{0.2}{\joule}$:
 \begin{align}
-  r_{\mathrm{NHZ}} &= \frac{1}{\phi}
-    \sqrt{\frac{4 P_\mathrm{pico}}{\pi E_\mathrm{MPE}}}
-  = \frac{1}{3\times10^{-3}}
-    \sqrt{\frac{4 \times 3.33\times10^{7}}{\pi \times 8.33\times10^{5}}} \notag\\
-  &= \frac{1}{3\times10^{-3}}
-    \sqrt{\frac{1.332\times10^{8}}{2.618\times10^{6}}}
-  = \frac{1}{3\times10^{-3}} \sqrt{50.9} \notag\\
-  &= \frac{7.13}{3\times10^{-3}} \notag\\
-  \Aboxed{r_{\mathrm{NHZ}} &\approx \SI{2376}{\metre}}
-  \label{eq:NHZ_num}
+	H_0               & = \frac{0{,}2}{0{,}1963} \approx \SI{1.02}{\joule\per\centi\metre\squared}
+	\label{eq:H0_L1}                                                                               \\
+	OD_{\mathrm{req}} & = \log_{10}\!\left(\frac{1{,}02}{5\times10^{-7}}\right)
+	\approx \mathbf{6{,}31}
+	\label{eq:OD_L1}
 \end{align}
 
-Este valor pone de manifiesto que \textbf{el sistema PIV Nd:YAG es extremadamente
-peligroso} y exige controles de acceso estrictos.
+\paragraph{Evaluación de las 12 lentes a 532~nm (Tabla~\ref{tab:eval_L1}).}
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación del catálogo para L1 -- PIV 532~nm ($OD_{\mathrm{req}} = 6{,}31$).}
+	\label{tab:eval_L1}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 532} & \textbf{$\ge OD_{\mathrm{req}}$?}
+		               & \textbf{Margen}   & \textbf{VLT}                      & \textbf{Veredicto}                                                               \\
+		\midrule
+		L-01           & 5                 & No                                & $-1{,}31$          & 40\% & \textcolor{aerored}{Insuficiente}                    \\
+		L-03           & 6                 & No                                & $-0{,}31$          & 15\% & \textcolor{aerored}{Insuficiente}                    \\
+		\rowcolor{aerogreen!15}
+		L-05           & 7                 & Sí                                & $+0{,}69$          & 30\% & \textcolor{aerogreen}{\textbf{Adecuada}}             \\
+		L-06           & 3                 & No                                & $-3{,}31$          & 50\% & \textcolor{aerored}{Insuficiente}                    \\
+		L-07           & 4                 & No                                & $-2{,}31$          & 35\% & \textcolor{aerored}{Insuficiente}                    \\
+		L-09           & 2                 & No                                & $-4{,}31$          & 45\% & \textcolor{aerored}{Insuficiente}                    \\
+		\rowcolor{aerogreen!15}
+		L-10           & 6                 & Sí*                               & $-0{,}31$          & 20\% & \textcolor{aeroyellow}{Marginal (6+ $\approx$ 6,31)} \\
+		L-12           & 4                 & No                                & $-2{,}31$          & 22\% & \textcolor{aerored}{Insuficiente}                    \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize L-02, L-04, L-08, L-11: sin cobertura a 532~nm $\rightarrow$ \textcolor{aerored}{No aplica}.}                            \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Selección: L-05} (OD~7, margen +0,69; VLT 30\%).
+L-10 es marginal (OD~6+ podría no alcanzar 6,31).
+
+\subsection{L2: LDA -- Ar-Ion 514,5~nm (Clase~4)}
+
+$a = \SI{1.2}{\mm} = \SI{0.12}{\cm}$ $\Rightarrow$
+$A = \pi(0{,}12)^2/4 = \SI{1.131e-2}{\centi\metre\squared}$
+
+$P = \SI{1.5}{\watt}$:
+\begin{align}
+	H_0               & = \frac{1{,}5}{1{,}131\times10^{-2}} \approx \SI{132.6}{\watt\per\centi\metre\squared}
+	\label{eq:H0_L2}                                                                                           \\
+	OD_{\mathrm{req}} & = \log_{10}\!\left(\frac{132{,}6}{2{,}5\times10^{-3}}\right)
+	\approx \mathbf{4{,}72}
+	\label{eq:OD_L2}
+\end{align}
+
+\paragraph{Evaluación a 514,5~nm (Tabla~\ref{tab:eval_L2}).}
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación del catálogo para L2 -- LDA 514,5~nm ($OD_{\mathrm{req}} = 4{,}72$).}
+	\label{tab:eval_L2}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 514,5} & \textbf{$\ge OD_{\mathrm{req}}$?}
+		               & \textbf{Margen}     & \textbf{VLT}                      & \textbf{Veredicto}                                                     \\
+		\midrule
+		\rowcolor{aerogreen!15}
+		L-01           & 5                   & Sí                                & $+0{,}28$          & 40\% & \textcolor{aerogreen}{\textbf{Adecuada}}   \\
+		L-03           & 7                   & Sí                                & $+2{,}28$          & 15\% & \textcolor{aerogreen}{Adecuada (baja VLT)} \\
+		\rowcolor{aerogreen!15}
+		L-05           & 7                   & Sí                                & $+2{,}28$          & 30\% & \textcolor{aerogreen}{\textbf{Adecuada}}   \\
+		L-06           & 3                   & No                                & $-1{,}72$          & 50\% & \textcolor{aerored}{Insuficiente}          \\
+		L-07           & 4                   & No                                & $-0{,}72$          & 35\% & \textcolor{aerored}{Insuficiente}          \\
+		L-09           & 2                   & No                                & $-2{,}72$          & 45\% & \textcolor{aerored}{Insuficiente}          \\
+		\rowcolor{aerogreen!15}
+		L-10           & 6                   & Sí                                & $+1{,}28$          & 20\% & \textcolor{aerogreen}{Adecuada}            \\
+		L-12           & 4                   & No                                & $-0{,}72$          & 22\% & \textcolor{aerored}{Insuficiente}          \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize L-02, L-04, L-08, L-11: sin cobertura a 514,5~nm $\rightarrow$ \textcolor{aerored}{No aplica}.}                  \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Selección: L-01} (OD~5, margen +0,28; mejor VLT = 40\%).
+
+\subsection{L3: Alineación -- Diodo 635~nm (Clase~3R)}
+
+$a = \SI{3}{\mm} = \SI{0.3}{\cm}$ $\Rightarrow$
+$A = \pi(0{,}3)^2/4 = \SI{7.069e-2}{\centi\metre\squared}$
+
+$P = \SI{4.5}{\mW} = \SI{4.5e-3}{\watt}$:
+\begin{align}
+	H_0               & = \frac{4{,}5\times10^{-3}}{7{,}069\times10^{-2}}
+	\approx \SI{6.37e-2}{\watt\per\centi\metre\squared}
+	\label{eq:H0_L3}                                                                             \\
+	OD_{\mathrm{req}} & = \log_{10}\!\left(\frac{6{,}37\times10^{-2}}{2{,}5\times10^{-3}}\right)
+	\approx \mathbf{1{,}41}
+	\label{eq:OD_L3}
+\end{align}
+
+\paragraph{Evaluación a 635~nm (Tabla~\ref{tab:eval_L3}).}
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación del catálogo para L3 -- Alineación 635~nm ($OD_{\mathrm{req}} = 1{,}41$).}
+	\label{tab:eval_L3}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 635} & \textbf{$\ge OD_{\mathrm{req}}$?}
+		               & \textbf{Margen}   & \textbf{VLT}                      & \textbf{Veredicto}                                                     \\
+		\midrule
+		\rowcolor{aerogreen!15}
+		L-02           & 2                 & Sí                                & $+0{,}59$          & 55\% & \textcolor{aerogreen}{\textbf{Adecuada}}   \\
+		\rowcolor{aerogreen!15}
+		L-08           & 3                 & Sí                                & $+1{,}59$          & 25\% & \textcolor{aerogreen}{Adecuada}            \\
+		L-11           & 1                 & No                                & $-0{,}41$          & 60\% & \textcolor{aerored}{Insuficiente}          \\
+		\rowcolor{aerogreen!15}
+		L-12           & 5                 & Sí                                & $+3{,}59$          & 22\% & \textcolor{aerogreen}{Adecuada (excesiva)} \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize L-01, L-03, L-04, L-05, L-06, L-07, L-09, L-10: sin cobertura a 635~nm $\rightarrow$ N/A.}                     \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Selección: L-02} (OD~2, margen +0,59; mejor VLT = 55\%).
+
+\subsection{Tabla Resumen}
+
+\begin{table}[H]
+	\centering
+	\caption{Resumen de resultados para los tres escenarios base.}
+	\label{tab:resumen}
+	\small
+	\begin{tabular}{l c c c c c}
+		\toprule
+		\textbf{Láser (Clase)}    & $\boldsymbol{\lambda}$
+		                          & $\boldsymbol{H_0}$               & $\boldsymbol{H_{\mathrm{MPE}}}$
+		                          & $\boldsymbol{OD_{\mathrm{req}}}$ & \textbf{Lente}                                                                    \\
+		\midrule
+		L1 -- PIV (\textbf{4})    & 532~nm                           & 1,02~J/cm$^2$                   & $5\!\times\!10^{-7}$~J/cm$^2$     & 6,31 & L-05 \\
+		L2 -- LDA (\textbf{4})    & 514,5~nm                         & 132,6~W/cm$^2$                  & $2{,}5\!\times\!10^{-3}$~W/cm$^2$ & 4,72 & L-01 \\
+		L3 -- Alin. (\textbf{3R}) & 635~nm                           & 0,064~W/cm$^2$                  & $2{,}5\!\times\!10^{-3}$~W/cm$^2$ & 1,41 & L-02 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% =============================================================================
+\section{Casos de Estudio por Equipos}
+\label{sec:equipos}
+
+Cada equipo de trabajo recibe un escenario diferente que debe resolver de forma
+autónoma. Los cuatro casos se basan en láseres reales empleados en laboratorios
+aeronáuticos. Cada equipo debe:
+\begin{enumerate}
+	\item Calcular $A$, $H_0$ y $OD_{\mathrm{req}}$.
+	\item Evaluar las 12 lentes del catálogo (Tabla~\ref{tab:epo}).
+	\item Seleccionar la lente óptima (OD suficiente + mejor VLT).
+	\item Justificar si alguna lente es marginal o insuficiente.
+	\item Verificar con el script Python o el notebook.
+\end{enumerate}
+
+% ---- EQUIPO 1 ----
+\subsection{Equipo~1: Nd:YAG Fundamental 1064~nm (Clase~4, Pulsado)}
+\label{sec:eq1}
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del láser -- Equipo~1.}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro} & \textbf{Valor}                                                 \\
+		\midrule
+		Tipo / Aplicación  & Nd:YAG fundamental / PIV-IR, LIBS                              \\
+		$\lambda$          & 1064~nm                                                        \\
+		Modo               & Pulsado                                                        \\
+		Energía $E$        & 500~mJ/pulso                                                   \\
+		Duración $\tau$    & 10~ns                                                          \\
+		Repetición $f$     & 10~Hz                                                          \\
+		Diámetro $a$       & 7~mm                                                           \\
+		\rowcolor{aerored!15}
+		Clase              & \textbf{4}                                                     \\
+		$H_{\mathrm{MPE}}$ & $\SI{5.0e-6}{\joule\per\centi\metre\squared}$ (pulso, 1064~nm) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\paragraph{Solución de referencia.}
+$A = \pi(0{,}7)^2/4 = \SI{0.3848}{\centi\metre\squared}$;
+$H_0 = 0{,}5 / 0{,}3848 = \SI{1.30}{\joule\per\centi\metre\squared}$;
+$OD_{\mathrm{req}} = \log_{10}(1{,}30 / 5\times10^{-6}) = \log_{10}(2{,}60\times10^{5}) \approx \mathbf{5{,}41}$.
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación para Equipo~1 -- 1064~nm ($OD_{\mathrm{req}} = 5{,}41$).}
+	\label{tab:eq1_eval}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 1064} & \textbf{Cumple?}
+		               & \textbf{Margen}    & \textbf{VLT}     & \textbf{Veredicto}                                              \\
+		\midrule
+		L-02           & 4                  & No               & $-1{,}41$          & 55\% & \textcolor{aerored}{Insuficiente}   \\
+		L-03           & 5                  & No               & $-0{,}41$          & 15\% & \textcolor{aerored}{Insuficiente}   \\
+		L-08           & 5                  & No               & $-0{,}41$          & 25\% & \textcolor{aerored}{Insuficiente}   \\
+		L-09           & 4                  & No               & $-1{,}41$          & 45\% & \textcolor{aerored}{Insuficiente}   \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize L-01, L-04, L-05, L-06, L-07, L-10, L-11, L-12: sin banda a 1064~nm $\rightarrow$ N/A.} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Resultado:}
+\textcolor{aerored}{\textbf{Ninguna lente del catálogo cumple}} ($OD_{\mathrm{req}} = 5{,}41$,
+máximo disponible = OD~5). El equipo debe:
+\begin{itemize}
+	\item Informar la carencia al LSO.
+	\item Proponer adquisición de gafas OD~$\ge 6$ a 1064~nm.
+	\item Suspender operaciones con este láser hasta disponer de EPO adecuado.
+\end{itemize}
+
+% ---- EQUIPO 2 ----
+\subsection{Equipo~2: CO$_2$ CW a 10\,600~nm (Clase~4)}
+\label{sec:eq2}
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del láser -- Equipo~2.}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro} & \textbf{Valor}                                                      \\
+		\midrule
+		Tipo / Aplicación  & CO$_2$ / Corte industrial, DIAL                                     \\
+		$\lambda$          & 10\,600~nm                                                          \\
+		Modo               & CW                                                                  \\
+		Potencia $P$       & 50~W                                                                \\
+		Diámetro $a$       & 8~mm                                                                \\
+		\rowcolor{aerored!15}
+		Clase              & \textbf{4}                                                          \\
+		$H_{\mathrm{MPE}}$ & $\SI{0.1}{\watt\per\centi\metre\squared}$ (CW, 10\,600~nm, $>10$~s) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\paragraph{Solución de referencia.}
+$A = \pi(0{,}8)^2/4 = \SI{0.5027}{\centi\metre\squared}$;
+$H_0 = 50 / 0{,}5027 = \SI{99.5}{\watt\per\centi\metre\squared}$;
+$OD_{\mathrm{req}} = \log_{10}(99{,}5 / 0{,}1) = \log_{10}(995) \approx \mathbf{3{,}00}$.
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación para Equipo~2 -- CO$_2$ 10\,600~nm ($OD_{\mathrm{req}} = 3{,}00$).}
+	\label{tab:eq2_eval}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 10\,600} & \textbf{Cumple?}
+		               & \textbf{Margen}       & \textbf{VLT}     & \textbf{Veredicto}                                            \\
+		\midrule
+		L-04           & 2                     & No               & $-1{,}00$          & 90\% & \textcolor{aerored}{Insuficiente} \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize L-01 a L-03, L-05 a L-12: sin banda a 10\,600~nm $\rightarrow$ N/A.}                     \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Resultado:}
+\textcolor{aerored}{\textbf{Ninguna lente cumple}} ($OD_{\mathrm{req}} = 3{,}00$, L-04 solo
+ofrece OD~2). Mismo protocolo: informar al LSO e iniciar adquisición. Nótese que
+a $>$1400~nm el riesgo es corneal (no retiniano), pero un CO$_2$ Clase~4 a 50~W
+puede causar quemaduras corneales graves.
+
+% ---- EQUIPO 3 ----
+\subsection{Equipo~3: Diodo 808~nm CW (Clase~3B)}
+\label{sec:eq3}
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del láser -- Equipo~3.}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro} & \textbf{Valor}                                                    \\
+		\midrule
+		Tipo / Aplicación  & Diodo semiconductor / Bombeo, iluminación IR                      \\
+		$\lambda$          & 808~nm                                                            \\
+		Modo               & CW                                                                \\
+		Potencia $P$       & 300~mW                                                            \\
+		Diámetro $a$       & 2~mm                                                              \\
+		\rowcolor{aeroyellow!30}
+		Clase              & \textbf{3B}                                                       \\
+		$H_{\mathrm{MPE}}$ & $\SI{2.5e-3}{\watt\per\centi\metre\squared}$ (CW, 808~nm, 0,25~s) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\paragraph{Solución de referencia.}
+$A = \pi(0{,}2)^2/4 = \SI{3.142e-2}{\centi\metre\squared}$;
+$H_0 = 0{,}3 / 3{,}142\times10^{-2} = \SI{9.55}{\watt\per\centi\metre\squared}$;
+$OD_{\mathrm{req}} = \log_{10}(9{,}55 / 2{,}5\times10^{-3}) = \log_{10}(3820) \approx \mathbf{3{,}58}$.
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación para Equipo~3 -- Diodo 808~nm ($OD_{\mathrm{req}} = 3{,}58$).}
+	\label{tab:eq3_eval}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 808} & \textbf{Cumple?}
+		               & \textbf{Margen}   & \textbf{VLT}     & \textbf{Veredicto}                                                   \\
+		\midrule
+		\rowcolor{aerogreen!15}
+		L-02           & 4                 & Sí               & $+0{,}42$          & 55\% & \textcolor{aerogreen}{\textbf{Adecuada}} \\
+		\rowcolor{aerogreen!15}
+		L-05           & 6                 & Sí               & $+2{,}42$          & 30\% & \textcolor{aerogreen}{Adecuada}          \\
+		\rowcolor{aerogreen!15}
+		L-08           & 5                 & Sí               & $+1{,}42$          & 25\% & \textcolor{aerogreen}{Adecuada}          \\
+		\rowcolor{aerogreen!15}
+		L-09           & 4                 & Sí               & $+0{,}42$          & 45\% & \textcolor{aerogreen}{\textbf{Adecuada}} \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize L-01, L-03, L-04, L-06, L-07, L-10, L-11, L-12: sin banda a 808~nm $\rightarrow$ N/A.}      \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Selección: L-02} (OD~4, margen +0,42; \textbf{mejor VLT = 55\%}).
+L-09 es segunda opción (VLT 45\%).
+
+% ---- EQUIPO 4 ----
+\subsection{Equipo~4: He-Ne CW a 632,8~nm (Clase~3R) + LDA Prolongada}
+\label{sec:eq4}
+
+Este equipo tiene un caso compuesto: primero evalúa un He-Ne de alineación y
+luego reevalúa el L2 (LDA 514,5~nm) bajo exposición prolongada ($>$10~s,
+$H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$).
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del láser -- Equipo~4 (Caso~A).}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro} & \textbf{Valor}                                        \\
+		\midrule
+		Tipo / Aplicación  & He-Ne / Alineación óptica                             \\
+		$\lambda$          & 632,8~nm                                              \\
+		Modo               & CW                                                    \\
+		Potencia $P$       & 10~mW                                                 \\
+		Diámetro $a$       & 1,5~mm                                                \\
+		\rowcolor{aeroyellow!30}
+		Clase              & \textbf{3R}                                           \\
+		$H_{\mathrm{MPE}}$ & $\SI{2.5e-3}{\watt\per\centi\metre\squared}$ (0,25~s) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\paragraph{Caso~A -- He-Ne 632,8~nm.}
+$A = \pi(0{,}15)^2/4 = \SI{1.767e-2}{\centi\metre\squared}$;
+$H_0 = 0{,}01 / 1{,}767\times10^{-2} = \SI{0.566}{\watt\per\centi\metre\squared}$;
+$OD_{\mathrm{req}} = \log_{10}(0{,}566 / 2{,}5\times10^{-3}) \approx \mathbf{2{,}35}$.
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación para Equipo~4, Caso~A -- He-Ne 632,8~nm ($OD_{\mathrm{req}} = 2{,}35$).}
+	\label{tab:eq4a_eval}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 633} & \textbf{Cumple?}
+		               & \textbf{Margen}   & \textbf{VLT}     & \textbf{Veredicto}                                                   \\
+		\midrule
+		L-02           & 2                 & No               & $-0{,}35$          & 55\% & \textcolor{aerored}{Insuficiente}        \\
+		\rowcolor{aerogreen!15}
+		L-08           & 3                 & Sí               & $+0{,}65$          & 25\% & \textcolor{aerogreen}{\textbf{Adecuada}} \\
+		L-11           & 1                 & No               & $-1{,}35$          & 60\% & \textcolor{aerored}{Insuficiente}        \\
+		\rowcolor{aerogreen!15}
+		L-12           & 5                 & Sí               & $+2{,}65$          & 22\% & \textcolor{aerogreen}{Adecuada}          \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize Resto: sin banda a 633~nm $\rightarrow$ N/A.}                                               \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Selección Caso~A: L-08} (OD~3, margen +0,65; VLT 25\%).
+L-02 queda corta ($OD=2 < 2{,}35$): este es un ejemplo donde una lente
+«aparentemente cercana» no cumple.
+
+\paragraph{Caso~B -- LDA 514,5~nm con exposición prolongada.}
+Reutilizando $H_0 = \SI{132.6}{\watt\per\centi\metre\squared}$ del L2 con
+$H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$:
+\begin{align}
+	OD_{\mathrm{req}} & = \log_{10}\!\left(\frac{132{,}6}{1{,}0\times10^{-3}}\right) \approx \mathbf{5{,}12}
+	\label{eq:OD_L2_long}
+\end{align}
+
+\begin{table}[H]
+	\centering
+	\caption{Reevaluación L2 -- LDA 514,5~nm prolongada ($OD_{\mathrm{req}} = 5{,}12$).}
+	\label{tab:eq4b_eval}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ 514,5} & \textbf{Cumple?}
+		               & \textbf{Margen}     & \textbf{VLT}     & \textbf{Veredicto}                                                               \\
+		\midrule
+		L-01           & 5                   & Sí*              & $-0{,}12$          & 40\% & \textcolor{aeroyellow}{Marginal (5+ $\approx$ 5,12)} \\
+		L-03           & 7                   & Sí               & $+1{,}88$          & 15\% & \textcolor{aerogreen}{Adecuada (baja VLT)}           \\
+		\rowcolor{aerogreen!15}
+		L-05           & 7                   & Sí               & $+1{,}88$          & 30\% & \textcolor{aerogreen}{\textbf{Adecuada}}             \\
+		L-10           & 6                   & Sí               & $+0{,}88$          & 20\% & \textcolor{aerogreen}{Adecuada}                      \\
+		\midrule
+		\multicolumn{6}{l}{\footnotesize L-06 (OD~3), L-07 (OD~4), L-09 (OD~2), L-12 (OD~4): Insuficientes.}                                       \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Selección Caso~B: L-05} (OD~7, margen +1,88; VLT 30\%).
+
+\textbf{Conclusión del Equipo~4:} la exposición prolongada incrementó
+$OD_{\mathrm{req}}$ de 4,72 a 5,12. L-01, antes adecuada, ahora es
+\textcolor{aeroyellow}{marginal}. Este caso ilustra la importancia de considerar
+la duración real de exposición.
 
 % =============================================================================
 \section{Evaluación de Riesgos}
 \label{sec:riesgos}
 
-\subsection{Matriz de riesgos}
+\subsection{Matriz de Riesgos}
 
 \begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[scale=0.85]
-    % Grid
-    \foreach \x in {0,...,4} {
-      \foreach \y in {0,...,4} {
-        \pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
-        \pgfmathparse{\risk < 5 ? "aerogreen!40" : (\risk < 13 ? "aeroyellow!60" : "aerored!50")}
-        \edef\fillcol{\pgfmathresult}
-        \fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
-        \draw[gray] (\x,\y) rectangle (\x+1,\y+1);
-        \node at (\x+0.5,\y+0.5) {\pgfmathprintnumber[fixed,precision=0]{\risk}};
-      }
-    }
-    % Axis labels
-    \foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
-      \node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.1) {\l};
-    }
-    \foreach \y/\l in {0/Insignificante,1/Menor,2/Moderado,3/Mayor,4/Catastrófico} {
-      \node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
-    }
-    \node[font=\small\bfseries,rotate=90] at (-1.5,2.5) {Severidad};
-    \node[font=\small\bfseries] at (2.5,-1.2) {Probabilidad};
-    % PIV marker
-    \fill[blue,opacity=0.8] (3.5,3.5) circle (0.25);
-    \node[blue,font=\tiny\bfseries] at (3.5,3.5) {PIV};
-    % Legend
-    \fill[aerogreen!40] (5.5,3.5) rectangle (6.0,4.0);
-    \node[right,font=\tiny] at (6.0,3.75) {Bajo ($<5$)};
-    \fill[aeroyellow!60] (5.5,2.8) rectangle (6.0,3.3);
-    \node[right,font=\tiny] at (6.0,3.05) {Medio (5--12)};
-    \fill[aerored!50] (5.5,2.1) rectangle (6.0,2.6);
-    \node[right,font=\tiny] at (6.0,2.35) {Alto ($>12$)};
-  \end{tikzpicture}
-  \caption{Matriz de riesgos 5$\times$5 para el laboratorio láser. El sistema
-           PIV (marcador azul) se sitúa en la zona roja de riesgo alto.}
-  \label{fig:risk_matrix}
+	\centering
+	\begin{tikzpicture}[scale=0.85]
+		\foreach \x in {0,...,4} {
+				\foreach \y in {0,...,4} {
+						\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+						\pgfmathparse{\risk < 5 ? "aerogreen!40" : (\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+						\edef\fillcol{\pgfmathresult}
+						\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+						\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+						\node at (\x+0.5,\y+0.5) {\pgfmathprintnumber[fixed,precision=0]{\risk}};
+					}
+			}
+		\foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+				\node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.1) {\l};
+			}
+		\foreach \y/\l in {0/Insignificante,1/Menor,2/Moderado,3/Mayor,4/Catastrófico} {
+				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+			}
+		\node[font=\small\bfseries,rotate=90] at (-1.5,2.5) {Severidad};
+		\node[font=\small\bfseries] at (2.5,-1.2) {Probabilidad};
+		\fill[blue,opacity=0.8] (3.5,3.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (3.5,3.5) {PIV};
+		\fill[blue!70,opacity=0.8] (2.5,3.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (2.5,3.5) {LDA};
+		\fill[orange,opacity=0.8] (0.5,1.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (0.5,1.5) {Alin.};
+		\fill[aerogreen!40] (5.5,3.5) rectangle (6.0,4.0);
+		\node[right,font=\tiny] at (6.0,3.75) {Bajo ($<5$)};
+		\fill[aeroyellow!60] (5.5,2.8) rectangle (6.0,3.3);
+		\node[right,font=\tiny] at (6.0,3.05) {Medio (5--12)};
+		\fill[aerored!50] (5.5,2.1) rectangle (6.0,2.6);
+		\node[right,font=\tiny] at (6.0,2.35) {Alto ($>12$)};
+	\end{tikzpicture}
+	\caption{Matriz de riesgos. PIV y LDA (Clase~4): zona roja; Alineación
+		(Clase~3R): zona verde.}
+	\label{fig:risk_matrix}
 \end{figure}
 
-\subsection{Controles de mitigación (jerarquía de controles)}
+\subsection{Jerarquía de Controles}
 
 \begin{enumerate}
-  \item \textbf{Eliminación/Sustitución}: Usar láseres de clase inferior cuando
-        sea técnicamente posible.
-  \item \textbf{Controles de ingeniería}: Enclave de puerta (\textit{interlock}),
-        sistema de obturador automático, cabina de láser con paredes opacas.
-  \item \textbf{Controles administrativos}: Señalización de NHZ, Oficial de
-        Seguridad Láser (LSO), registro de uso, procedimientos escritos.
-  \item \textbf{EPP}: Gafas certificadas EN~207, marcado \texttt{I 532 L6}.
+	\item \textbf{Eliminación/Sustitución}: clase inferior si es posible.
+	\item \textbf{Controles de ingeniería}: enclave, obturador, cabina, cortinas.
+	\item \textbf{Controles administrativos}: señalización, LSO, SOPs, registro.
+	\item \textbf{EPP}: gafas EN~207~\cite{en207} con OD y VLT adecuados.
 \end{enumerate}
 
 % =============================================================================
-\section{Caso de Estudio: PIV en Túnel de Viento para Perfil NACA 0012}
-\label{sec:caso_estudio}
-
-\subsection{Descripción del escenario}
-
-Un grupo de investigación aeronáutica realiza mediciones PIV para estudiar
-la transición laminar-turbulenta sobre un ala con perfil NACA~0012 a
-$\mathrm{Re} = 3\times10^5$ en un túnel de viento de sección
-$\SI{0.5}{\metre}\times\SI{0.5}{\metre}$.
-
-\textbf{Configuración del sistema:}
-\begin{itemize}
-  \item Láser: Nd:YAG doble pulso, \SI{532}{\nm}, \SI{200}{\milli\joule}/pulso,
-        $\tau = \SI{6}{\ns}$, $\phi = \SI{3}{\milli\radian}$
-  \item Espejo de lámina + lente cilíndrica $f = \SI{-25}{\mm}$
-  \item Cámara CCD 2 Mpx, $\Delta t_{\mathrm{PIV}} = \SI{50}{\micro\second}$
-  \item Seeding: aceite de oliva nebulizado, $d_p \approx \SI{1}{\micro\metre}$
-\end{itemize}
-
-\subsection{Aplicación de la evaluación de riesgos}
-
-\paragraph{OD requerido.}
-Con los valores calculados en la Sección~\ref{sec:calculo_OD}:
-$OD_{\min} = 5.71 \implies$ \textbf{OD = 6}.
-
-\paragraph{NHZ.}
-Con $r_{\mathrm{NHZ}} \approx \SI{2.4}{\km}$ (haz sin expandir), la sala de
-ensayos debe tener control de acceso total.  Con el sistema de lámina formada
-(divergencia efectiva $\approx \SI{100}{\milli\radian}$ en el eje de la lámina),
-la NHZ se reduce a:
-\begin{equation}
-  r_{\mathrm{NHZ,lámina}} = \frac{1}{0.1}
-    \sqrt{\frac{4\times3.33\times10^7}{\pi\times8.33\times10^5}}
-  = 10 \times 7.13 \approx \SI{71}{\metre}
-\end{equation}
-dentro de la cual sigue siendo necesaria la protección.
-
-\paragraph{Equipo de protección seleccionado.}
-\begin{itemize}
-  \item Gafas: \texttt{I 532 L6} (continuo e impulsional, 532 nm, OD 6).
-  \item Interlock de puerta activo durante disparo del láser.
-  \item Pantalla de absorción en la pared opuesta al láser.
-\end{itemize}
-
-% =============================================================================
-\section{Herramienta de Software}
+\section{Herramientas de Software}
 \label{sec:software}
 
-El notebook Jupyter \texttt{Practicas/P01\_Proteccion\_Laser/notebooks/\\
-P01\_Proteccion\_Laser.ipynb} automatiza todos los cálculos de esta práctica:
+Carpeta \texttt{Practicas/P01\_Proteccion\_Laser/}:
 
-\begin{itemize}
-  \item Cálculo interactivo de $H_0$, MPE y OD para diferentes láseres y
-        condiciones de exposición.
-  \item Verificación automática de OD contra el catálogo de protecciones (EPO).
-  \item Generación de informe PDF con matriz de riesgos y resumen de controles.
-\end{itemize}
+\subsection{Notebook Jupyter}
+\texttt{notebooks/P01\_Proteccion\_Laser.ipynb} -- cálculo interactivo de $H_0$
+y OD para los 3 escenarios base, verificación contra catálogo CSV, gráficas de
+margen OD.
 
-\begin{lstlisting}[language=Python, caption={Fragmento del cálculo de OD en Python.}]
-import numpy as np
+\subsection{Script Python}
+\texttt{src/P01\_Proteccion\_Laser.py} -- funciones de cálculo reutilizables:
 
-def calcular_OD(Q_J, w0_m, MPE_Jm2):
-    """
-    Calcula la Densidad Optica minima requerida.
-    Q_J   : energia por pulso [J]
-    w0_m  : radio del haz en cintura [m]
-    MPE_Jm2: Exposicion Maxima Permisible [J/m^2]
-    """
-    H0 = Q_J / (np.pi * w0_m**2)        # Exposicion incidente
-    OD = np.log10(H0 / MPE_Jm2)         # Densidad optica
-    return OD, H0
+\begin{lstlisting}[language=Python, caption={Funciones principales.}]
+import math
+def area_cm2_from_diameter_mm(a_mm):
+    d_cm = a_mm / 10.0
+    return math.pi * (d_cm / 2.0) ** 2
 
-# Sistema PIV: Nd:YAG 532 nm, 200 mJ, w0=5mm, MPE=5e-3 J/m^2
-OD, H0 = calcular_OD(0.200, 5e-3, 5e-3)
-print(f"H0 = {H0:.1f} J/m^2")
-print(f"OD_min = {OD:.2f}  ->  OD requerido = {int(np.ceil(OD))}")
-# H0 = 2546.5 J/m^2
-# OD_min = 5.71  ->  OD requerido = 6
+def od_required(H0, HMPE):
+    if H0 <= HMPE: return 0.0
+    return math.log10(H0 / HMPE)
 \end{lstlisting}
+
+\subsection{Datos}
+\texttt{data/epo\_lenses.csv} -- catálogo de 12 lentes con columnas:
+\texttt{lens\_id}, \texttt{brand}, \texttt{model}, \texttt{band\_lo\_nm},
+\texttt{band\_hi\_nm}, \texttt{od\_value}, \texttt{vlt\_pct}.
 
 % =============================================================================
 \section{Procedimiento Experimental}
 \label{sec:procedimiento}
 
 \begin{enumerate}
-  \item Identificar el láser: $\lambda$, modo (CW/pulsado), $Q$ o $P$, $\phi$,
-        $\tau$ si aplicable.
-  \item Calcular $H_0$ usando ec.~\eqref{eq:H0}.
-  \item Determinar MPE según IEC~60825-1 para la $\lambda$ y $t$ de exposición.
-  \item Calcular $OD_{\min}$ con ec.~\eqref{eq:OD}.
-  \item Redondear OD al entero superior y seleccionar gafas con marcado EN~207.
-  \item Calcular $r_{\mathrm{NHZ}}$ con ec.~\eqref{eq:NHZ} para el haz más
-        peligroso presente en el experimento.
-  \item Elaborar la matriz de riesgos e implementar la jerarquía de controles.
-  \item Verificar y registrar el resultado en el informe de seguridad.
+	\item Identificar el láser asignado al equipo.
+	\item Calcular $A$, $H_0$ y $OD_{\mathrm{req}}$.
+	\item Evaluar las 12 lentes del catálogo.
+	\item Seleccionar la lente óptima y justificar.
+	\item Verificar con el notebook / script Python.
+	\item Elaborar matriz de riesgos.
+	\item Registrar resultados en el informe.
 \end{enumerate}
 
 % =============================================================================
-\section{Resultados y Discusión}
-\label{sec:resultados}
+\section{Cuestionario}
+\label{sec:cuestionario}
 
-\begin{table}[H]
-  \centering
-  \caption{Resumen de resultados de protección para el laboratorio PIV.}
-  \label{tab:resumen}
-  \begin{tabular}{lSS}
-    \toprule
-    \textbf{Parámetro} & {\textbf{Valor calculado}} & {\textbf{Unidad}} \\
-    \midrule
-    $H_0$ (cintura, 532 nm)       & 2546.5 & \si{\joule\per\metre\squared} \\
-    MPE (pulso 6 ns, 532 nm)      & 5e-3   & \si{\joule\per\metre\squared} \\
-    $OD_{\min}$                   & 5.71   & -- \\
-    OD seleccionado               & 6      & -- \\
-    $H_{\mathrm{trans}}$ (OD=6)   & 2.55e-3& \si{\joule\per\metre\squared} \\
-    $r_{\mathrm{NHZ}}$ (haz libre)& 2376   & \si{\metre} \\
-    $r_{\mathrm{NHZ}}$ (lámina)   & 71     & \si{\metre} \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{enumerate}
+	\item ¿Qué significa «OD~5+ @ 190--540~nm»? ¿En cuánto reduce la intensidad
+	      a 532~nm? ¿Y a 600~nm?
+	\item ¿Por qué un Clase~4 es peligroso incluso con reflexiones difusas?
+	\item Mencione al menos tres parámetros necesarios para calcular
+	      $OD_{\mathrm{req}}$.
+	\item Entre dos lentes de igual OD, una con VLT~45\% y otra 20\%: ¿cuál
+	      elegir y por qué?
+	\item ¿Gafas para 1064~nm protegen a 532~nm del mismo Nd:YAG? Justifique.
+	\item ¿Qué protocolo se sigue cuando ninguna lente cumple (Equipos~1 y~2)?
+\end{enumerate}
 
-Los resultados confirman que el sistema PIV Nd:YAG de \SI{200}{\milli\joule}
-es un laser de Clase 4 con NHZ de kilómetros si el haz se deja propagar sin
-obstáculos.  Las medidas de ingeniería (enclave, cabina) son esenciales.
+% =============================================================================
+\section{Formato del Informe}
+\label{sec:informe}
+
+Formato AIAA con secciones: Resumen, Introducción, Fundamento Teórico,
+Metodología, Resultados (escenarios base + caso del equipo), Discusión
+(cuestionario), Conclusiones, Referencias, Apéndice~A (gráficas Python).
 
 % =============================================================================
 \section{Conclusiones}
 \label{sec:conclusiones}
 
 \begin{enumerate}
-  \item El sistema PIV con Nd:YAG a \SI{532}{\nm} requiere protección ocular
-        con \textbf{OD = 6}, marcado \texttt{I 532 L6} según EN~207.
-  \item La NHZ para el haz sin expandir supera los \SI{2}{\km}, lo que exige
-        controles de ingeniería robustos (interlocks, cabinas, obturadores).
-  \item La jerarquía de controles debe aplicarse en el orden: eliminación $>$
-        controles de ingeniería $>$ controles administrativos $>$ EPP.
-  \item El notebook Python automatiza los cálculos y permite adaptar la
-        evaluación a diferentes configuraciones de laser.
+	\item El catálogo de 12 lentes permite evaluar escenarios desde UV hasta
+	      IR lejano, incluyendo situaciones donde \textbf{ninguna lente cumple}.
+	\item El sistema PIV (532~nm, Clase~4) requiere $OD \ge 6{,}31$: solo L-05
+	      cumple con certeza.
+	\item El sistema LDA (514,5~nm, Clase~4) requiere $OD \ge 4{,}72$
+	      (0,25~s) o $\ge 5{,}12$ (prolongada): L-01 es adecuada para
+	      exposición breve; L-05 es necesaria para prolongada.
+	\item El diodo de alineación (635~nm, Clase~3R) requiere $OD \ge 1{,}41$:
+	      L-02 es suficiente con VLT 55\%.
+	\item Cuando el catálogo es insuficiente (Equipos~1 y~2), el protocolo es
+	      informar al LSO y suspender operaciones.
+	\item Las herramientas Python automatizan todo el flujo de evaluación.
 \end{enumerate}
 
 % =============================================================================
 \printbibliography[title={Referencias}]
+
+% =============================================================================
+\appendix
+\section{Tabla de MPE de Referencia}
+\label{sec:appendix_mpe}
+
+\begin{table}[H]
+	\centering
+	\caption{Valores de MPE para exposición ocular -- resumen (IEC~60825-1).}
+	\label{tab:mpe_ref}
+	\small
+	\begin{tabular}{l l l l}
+		\toprule
+		\textbf{Rango $\lambda$} & \textbf{Duración}                 & \textbf{MPE}         & \textbf{Unidades} \\
+		\midrule
+		400--700~nm              & $<\SI{1.8e-5}{\second}$ (pulsado) & $5{,}0\times10^{-7}$ & J/cm$^2$          \\
+		400--700~nm              & 0,25~s (reflejo aversión)         & $2{,}5\times10^{-3}$ & W/cm$^2$          \\
+		400--700~nm              & 10~s (prolongada)                 & $1{,}0\times10^{-3}$ & W/cm$^2$          \\
+		700--1050~nm             & 0,25~s                            & $2{,}5\times10^{-3}$ & W/cm$^2$          \\
+		1050--1400~nm            & $<\SI{1e-5}{\second}$ (pulsado)   & $5{,}0\times10^{-6}$ & J/cm$^2$          \\
+		$>$1400~nm               & $>$10~s (CW)                      & $1{,}0\times10^{-1}$ & W/cm$^2$          \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 
 \end{document}
