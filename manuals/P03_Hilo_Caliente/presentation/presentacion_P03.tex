@@ -1,6 +1,7 @@
 % =============================================================================
-% Presentación Beamer P03 – Anemometría de Hilo Caliente
+% Presentación Beamer P03 – Anemometría de Hilo Caliente (CTA/HWA)
 % Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode presentacion_P03.tex
 % =============================================================================
 \documentclass[aspectratio=169,12pt]{beamer}
 
@@ -8,406 +9,1404 @@
 \usecolortheme{seahorse}
 \usefonttheme{professionalfonts}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% ---- Encoding & Language ----
+\usepackage{fontspec}
+\usepackage{csquotes}
 \usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+% ---- Math & Physics ----
 \usepackage{amsmath,amssymb}
+\usepackage{mathtools}
 \usepackage{siunitx}
 \sisetup{output-decimal-marker={,}}
+
+% ---- TikZ ----
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
+                decorations.markings,decorations.pathmorphing,patterns}
 \usepackage{circuitikz}
+
+% ---- Tables ----
 \usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{array}
+
+% ---- Code ----
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\tiny,
   keywordstyle=\color{blue!80}\bfseries,
   commentstyle=\color{green!50!black},
   backgroundcolor=\color{gray!10},
-  frame=single, breaklines=true
+  frame=single,
+  breaklines=true
 }
 
+% ---- Custom Colors ----
 \definecolor{aeroblue}{RGB}{0,51,102}
 \definecolor{aerored}{RGB}{153,0,0}
 \definecolor{aerogreen}{RGB}{0,102,51}
-\definecolor{aeroorange}{RGB}{200,100,0}
+\definecolor{aeroyellow}{RGB}{204,153,0}
+\definecolor{aerogreendark}{RGB}{0,80,40}
+\definecolor{aerogreenlight}{RGB}{0,140,70}
 
-\setbeamercolor{frametitle}{bg=aeroblue,fg=white}
-\setbeamercolor{title}{bg=aeroblue,fg=white}
-\setbeamercolor{structure}{fg=aeroblue}
+% ---- GREEN THEME ----
+\setbeamercolor{frametitle}{bg=aerogreen,fg=white}
+\setbeamercolor{title}{bg=aerogreen,fg=white}
+\setbeamercolor{structure}{fg=aerogreen}
+\setbeamercolor{palette primary}{bg=aerogreen,fg=white}
+\setbeamercolor{palette secondary}{bg=aerogreenlight,fg=white}
+\setbeamercolor{palette tertiary}{bg=aerogreendark,fg=white}
+\setbeamercolor{palette quaternary}{bg=aerogreendark,fg=white}
+\setbeamercolor{section in toc}{fg=aerogreen}
+\setbeamercolor{subsection in toc}{fg=aerogreendark}
+\setbeamercolor{block title}{bg=aerogreen,fg=white}
+\setbeamercolor{block body}{bg=aerogreen!10,fg=black}
+\setbeamercolor{block title alerted}{bg=aerored,fg=white}
+\setbeamercolor{block body alerted}{bg=aerored!10,fg=black}
+\setbeamercolor{block title example}{bg=aerogreenlight,fg=white}
+\setbeamercolor{block body example}{bg=aerogreenlight!10,fg=black}
+\setbeamercolor{item}{fg=aerogreen}
+\setbeamercolor{itemize item}{fg=aerogreen}
+\setbeamercolor{enumerate item}{fg=aerogreen}
 
-\title[P03 -- Hilo Caliente]{P03: Anemometría de Hilo Caliente (CTA/HWA)}
+% ---- Title Info ----
+\title[P03 -- Hilo Caliente]{P03: Anemometría de\\Hilo Caliente (CTA/HWA)}
 \subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
 \author{Laboratorio de Técnicas de Medida}
-\institute{Departamento de Ingeniería Aeroespacial}
-\date{\today}
+\date{}
 
 % =============================================================================
 \begin{document}
 
 \begin{frame}
-  \titlepage
+	\titlepage
 \end{frame}
 
-\begin{frame}{Contenido}
-  \tableofcontents
-\end{frame}
-
-% =============================================================================
-\section{Principio de Funcionamiento}
-
-\begin{frame}{¿Qué es el HWA?}
-  \begin{columns}
-    \begin{column}{0.55\textwidth}
-      \textbf{Hot-Wire Anemometry (HWA / CTA):}
-      \begin{itemize}
-        \item Hilo de \textbf{wolframio}, $d \approx \SI{5}{\micro\m}$,
-              $L \approx \SI{1}{\mm}$
-        \item Calentado eléctricamente ($T_w \approx \SI{220}{\celsius}$)
-        \item El flujo \textbf{enfría el hilo} $\to$ varía la resistencia
-        \item Puente CTA mantiene $T_w = \mathrm{cte}$ ajustando la corriente
-        \item $E(t) \leftrightarrow U(t)$ vía \textbf{ley de King}
-      \end{itemize}
-      \vspace{0.3em}
-      \begin{alertblock}{Ventaja clave}
-        Ancho de banda hasta \SI{400}{\kHz} -- ideal para turbulencia.
-      \end{alertblock}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{tikzpicture}[scale=0.85,>=Stealth]
-        % Probe body
-        \draw[fill=gray!30,draw=black,thick] (1.5,-0.4) rectangle (1.9,1.8);
-        \draw[fill=gray!50] (1.5,1.8) -- (1.7,2.0) -- (1.9,1.8);
-        % Prongs
-        \draw[black,very thick] (1.7,2.0) -- (1.2,2.5);
-        \draw[black,very thick] (1.7,2.0) -- (2.2,2.5);
-        % Hot wire
-        \draw[aerored,ultra thick,line width=2.5pt] (1.2,2.5) -- (2.2,2.5);
-        \node[aerored,above,font=\tiny\bfseries] at (1.7,2.6) {Hilo ($d=5\,\mu$m)};
-        % Flow
-        \foreach \y in {2.2,2.5,2.8} {
-          \draw[->,blue!60,thick] (0.2,\y) -- (1.1,\y);
-        }
-        \node[blue!60,font=\tiny] at (0.6,2.0) {$U$};
-        % Heat arrows
-        \draw[aerored!60,->] (1.7,2.5) -- (1.7,3.2)
-              node[above,font=\tiny,aerored] {$Q_\mathrm{conv}$};
-        % Connection
-        \draw[aeroblue,thick,->] (1.9,1.0) -- (3.0,1.0)
-              node[right,font=\tiny] {$E(t)$};
-        % CTA label
-        \node[aeroblue,font=\tiny,right] at (3.0,1.3) {CTA};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{Índice}
+	\tableofcontents
 \end{frame}
 
 % =============================================================================
-\section{Teoría: Ley de King}
+\section{Introducción}
+% =============================================================================
 
-\begin{frame}{Ley de King}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Balance energético:}
-      \begin{equation*}
-        I_w^2 R_w = h\,A_s\,(T_w - T_a)
-      \end{equation*}
-
-      \textbf{Nusselt cilindrico:} $Nu = A_0 + B_0 Re^n$
-
-      \vspace{0.5em}
-      \begin{block}{Ley de King}
-        \begin{equation*}
-          \boxed{E^2 = A + B\,U^n}
-        \end{equation*}
-        $A$, $B$ constantes del sensor\\
-        $n \approx 0.45$ (King) o ajustado
-      \end{block}
-
-      \vspace{0.3em}
-      \textbf{Inversión:}
-      \begin{equation*}
-        U = \left(\frac{E^2 - A}{B}\right)^{1/n}
-      \end{equation*}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.75]
-        \draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$U$ (m/s)};
-        \draw[->] (0,0) -- (0,4) node[above,font=\tiny] {$E^2$ (V²)};
-        % King curve (E^2 = 0.9 + 2.5*U^(1/3))
-        \draw[aerored,very thick] plot[domain=0:4.5,samples=50]
-              (\x, {0.23 + 0.63*\x^0.333});
-        % Data points
-        \foreach \u/\e in {0.5/0.46, 1.0/0.63, 1.5/0.78, 2.0/0.84,
-                            2.5/0.92, 3.5/1.06, 4.5/1.28} {
-          \fill[aeroblue] (\u,\e) circle (0.07);
-        }
-        \node[aerored,font=\tiny] at (3.5,0.8) {$E^2=A+BU^n$};
-        % Axes tick labels
-        \foreach \x/\l in {1/10,2/20,3/30,4/40} {
-          \node[below,font=\tiny] at (\x,0) {\l};
-        }
-        \foreach \y/\l in {0.5/4.6,1.0/6.3,1.5/8.4,2.0/10.6} {
-          \node[left,font=\tiny] at (0,\y) {\l};
-        }
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{¿Qué es la Anemometría de Hilo Caliente?}
+	\begin{columns}
+		\begin{column}{0.55\textwidth}
+			\begin{itemize}
+				\item Sensor: hilo metálico calentado
+				      ($d \approx \SI{5}{\micro\metre}$, tungsteno)
+				\item Al aumentar $U$ del fluido, el hilo se enfría más
+				\item El CTA mantiene $T_w$ cte.\ y mide $E(t)$
+				\item \textbf{Resolución temporal} excepcional
+				      ($> \SI{100}{\kilo\hertz}$)
+			\end{itemize}
+			\vspace{0.3em}
+			\begin{alertblock}{Objetivo}
+				Calibrar el sensor con la \textbf{ley de King} y
+				caracterizar la turbulencia del túnel
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.42\textwidth}
+			\begin{tikzpicture}[scale=0.7,>=Stealth]
+				% Probe body
+				\draw[fill=gray!30,draw=black,thick]
+				(0,-0.3) rectangle (0.35,2.0);
+				\draw[fill=gray!50,draw=black,thick]
+				(0,2.0) -- (0.175,2.2) -- (0.35,2.0);
+				% Prongs
+				\draw[black,very thick] (0.175,2.2) -- (-0.3,2.8);
+				\draw[black,very thick] (0.175,2.2) -- (0.65,2.8);
+				% Sensing wire
+				\draw[aerored,ultra thick,line width=2pt]
+				(-0.3,2.8) -- (0.65,2.8);
+				\node[aerored,font=\tiny,above] at (0.175,2.85) {Hilo};
+				% Flow arrows
+				\foreach \x in {-0.4,0.0,0.4} {
+						\draw[->,blue!60,thick] (\x,3.5) -- (\x,2.95);
+					}
+				\node[blue!60,above,font=\tiny] at (0.0,3.55) {Flujo $U$};
+				% CTA box
+				\draw[fill=aeroblue!15,draw=aeroblue,thick]
+				(1.5,2.3) rectangle (3.5,3.3);
+				\node[aeroblue,font=\tiny\bfseries] at (2.5,2.95) {CTA};
+				\node[font=\tiny] at (2.5,2.6) {Dantec};
+				% Connection
+				\draw[aeroblue,thick,->] (0.35,2.8) -- (1.5,2.8);
+				% Output
+				\draw[aeroblue,thick,->] (3.5,2.8) -- (4.2,2.8)
+				node[right,font=\tiny] {$E(t)$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\begin{frame}{Circuito CTA -- Puente Wheatstone}
-  \begin{columns}
-    \begin{column}{0.55\textwidth}
-      El puente Wheatstone mantiene $R_w = \mathrm{cte}$:
-      \vspace{0.3em}
-      \begin{itemize}\small
-        \item Si $U\uparrow$ $\Rightarrow$ enfría el hilo
-        \item $R_w\downarrow$ $\Rightarrow$ $\Delta V \neq 0$
-        \item Amplificador corrige la corriente $I_w\uparrow$
-        \item Nuevo equilibrio: $T_w = \mathrm{cte}$
-        \item $E_\mathrm{out} \propto I_w \propto U$
-      \end{itemize}
-      \vspace{0.3em}
-      \begin{block}{Resultado}
-        $E(t)$ contiene la información de $U(t)$ a alta frecuencia.
-      \end{block}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{circuitikz}[scale=0.55, transform shape]
-        \node (A) at (0,3) {};
-        \node (B) at (0,-3) {};
-        \node (L) at (-3,0) {};
-        \node (R) at (3,0) {};
-        \draw (A) to[R,l=$R_1$] (L);
-        \draw (A) to[R,l=$R_2$] (R);
-        \draw (L) to[R,l=$R_3$] (B);
-        \draw[aerored,very thick] (R) to[R,l_=$R_w$,color=aerored] (B);
-        \draw (A) to[battery1,l=$V_s$] (0,4.5);
-        \draw (0,-3) to[short] (0,-4.5);
-        \draw[fill=aeroblue!10] (-2,0.8) -- (2,0.8) -- (0,2.2) -- cycle;
-        \node[font=\tiny,aeroblue] at (0,1.4) {Amp.};
-        \draw[aeroblue,->] (0,2.2) -- (0,3.3)
-              node[above,font=\tiny] {$E_{out}$};
-        \draw[aeroorange,dashed,->] (0,3.0) -- (4.5,3.0) -- (4.5,-1) -- (3.2,-0.2);
-        \node[aeroorange,font=\tiny] at (4.8,1) {FB};
-      \end{circuitikz}
-    \end{column}
-  \end{columns}
+\begin{frame}{Aplicaciones y Limitaciones}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{enumerate}\small
+				\item Turbulencia en secciones de prueba
+				\item Capas límite sobre perfiles aerodinámicos
+				\item Estelas y mezcla en toberas
+				\item Validación de CFD en régimen turbulento
+				\item Verificación de la ley de Kolmogorov
+				      ($f^{-5/3}$ en la PSD)
+			\end{enumerate}
+			\vspace{0.3em}
+			\begin{exampleblock}{Ventaja clave}
+				Ninguna otra técnica iguala su resolución
+				temporal para medir turbulencia
+			\end{exampleblock}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{alertblock}{Limitaciones}
+				\begin{itemize}\small
+					\item Sensor frágil ($d \approx \SI{5}{\micro\metre}$)
+					\item Susceptible a contaminación
+					\item Intrusivo (perturba el flujo)
+					\item Relación $E$--$U$ \textbf{no lineal}
+					      $\to$ calibración obligatoria
+				\end{itemize}
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Objetivos de Aprendizaje}
+	\begin{enumerate}
+		\item Comprender el principio CTA y sus diferencias con CCA
+		\item Procesar series temporales de voltaje: descarte de
+		      transitorios, promedios, consolidación por SD
+		\item Aplicar la ley de King: $U^{1/n} = A\,E^2 + B$
+		      (regresión lineal)
+		\item Evaluar la calidad del ajuste mediante $R^2$
+		\item Calcular estadísticos de turbulencia: $\bar{U}$,
+		      $u'_\mathrm{rms}$, $I_u$
+		\item Interpretar la PSD y verificar la ley $f^{-5/3}$
+		\item Propagar incertidumbre del voltaje a la velocidad
+		      (método GUM)
+		\item Realizar evaluación de riesgos con la matriz $5\times5$
+	\end{enumerate}
 \end{frame}
 
 % =============================================================================
-\section{Calibración}
+\section{Fundamentos Teóricos}
+% =============================================================================
 
-\begin{frame}{Calibración -- Datos del laboratorio}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Datos de calibración (lab.):}
-      \begin{table}
-        \centering
-        \tiny
-        \begin{tabular}{SSS}
-          \toprule
-          {$U$ (m/s)} & {$E$ (V)} & {$E^2$ (V²)} \\
-          \midrule
-           5.2 & 2.15 & 4.622 \\
-          10.4 & 2.52 & 6.350 \\
-          15.6 & 2.74 & 7.508 \\
-          20.8 & 2.90 & 8.410 \\
-          26.0 & 3.03 & 9.181 \\
-          36.4 & 3.26 & 10.628 \\
-          \bottomrule
-        \end{tabular}
-      \end{table}
-      \textbf{Resultado del ajuste ($n=3$):}
-      \begin{align*}
-        A &= 0.9141\,\si{V^2}\\
-        B &= 2.5486\,\si{V^2}\\
-        R^2 &= 0.872
-      \end{align*}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.8]
-        \draw[->] (0,0) -- (4.5,0) node[right,font=\tiny] {$U^{1/3}$};
-        \draw[->] (0,0) -- (0,4.5) node[above,font=\tiny] {$E^2$ (V²)};
-        % Linear fit line
-        \draw[aeroblue,thick] (1.5,0.5) -- (3.5,3.8);
-        % Data points
-        \foreach \x/\y in {1.732/1.04, 2.183/1.43, 2.503/1.69,
-                            2.748/1.89, 2.962/2.07, 3.314/2.39} {
-          \fill[aerored] (\x-0.7,{\y*1.5}) circle (0.1);
-        }
-        \node[aeroblue,font=\tiny,rotate=52] at (2.8,2.5)
-              {$E^2=0.914+2.549\,U^{1/3}$};
-        \node[left,font=\tiny] at (0,1.04) {4.6};
-        \node[left,font=\tiny] at (0,2.39) {10.6};
-        \node[below,font=\tiny] at (1.03,0) {1.73};
-        \node[below,font=\tiny] at (2.6,0) {2.96};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{Transferencia de Calor en el Hilo Sensor}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Balance energético:}
+			\begin{equation*}
+				Q = I^2 R_w = \pi d\,l\,k\,\frac{Nu}{d}\,(T_w - T_f)
+			\end{equation*}
+
+			\textbf{Correlación de Kramers:}
+			\begin{equation*}
+				Nu = 0{,}42\,Pr^{0{,}2}
+				+ 0{,}57\,Pr^{0{,}33}\,Re^{0{,}50}
+			\end{equation*}
+
+			\vspace{0.3em}
+			\textbf{Relación de King (1914):}
+			\begin{equation*}
+				Q = (T_w - T_f)(k_0 + k_1\sqrt{U})
+			\end{equation*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.75,>=Stealth]
+				% Wire cross-section
+				\draw[fill=aerored!30,draw=aerored,very thick]
+				(2,2) circle (0.4);
+				\node[aerored,font=\tiny\bfseries] at (2,2) {$T_w$};
+				% Flow arrows
+				\foreach \y in {0.8,1.4,2.0,2.6,3.2} {
+						\draw[->,blue!60,thick] (0,\y) -- (1.2,\y);
+					}
+				\node[blue!60,font=\tiny,left] at (0,2) {$U$, $T_f$};
+				% Convection arrows
+				\foreach \a in {0,45,90,135,180,225,270,315} {
+						\draw[->,aeroyellow,thick]
+						(2,2) ++(\a:0.5) -- ++(\a:0.6);
+					}
+				\node[aeroyellow,font=\tiny] at (2,3.5) {$Q$ (convección)};
+				% Labels
+				\node[font=\tiny] at (2,0.3)
+				{$d \approx\SI{5}{\micro\metre}$};
+				\draw[<->,gray,thin] (1.6,1.5) -- (2.4,1.5);
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Ley de King -- Forma Clásica y Linealizada}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Forma clásica:}
+			\begin{equation*}
+				\boxed{E^2 = A' + B'\,U^n}
+			\end{equation*}
+			$n \approx 0{,}45$--$0{,}50$ (ideal)
+
+			\vspace{0.5em}
+			\textbf{Forma linealizada ($n = 3$):}
+			\begin{equation*}
+				\boxed{U^{1/n} = A\,E^2 + B}
+			\end{equation*}
+
+			Variables transformadas:
+			\begin{itemize}\small
+				\item $X = E^2$ \quad [V$^2$]
+				\item $Y = U^{1/3}$ \quad [(mm/s)$^{1/3}$]
+			\end{itemize}
+			$\Rightarrow$ Regresión lineal $Y = AX + B$
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\textbf{Reconstrucción de velocidad:}
+			\begin{equation*}
+				\boxed{U = (A\,E^2 + B)^n}
+			\end{equation*}
+
+			\vspace{0.5em}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (5.5,0)
+				node[right,font=\tiny] {$E^2$ [V$^2$]};
+				\draw[->] (0,0) -- (0,4.5)
+				node[above,font=\tiny] {$U^{1/3}$};
+				% Linear fit
+				\draw[aerogreen,thick] (0.5,1.5) -- (5.0,4.0);
+				\node[aerogreen,font=\tiny,rotate=27] at (3.5,3.2)
+				{$Y = AX + B$};
+				% Data points
+				\foreach \x/\y in {0.8/1.7, 1.5/2.1, 2.2/2.5,
+						3.0/3.0, 3.8/3.4, 4.5/3.8} {
+						\fill[aerored] (\x,\y) circle (0.08);
+					}
+				\node[font=\tiny] at (1.0,0.5) {$R^2 > 0{,}99$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Puente de Wheatstone -- Modo CTA}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{circuitikz}[scale=0.65,transform shape,>=Stealth]
+				% Bridge resistances
+				\draw (0,3) to[R,l=$R_1$] (3,3);
+				\draw (3,3) to[vR,l_=$R_w$,color=aerored] (3,0);
+				\draw (0,3) to[R,l_=$R_2$] (0,0);
+				\draw (0,0) to[R,l=$R_3$] (3,0);
+				% Bridge supply
+				\draw (1.5,4.2)
+				node[above,font=\tiny] {$V_\mathrm{bridge}$}
+				-- (1.5,3.8);
+				\draw (1.5,3.8) -| (0,3);
+				\draw (1.5,3.8) -| (3,3);
+				% Ground
+				\draw (1.5,-0.8) node[ground]{} -- (1.5,-0.4);
+				\draw (1.5,-0.4) -| (0,0);
+				\draw (1.5,-0.4) -| (3,0);
+				% Output
+				\fill (3,1.5) circle (2pt);
+				\draw[aeroblue,thick,->] (3,1.5) -- (4.2,1.5);
+				% Servo amp
+				\draw[fill=aeroblue!10,draw=aeroblue,thick]
+				(4.2,0.5) rectangle (6.0,2.5);
+				\node[aeroblue,font=\tiny,align=center] at (5.1,1.5)
+				{Servo\\Amp.};
+				\draw[aeroblue,thick,->] (6.0,1.5) -- (7.0,1.5)
+				node[right,font=\tiny] {$E(t)$};
+				% Label
+				\node[aerored,font=\tiny] at (3.8,0.2) {Sensor};
+			\end{circuitikz}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{block}{Principio CTA}
+				\begin{itemize}\small
+					\item Servo-amplificador mantiene
+					      $R_w = \mathrm{cte}$
+					\item $\Rightarrow T_w = \mathrm{cte}$
+					\item $E(t)$ sube cuando $U$ sube
+					      (más corriente para compensar enfriamiento)
+				\end{itemize}
+			\end{block}
+			\vspace{0.3em}
+			\begin{exampleblock}{Parámetros del lab}
+				\begin{itemize}\scriptsize
+					\item Puente: Dantec StreamLine
+					\item Overheat ratio $a = 0{,}8$
+					\item $T_w \approx \SI{250}{\degreeCelsius}$
+				\end{itemize}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{CTA vs.\ CCA}
+	\centering
+	\small
+	\begin{tabular}{lcc}
+		\toprule
+		\textbf{Característica}     & \textbf{CTA}
+		                            & \textbf{CCA}                            \\
+		\midrule
+		Magnitud constante          & $R_w$ (temperatura)
+		                            & $I$ (corriente)                         \\
+		Señal de salida             & $E \propto Q^{1/2}$
+		                            & $\Delta V \propto R_w$                  \\
+		Respuesta en frecuencia     & $>$\,\SI{100}{\kilo\hertz}
+		                            & ${\sim}$\,\SI{1}{\kilo\hertz}          \\
+		Uso principal               & Turbulencia, flujos rápidos
+		                            & Baja velocidad                          \\
+		Riesgo de rotura            & Menor (retroalimentación)
+		                            & Mayor (sin control)                     \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.5cm}
+	\begin{tikzpicture}
+		\node[draw=aerogreen,thick,rounded corners,fill=aerogreen!10,
+			text width=8cm,align=center,font=\small] {
+			Nuestra práctica usa \textbf{CTA} (temperatura constante)\\
+			$\Rightarrow$ alta respuesta en frecuencia para medir turbulencia
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Estadísticos de Turbulencia}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Velocidad media:}
+			\begin{equation*}
+				\bar{U} = \frac{1}{N}\sum_{i=1}^{N} U_i
+			\end{equation*}
+
+			\textbf{Fluctuación RMS:}
+			\begin{equation*}
+				u'_\mathrm{rms} = \sqrt{\frac{1}{N-1}
+					\sum_{i=1}^{N}(U_i - \bar{U})^2}
+			\end{equation*}
+
+			\textbf{Intensidad de turbulencia:}
+			\begin{equation*}
+				\boxed{I_u = \frac{u'_\mathrm{rms}}{\bar{U}}
+					\times 100\%}
+			\end{equation*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (5.5,0)
+				node[right,font=\tiny] {$t$};
+				\draw[->] (0,0) -- (0,4)
+				node[above,font=\tiny] {$U(t)$};
+				% Mean line
+				\draw[aerogreen,thick,dashed] (0,2) -- (5.2,2);
+				\node[aerogreen,left,font=\tiny] at (0,2) {$\bar{U}$};
+				% Signal
+				\draw[aeroblue,thick]
+				(0.1,2.0) sin (0.4,2.6) cos (0.7,2.0) sin (1.0,1.4)
+				cos (1.3,2.0) sin (1.6,2.8) cos (1.9,2.0)
+				sin (2.2,1.3) cos (2.5,2.0) sin (2.8,2.5)
+				cos (3.1,2.0) sin (3.4,1.5) cos (3.7,2.0)
+				sin (4.0,2.7) cos (4.3,2.0) sin (4.6,1.6)
+				cos (4.9,2.0);
+				% RMS annotation
+				\draw[<->,aerored,thick] (5.0,2.0) -- (5.0,2.7);
+				\node[aerored,right,font=\tiny] at (5.0,2.35)
+				{$u'_\mathrm{rms}$};
+			\end{tikzpicture}
+
+			\vspace{0.3em}
+			\begin{alertblock}{Referencia}
+				Túnel de calidad: $I_u < 1\%$\\
+				Nuestro túnel: $I_u \approx 5$--$9\%$
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Densidad Espectral de Potencia (PSD) -- Kolmogorov}
+	\begin{columns}
+		\begin{column}{0.47\textwidth}
+			\textbf{Ley de Kolmogorov:}
+			\begin{equation*}
+				\boxed{S(f) = C_K\,\varepsilon^{2/3}\,f^{-5/3}}
+			\end{equation*}
+			$C_K \approx 0{,}5$, $\varepsilon$ = tasa de disipación
+
+			\vspace{0.3em}
+			\begin{itemize}\small
+				\item En log-log: pendiente $-5/3$
+				\item Confirma turbulencia desarrollada
+				\item Tres zonas: energía, inercial, disipación
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (6.2,0)
+				node[right,font=\tiny] {$\log(f)$};
+				\draw[->] (0,0) -- (0,5)
+				node[above,font=\tiny] {$\log(S)$};
+				% Zones
+				\fill[aeroblue!12] (0,0) rectangle (1.5,5);
+				\fill[aerogreen!12] (1.5,0) rectangle (4.0,5);
+				\fill[aerored!8] (4.0,0) rectangle (6.2,5);
+				\node[aeroblue,font=\tiny,rotate=90] at (0.75,2.5)
+				{Energía};
+				\node[aerogreen,font=\tiny,rotate=90] at (2.75,2.5)
+				{Inercial};
+				\node[aerored,font=\tiny,rotate=90] at (5.1,2.5)
+				{Disipación};
+				% PSD curve
+				\draw[aeroblue,thick]
+				(0.3,4.5) .. controls (0.8,4.2) .. (1.5,3.8);
+				\draw[aerored,very thick] (1.5,3.8) -- (4.0,0.8);
+				\draw[aeroblue,thick] (4.0,0.8) -- (5.8,0.2);
+				% Slope label
+				\node[aerored,font=\small\bfseries] at (3.2,2.8)
+				{$-5/3$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % =============================================================================
-\section{Estadísticos de Turbulencia}
+\section{Datos Experimentales}
+% =============================================================================
 
-\begin{frame}{Turbulencia: estadísticos y espectro}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Velocidad media y fluctuación:}
-      \begin{align*}
-        \bar{U} &= \SI{26.0}{\m\per\s}\\
-        u'_\mathrm{rms} &= \SI{1.82}{\m\per\s}\\
-        I_u &= \frac{1.82}{26.0}\times100\% = 7.0\%
-      \end{align*}
-      \vspace{0.3em}
-      \textbf{Ley de Kolmogorov:}
-      \begin{equation*}
-        S(f) \propto f^{-5/3}
-      \end{equation*}
-      (sub-rango inercial)
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.8]
-        \draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$\log f$};
-        \draw[->] (0,0) -- (0,4) node[above,font=\tiny] {$\log S(f)$};
-        \fill[aeroblue!15] (0,0) rectangle (1.5,4);
-        \fill[aerogreen!15] (1.5,0) rectangle (3.5,4);
-        \fill[aerored!10] (3.5,0) rectangle (5,4);
-        \node[font=\tiny,aeroblue,rotate=90] at (0.75,2) {Energía};
-        \node[font=\tiny,aerogreen,rotate=90] at (2.5,2) {Inercial};
-        \node[font=\tiny,aerored,rotate=90] at (4.25,2) {Disipac.};
-        \draw[aerored,very thick] (1.5,3.5) -- (3.5,0.8);
-        \node[aerored,font=\tiny,rotate=-67] at (2.8,2.3) {$-5/3$};
-        \draw[aeroblue,thick] (0.5,3.8) .. controls (1.0,3.6) .. (1.5,3.5);
-        \draw[aeroblue,thick] (3.5,0.8) -- (4.8,0.2);
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{Estructura de Datos -- \texttt{files/P3/AO/}}
+	\begin{columns}
+		\begin{column}{0.45\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ccl}
+				\toprule
+				\textbf{SD (\%)} & \textbf{Archivos}
+				                 & \textbf{Notas}                   \\
+				\midrule
+				15               & 6  &                             \\
+				16               & 7  &                             \\
+				17               & 7  &                             \\
+				18               & 7  &                             \\
+				\rowcolor{aerored!15}
+				19               & -- & \textbf{Sin datos}          \\
+				20--29           & 3--7 &                           \\
+				30               & 3  & Mínimo                     \\
+				31--35           & 6--7 &                           \\
+				\bottomrule
+			\end{tabular}
+			\vspace{0.3em}
+
+			\textit{\tiny 20 condiciones de SD, 134 archivos en total}
+		\end{column}
+		\begin{column}{0.52\textwidth}
+			\begin{block}{Formato de datos}
+				\scriptsize
+				\begin{itemize}
+					\item Un archivo \texttt{.txt} por iteración
+					\item 50\,000 muestras por archivo
+					\item Columna única: $E(t)$ en voltios (VDC)
+					\item Ejemplo: \texttt{AO\_00-25/25\_3.txt}
+				\end{itemize}
+			\end{block}
+			\vspace{0.2em}
+			\begin{exampleblock}{Lectura automática}
+				\scriptsize
+				\texttt{iter\_hwa\_files(root)}\\
+				Descubre todos los \texttt{.txt} y extrae SD\\
+				desde el nombre del directorio padre
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Velocidad de Referencia del Túnel}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Calibración P02:}
+			\begin{equation*}
+				\boxed{U_\mathrm{ref}\;[\text{mm/s}]
+					= 7{,}6243 \times \mathrm{SD} - 1{,}8926}
+			\end{equation*}
+
+			\vspace{0.3em}
+			\centering\scriptsize
+			\begin{tabular}{SS[table-format=3.1]}
+				\toprule
+				{SD (\%)} & {$U_\mathrm{ref}$ (mm/s)} \\
+				\midrule
+				15        & 112.5                      \\
+				20        & 150.6                      \\
+				25        & 188.7                      \\
+				30        & 226.8                      \\
+				35        & 265.0                      \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (5.5,0)
+				node[right,font=\tiny] {SD (\%)};
+				\draw[->] (0,0) -- (0,4.5)
+				node[above,font=\tiny] {$U_\mathrm{ref}$ (mm/s)};
+				% Linear fit
+				\draw[aerogreen,thick] (0.0,0.3) -- (5.0,4.2);
+				% Data points
+				\foreach \sd/\u in {15/112,20/151,25/189,30/227,35/265} {
+						\pgfmathsetmacro{\sx}{(\sd-13)/4.5}
+						\pgfmathsetmacro{\uy}{\u/70}
+						\fill[aerored] (\sx,\uy) circle (0.08);
+					}
+				% Labels
+				\foreach \x/\l in {1/15,2.5/25,4.5/35} {
+						\node[below,font=\tiny] at (\x,0) {\l};
+					}
+				\foreach \y/\l in {1.6/112,2.7/189,3.8/265} {
+						\node[left,font=\tiny] at (0,\y) {\l};
+					}
+				\node[aerogreen,font=\tiny,rotate=37] at (3.5,3.0)
+				{$m = 7{,}62$};
+			\end{tikzpicture}
+			\vspace{0.3em}
+			\begin{alertblock}{SD~$= 19\%$}
+				Sin datos disponibles.\\
+				20 condiciones efectivas.
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Parámetros del Sistema CTA}
+	\centering
+	\begin{tabular}{llr}
+		\toprule
+		\textbf{Parámetro}       & \textbf{Valor}
+		                         & \textbf{Unidad}                   \\
+		\midrule
+		Tipo de sensor           & Hilo caliente (1D)   & --        \\
+		Diámetro del hilo        & $\approx 5$
+		                         & \si{\micro\metre}                 \\
+		Material                 & Tungsteno (W)        & --        \\
+		Modo de operación        & CTA                  & --        \\
+		Overheat ratio $a$       & 0,8                  & --        \\
+		Puente CTA               & Dantec StreamLine    & --        \\
+		Exponente King $n$       & 3                    & --        \\
+		Descarte transitorios    & 10\% inicio + 10\% final & --    \\
+		Rango de SD              & 15--35               & \%        \\
+		Iteraciones por SD       & 3--7 (típico 7)      & --        \\
+		Total archivos           & 134                  & --        \\
+		Muestras por archivo     & 50\,000              & --        \\
+		\bottomrule
+	\end{tabular}
 \end{frame}
 
 % =============================================================================
-\section{Caso de Estudio}
+\section{Procesamiento de Señales}
+% =============================================================================
 
-\begin{frame}{Caso: Capa límite sobre NACA 4412}
-  \begin{block}{Escenario}
-    Perfil de velocidades HWA en capa límite de NACA~4412 ($c=\SI{200}{\mm}$,
-    $\alpha=\SI{4}{\degree}$, $Re_c=3\times10^5$).
-  \end{block}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Ley logarítmica (turbulenta):}
-      \begin{equation*}
-        U^+ = \frac{1}{\kappa}\ln(y^+) + B,
-        \quad \kappa = 0.41
-      \end{equation*}
-      \textbf{Grosor de desplazamiento:}
-      \begin{equation*}
-        \delta^* = \int_0^\infty \left(1-\frac{U}{U_e}\right)dy
-      \end{equation*}
-      \begin{itemize}\small
-        \item Resolución del traverso: \SI{0.5}{\mm}
-        \item Barrido: $y \in [0, 20]\,\si{\mm}$
-        \item $\delta^* \approx \SI{3.5}{\mm}$
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=1.0,>=Stealth]
-        \draw[->] (0,0) -- (0,4) node[above,font=\tiny] {$y$ (mm)};
-        \draw[->] (0,0) -- (4,0) node[right,font=\tiny] {$U$ (m/s)};
-        % Wall
-        \fill[gray!50] (-0.2,-0.2) rectangle (0,4.2);
-        % Log law profile
-        \draw[aerored,very thick] plot[domain=0.1:3.8,samples=30]
-              ({0.8*ln(\x/0.1+1)}, \x);
-        % Reference velocity
-        \draw[gray,dashed] (2.8,0) -- (2.8,4);
-        \node[gray,right,font=\tiny] at (2.8,3.8) {$U_e$};
-        % Delta star
-        \fill[aeroblue!20] (0,0) -- (2.8,0) -- (2.8,0.7) ..
-              controls (1.5,1.5) .. (0,3.5) -- (0,0);
-        \node[aeroblue,font=\tiny] at (0.8,1.0) {$\delta^*$};
-        \foreach \y/\u in {0.5/0.9, 1.0/1.5, 1.5/2.0, 2.0/2.3,
-                            2.5/2.5, 3.0/2.7, 3.5/2.8} {
-          \fill[aerored] (\u,\y) circle (0.06);
-        }
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{Cadena de Procesamiento (4 Pasos)}
+	\centering
+	\begin{tikzpicture}[node distance=1.1cm,>=Stealth,
+			block/.style={rectangle,draw=aerogreen,thick,
+					fill=aerogreen!8,text width=4.2cm,align=center,
+					minimum height=0.8cm,font=\scriptsize,
+					rounded corners=3pt}]
+		\node[block] (read) {\textbf{Paso 1:}
+			Leer \texttt{SD\_iter.txt}\\
+			y descartar 10\% inicio/final};
+		\node[block,below=of read] (mean) {\textbf{Paso 2:}
+			Calcular $E_\mathrm{iter}$, $\sigma_{E}$\\
+			por cada archivo};
+		\node[block,below=of mean] (agg) {\textbf{Paso 3:}
+			Consolidar por SD\\
+			$E_\mathrm{SD}$ = media de iteraciones};
+		\node[block,below=of agg] (king) {\textbf{Paso 4:}
+			Transformar\\
+			$X = E^2$, $Y = U^{1/3}$};
+		% Arrows
+		\foreach \a/\b in {read/mean, mean/agg, agg/king} {
+				\draw[->,aerogreen,thick] (\a) -- (\b);
+			}
+		% Loop
+		\draw[aerored,thick,->] (mean.east) -- ++(1.0,0)
+		|- (read.east)
+		node[pos=0.25,right,font=\tiny,aerored] {3--7 iter.};
+		\draw[aeroblue,thick,->] (agg.east) -- ++(1.5,0)
+		|- (read.east)
+		node[pos=0.25,right,font=\tiny,aeroblue] {20 cond.\ SD};
+		% Output
+		\node[block,below=of king,draw=aerored,fill=aerored!8]
+		(fit) {\textbf{Regresión:} $Y = AX + B$\\
+			$\to A,\,B,\,R^2$};
+		\draw[->,aerored,thick] (king) -- (fit);
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Descarte de Transitorios}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{equation*}
+				E_\mathrm{útil}(t)
+				= E(t)\Big|_{t\in[0{,}10\,T,\;0{,}90\,T]}
+			\end{equation*}
+
+			\begin{itemize}\small
+				\item 50\,000 muestras $\to$ 40\,000 útiles
+				\item Elimina transitorios de arranque/parada
+				\item Inestabilidades iniciales del puente CTA
+				\item \texttt{trim\_series(arr, 0.10, 0.10)}
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (6,0)
+				node[right,font=\tiny] {$t$};
+				\draw[->] (0,0) -- (0,3.5)
+				node[above,font=\tiny] {$E(t)$};
+				% Discard zones
+				\fill[aerored!20] (0,0) rectangle (0.8,3.5);
+				\fill[aerored!20] (5.2,0) rectangle (6,3.5);
+				\fill[aerogreen!15] (0.8,0) rectangle (5.2,3.5);
+				% Signal
+				\draw[aeroblue,thick]
+				(0.1,1.0) .. controls (0.3,2.5) .. (0.8,2.0)
+				(0.8,2.0) sin (1.2,2.3) cos (1.6,2.0) sin (2.0,1.7)
+				cos (2.4,2.0) sin (2.8,2.2) cos (3.2,2.0)
+				sin (3.6,1.8) cos (4.0,2.0) sin (4.4,2.1)
+				cos (4.8,2.0) .. controls (5.2,2.0) .. (5.6,2.8);
+				% Labels
+				\node[aerored,font=\tiny] at (0.4,3.2) {10\%};
+				\node[aerored,font=\tiny] at (5.6,3.2) {10\%};
+				\node[aerogreen,font=\tiny] at (3.0,3.2) {80\% útil};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Consolidación y Transformación}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Promedio por iteración (Paso 2):}
+			\begin{equation*}
+				E_\mathrm{iter} = \frac{1}{N_\mathrm{útil}}
+				\sum_{i=1}^{N_\mathrm{útil}} E_i
+			\end{equation*}
+
+			\textbf{Consolidación por SD (Paso 3):}
+			\begin{equation*}
+				E_\mathrm{SD} = \frac{1}{N_\mathrm{iter}}
+				\sum_{j=1}^{N_\mathrm{iter}} E_{\mathrm{iter},j}
+			\end{equation*}
+
+			\textbf{Transformación (Paso 4):}
+			\begin{align*}
+				X & = E_\mathrm{SD}^2              \\
+				Y & = U_\mathrm{ref}^{1/n} \quad (n=3)
+			\end{align*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{exampleblock}{Ejemplo: SD~$=25\%$}
+				\scriptsize
+				\begin{itemize}
+					\item 7 iteraciones $\to$ 7 valores
+					      $E_\mathrm{iter}$
+					\item $E_\mathrm{SD} = 2{,}740$ V
+					\item $E^2 = 7{,}508$ V$^2$
+					\item $U_\mathrm{ref} = 188{,}7$ mm/s
+					\item $U^{1/3} = 5{,}736$
+				\end{itemize}
+			\end{exampleblock}
+			\vspace{0.3em}
+			\begin{block}{Repetibilidad}
+				$\sigma_{E,\mathrm{SD}}$ cuantifica la
+				variabilidad entre iteraciones\\
+				$\to$ fuente principal de $u_E$
+			\end{block}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % =============================================================================
-\section{Notebook Jupyter}
+\section{Calibración Numérica}
+% =============================================================================
 
-\begin{frame}[fragile]{P03\_Hilo\_Caliente.ipynb}
-  \begin{columns}
-    \begin{column}{0.55\textwidth}
-      \textbf{Ruta:}\\
-      \texttt{\small Practicas/P03\_Hilo\_Caliente/\\notebooks/P03\_Hilo\_Caliente.ipynb}
+\begin{frame}{Ajuste Lineal -- Resultados}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Curva de calibración}
+				\begin{equation*}
+					\boxed{U^{1/3} = 0{,}274\,E^2 + 3{,}475}
+				\end{equation*}
+				\begin{equation*}
+					R^2 = 0{,}984
+				\end{equation*}
+			\end{block}
+			\vspace{0.3em}
+			\textbf{Velocidad reconstituida:}
+			\begin{equation*}
+				U\;[\text{mm/s}] = (0{,}274\,E^2 + 3{,}475)^{3}
+			\end{equation*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{S S[table-format=1.3]
+					S[table-format=3.1] S[table-format=1.3]}
+				\toprule
+				{SD}  & {$E_\mathrm{SD}$} & {$U_\mathrm{ref}$}
+				      & {$U^{1/3}$}                               \\
+				      & {(V)}              & {(mm/s)}
+				      & {}                                        \\
+				\midrule
+				15    & 2.150 & 112.5 & 4.829 \\
+				20    & 2.520 & 150.6 & 5.319 \\
+				25    & 2.740 & 188.7 & 5.736 \\
+				30    & 2.900 & 226.8 & 6.098 \\
+				35    & 3.260 & 265.0 & 6.423 \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+	\end{columns}
+\end{frame}
 
-      \vspace{0.5em}
-      \textbf{El notebook/script automatiza:}
-      \begin{enumerate}\small
-        \item Lectura de \texttt{files/p3/} (señales E(t))
-        \item Descarte de transitorios (10\% c/extremo)
-        \item Calibración King ($A$, $B$, $n$)
-        \item $\bar{U}$, $u'_\mathrm{rms}$, $I_u$, PSD
-        \item Gráficas y exportación CSV/JSON
-        \item Actualización de \texttt{p3.md}
-      \end{enumerate}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{lstlisting}[language=Python]
-from scipy.optimize import curve_fit
-import numpy as np
+\begin{frame}{Verificación y Calidad del Ajuste}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Verificación a SD~$=25\%$:}
+			\begin{align*}
+				U_\mathrm{pred}
+				  & = (0{,}274 \times 7{,}508 + 3{,}475)^3 \\
+				  & = (5{,}531)^3                           \\
+				  & = \SI{169.1}{mm/s}                      \\
+				\varepsilon
+				  & = \SI{10.4}{\percent}
+			\end{align*}
 
-def king(U, A, B, n):
-    return A + B * U**n
+			\vspace{0.3em}
+			\begin{alertblock}{Posible mejora}
+				$R^2 = 0{,}984$ aceptable pero mejorable\\
+				$\to$ Optimizar $n$ con \texttt{curve\_fit}
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (5.5,0)
+				node[right,font=\tiny] {$E^2$ [V$^2$]};
+				\draw[->] (0,0) -- (0,4.5)
+				node[above,font=\tiny] {$U^{1/3}$};
+				% Grid
+				\foreach \x in {1,...,5} {
+						\draw[gray!15] (\x,0) -- (\x,4.5);
+					}
+				\foreach \y in {1,...,4} {
+						\draw[gray!15] (0,\y) -- (5.5,\y);
+					}
+				% Fit line
+				\draw[aerogreen,thick] (0.3,1.6) -- (5.0,3.9);
+				% Data points
+				\foreach \e/\u in {4.622/4.829, 6.350/5.319,
+						7.508/5.736, 8.410/6.098, 10.628/6.423} {
+						\pgfmathsetmacro{\ex}{(\e-3)/1.8}
+						\pgfmathsetmacro{\uy}{(\u-3.5)/0.8}
+						\fill[aerored] (\ex,\uy) circle (0.1);
+					}
+				% R2 label
+				\node[aerogreen,font=\small\bfseries] at (3.0,1.0)
+				{$R^2 = 0{,}984$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
 
-U_ref = np.array([5.2, 10.4,
-                  15.6, 20.8,
-                  26.0, 36.4])
-E_sq  = np.array([4.622, 6.350,
-                  7.508, 8.410,
-                  9.181, 10.628])
+\begin{frame}{Estadísticos de Turbulencia -- Resultados}
+	\begin{columns}
+		\begin{column}{0.48\textwidth}
+			\centering\small
+			\begin{tabular}{S[table-format=2.0]
+					S[table-format=3.1]
+					S[table-format=2.1]
+					S[table-format=1.1]}
+				\toprule
+				{SD (\%)} & {$\bar{U}$} & {$u'_\mathrm{rms}$}
+				          & {$I_u$ (\%)}                         \\
+				          & {(mm/s)}     & {(mm/s)}
+				          & {}                                   \\
+				\midrule
+				15        & 112.5        & 5.6  & 5.0 \\
+				20        & 150.6        & 9.0  & 6.0 \\
+				25        & 188.7        & 13.2 & 7.0 \\
+				30        & 226.8        & 15.9 & 7.0 \\
+				35        & 265.0        & 23.8 & 9.0 \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.49\textwidth}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (5.5,0)
+				node[right,font=\tiny] {SD (\%)};
+				\draw[->] (0,0) -- (0,4.5)
+				node[above,font=\tiny] {$I_u$ (\%)};
+				% Data
+				\foreach \sd/\iu in {15/5.0, 20/6.0, 25/7.0,
+						30/7.0, 35/9.0} {
+						\pgfmathsetmacro{\sx}{(\sd-13)/5}
+						\pgfmathsetmacro{\iy}{\iu*0.45}
+						\fill[aerored] (\sx,\iy) circle (0.1);
+					}
+				% Connect
+				\draw[aerored,thick]
+				(0.4,2.25) -- (1.4,2.7) -- (2.4,3.15)
+				-- (3.4,3.15) -- (4.4,4.05);
+				% 1% threshold
+				\draw[aerogreen,dashed,thick]
+				(0,0.45) -- (5.5,0.45);
+				\node[aerogreen,right,font=\tiny] at (4.5,0.65)
+				{$I_u = 1\%$};
+				% Labels
+				\node[below,font=\tiny] at (0.4,0) {15};
+				\node[below,font=\tiny] at (2.4,0) {25};
+				\node[below,font=\tiny] at (4.4,0) {35};
+			\end{tikzpicture}
 
-popt, _ = curve_fit(
-    king, U_ref, E_sq,
-    p0=[1, 2.5, 0.45])
-A, B, n = popt
-# A=0.914, B=2.549, n=0.333
+			\vspace{0.3em}
+			\begin{alertblock}{Observación}
+				$I_u$ crece con SD.\\
+				Flujo moderadamente turbulento.
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Incertidumbre}
+% =============================================================================
+
+\begin{frame}{Propagación GUM -- Ley de King}
+	\textbf{Incertidumbre combinada:}
+	\begin{equation*}
+		u_U^2 = \left(\frac{\partial U}{\partial E}\right)^2 u_E^2
+		+ \left(\frac{\partial U}{\partial A}\right)^2 u_A^2
+		+ \left(\frac{\partial U}{\partial B}\right)^2 u_B^2
+	\end{equation*}
+
+	\vspace{0.3em}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Sensibilidades:}
+			\begin{align*}
+				\frac{\partial U}{\partial E}
+				 & = 2nAE(AE^2+B)^{n-1} \\
+				\frac{\partial U}{\partial A}
+				 & = nE^2(AE^2+B)^{n-1} \\
+				\frac{\partial U}{\partial B}
+				 & = n(AE^2+B)^{n-1}
+			\end{align*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{exampleblock}{Valores típicos}
+				\begin{itemize}\small
+					\item $E \sim \SI{2.5}{\volt}$,
+					      $u_E \sim \SI{0.02}{\volt}$
+					\item Contribución dominante: $u_E$
+					\item Incertidumbre relativa:
+					      $u_U/U \sim 2$--$5\%$
+				\end{itemize}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{block}{Función del script}
+				\texttt{propagate\_sigma\_U(df, A, B, n)}\\
+				$\to$ columna $u_U$ por cada SD
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Evaluación de Riesgos}
+% =============================================================================
+
+\begin{frame}{Riesgos de la Práctica HWA}
+	\centering\small
+	\begin{tabular}{>{\raggedright\arraybackslash}p{2.8cm}
+			c c c c l}
+		\toprule
+		\textbf{Riesgo} & \textbf{P} & \textbf{S}
+		  & $\boldsymbol{R}$ & \textbf{Nivel}
+		  & \textbf{Controles}                                    \\
+		\midrule
+		\rowcolor{aerored!15}
+		Rotura hilo sensor
+		& 4 & 4 & 16
+		& \textcolor{aerored}{\textbf{Alto}}
+		& Extremo cuidado                                         \\
+		\rowcolor{aeroyellow!15}
+		Fallo equipo CTA
+		& 3 & 3 & 9
+		& \textcolor{aeroyellow}{\textbf{Medio}}
+		& Calentamiento previo                                    \\
+		\rowcolor{aeroyellow!15}
+		Flujo alta velocidad
+		& 2 & 4 & 8
+		& \textcolor{aeroyellow}{\textbf{Medio}}
+		& No superar SD 35\%                                      \\
+		\rowcolor{aerogreen!15}
+		Descarga eléctrica
+		& 1 & 3 & 3
+		& \textcolor{aerogreen}{\textbf{Bajo}}
+		& Puesta a tierra                                         \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.4em}
+	\begin{block}{$R = \text{Probabilidad} \times \text{Severidad}$}
+		Bajo ($<5$) \quad | \quad Medio (5--12)
+		\quad | \quad Alto ($>12$)
+	\end{block}
+\end{frame}
+
+\begin{frame}{Matriz de Riesgos $5\times5$}
+	\centering
+	\begin{tikzpicture}[scale=0.65]
+		\foreach \x in {0,...,4} {
+				\foreach \y in {0,...,4} {
+						\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+						\pgfmathparse{\risk < 5 ? "aerogreen!40" :
+							(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+						\edef\fillcol{\pgfmathresult}
+						\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+						\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+						\node[font=\tiny] at (\x+0.5,\y+0.5)
+						{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+					}
+			}
+		\foreach \x/\l in
+		{0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+				\node[font=\tiny,rotate=45,anchor=west]
+				at (\x+0.5,-0.1) {\l};
+			}
+		\foreach \y/\l in
+		{0/Insignif.,1/Menor,2/Moder.,3/Mayor,4/Catastrófico} {
+				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+			}
+		\node[font=\tiny\bfseries,rotate=90] at (-1.3,2.5)
+		{Severidad};
+		\node[font=\tiny\bfseries] at (2.5,-1) {Probabilidad};
+		% Markers
+		\fill[blue,opacity=0.8] (3.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (3.5,3.5) {Hilo};
+		\fill[blue!70,opacity=0.8] (2.5,2.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (2.5,2.5) {CTA};
+		\fill[orange,opacity=0.8] (1.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (1.5,3.5) {Túnel};
+		\fill[aerogreen!70,opacity=0.8] (0.5,2.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (0.5,2.5) {Elec.};
+	\end{tikzpicture}
+
+	\vspace{0.3cm}
+	\begin{tikzpicture}[scale=0.7,every node/.style={font=\small}]
+		\fill[aerogreendark] (0,0) -- (5,0) -- (4.2,0.8)
+		-- (0.8,0.8) -- cycle;
+		\fill[aerogreen] (0.8,0.8) -- (4.2,0.8) -- (3.4,1.6)
+		-- (1.6,1.6) -- cycle;
+		\fill[aeroyellow!80] (1.6,1.6) -- (3.4,1.6) -- (2.8,2.4)
+		-- (2.2,2.4) -- cycle;
+		\fill[aerored!60] (2.2,2.4) -- (2.8,2.4) -- (2.5,3.0)
+		-- cycle;
+		\node[white,font=\tiny\bfseries] at (2.5,0.4)
+		{Eliminación / Sustitución};
+		\node[white,font=\tiny\bfseries] at (2.5,1.2) {Ingeniería};
+		\node[font=\tiny\bfseries] at (2.5,2.0) {Admin.};
+		\node[white,font=\tiny\bfseries] at (2.5,2.6) {EPP};
+		\draw[->,gray,very thick] (5.3,2.8) -- (5.3,-0.1);
+		\node[gray,font=\tiny,rotate=90] at (5.6,1.3) {Más efectivo};
+	\end{tikzpicture}
+\end{frame}
+
+% =============================================================================
+\section{Casos de Estudio por Equipos}
+% =============================================================================
+
+\begin{frame}{Trabajo por Equipos: 4 Escenarios}
+	\begin{block}{Instrucciones}
+		Cada equipo recibe un escenario diferente.\ Deben:
+		\begin{enumerate}
+			\item Aplicar la curva de calibración de King
+			      a los datos indicados
+			\item Calcular estadísticos de turbulencia
+			      ($\bar{U}$, $I_u$, PSD)
+			\item Evaluar riesgo: $P$ (1--5), $S$ (1--5),
+			      $R = P \times S$, ubicar en la matriz
+			\item Resolver los problemas adicionales del escenario
+			\item Verificar resultados con el script Python
+		\end{enumerate}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Equipo~1: Turbulencia en la Sección de Prueba}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}     & \textbf{Valor}      \\
+				\midrule
+				SD                & 25\%                 \\
+				$U_\mathrm{ref}$  & \SI{188.7}{mm/s}    \\
+				Archivos          & 7 iteraciones        \\
+				$f_s$             & \SI{10}{\kilo\hertz} \\
+				Criterio          & $I_u < 1\%$          \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Flujo moderado,\\
+				sensor expuesto,\\
+				transitorios posibles.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[A.1] Calcular $I_u$ y PSD
+					\item[A.2] Verificar $f^{-5/3}$
+					\item[A.3] ¿Cumple $I_u < 1\%$?
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.5,>=Stealth]
+				\draw[fill=gray!10,draw=aerogreen,thick]
+				(0,0) rectangle (2.2,1.2);
+				\draw[aerored,ultra thick]
+				(0.8,0.5) -- (1.4,0.5);
+				\foreach \y in {0.3,0.6,0.9} {
+						\draw[->,blue!50,thick]
+						(-0.3,\y) -- (0.2,\y);
+					}
+				\node[font=\tiny] at (1.1,1.0) {HWA};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~2: Contaminación del Sensor}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}       & \textbf{Valor}      \\
+				\midrule
+				SD                  & 20\% y 30\%         \\
+				Factor $\eta$       & 0,95                \\
+				Atenuación          & 5\%                 \\
+				Criterio recalib.   & Desvío $> 5\%$      \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Sesiones prolongadas,\\
+				acumulación de polvo,\\
+				lecturas erróneas.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[B.1] $E_\mathrm{cont} = \eta\,E$
+					\item[B.2] Error en $U$
+					\item[B.3] Criterio recalib.
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~3: Efecto de la Temperatura}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}         & \textbf{Valor}           \\
+				\midrule
+				$T_{f,\mathrm{cal}}$  & \SI{20}{\degreeCelsius}  \\
+				$T_f$ operación       & \SI{25}{\degreeCelsius}  \\
+				$T_w$                 & \SI{250}{\degreeCelsius} \\
+				$\alpha_0$ (W)
+				  & \SI{4.5e-3}{\per\kelvin}                     \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Ensayo 2 horas,\\
+				$\Delta T = \SI{5}{\degreeCelsius}$,\\
+				calibración sesgada.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[C.1] $\Delta Q / Q$ por $\Delta T_f$
+					\item[C.2] Error de velocidad
+					\item[C.3] Corrección:\\
+					      $E_\mathrm{corr}^2 = E^2\,
+						      \frac{T_w-T_{f,\mathrm{cal}}}{T_w-T_f}$
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~4: Perfil de Capa Límite}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}  & \textbf{Valor}           \\
+				\midrule
+				SD             & 30\%                      \\
+				Superficie     & Placa plana               \\
+				$y$            & 0,5 a \SI{20}{\mm}       \\
+				Paso           & \SI{0.5}{\mm}            \\
+				Referencia     & Blasius (laminar)         \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Traverso automatizado,\\
+				sonda cerca de pared,\\
+				alto riesgo de rotura.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[D.1] Perfil $U(y)/U_e$
+					\item[D.2] $\delta^*$ y $\theta$
+					\item[D.3] $H = \delta^*/\theta$,
+					      ¿laminar o turbulento?
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.5,>=Stealth]
+				\draw[thick] (0,0) -- (2.5,0);
+				\draw[aeroblue,thick] (0,0)
+				.. controls (0.3,0.8) and (0.8,1.2)
+				.. (2.5,1.5);
+				\foreach \y in {0.2,0.5,0.8,1.1} {
+						\draw[->,aerored,thin]
+						(0.5,\y) -- (0.5+\y*0.8,\y);
+					}
+				\node[font=\tiny,above] at (1.2,1.5) {$\delta$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Herramientas de Software}
+% =============================================================================
+
+\begin{frame}[fragile]{Script \texttt{P03\_Hilo\_Caliente.py}}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Ruta}
+				\scriptsize
+				\texttt{Practicas/P03\_Hilo\_Caliente/}\\
+				\texttt{\ \ src/P03\_Hilo\_Caliente.py}
+			\end{block}
+			\vspace{0.2em}
+			\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Función}
+				  & \textbf{Resultado}                     \\
+				\midrule
+				\texttt{iter\_hwa\_files}
+				  & (SD, Path) tuples                      \\
+				\texttt{read\_voltage\_series}
+				  & \texttt{np.ndarray}                    \\
+				\texttt{trim\_series}
+				  & Sub-array sin 10\%                     \\
+				\texttt{tunnel\_velocity\_from\_sd}
+				  & $U_\mathrm{ref}$ (mm/s)                \\
+				\texttt{process\_iteration\_file}
+				  & $(E_\mathrm{mean}, E_\mathrm{rms})$    \\
+				\texttt{aggregate\_by\_sd}
+				  & DataFrame por SD                       \\
+				\texttt{fit\_king\_linear}
+				  & $(A, B, R^2)$                          \\
+				\texttt{propagate\_sigma\_U}
+				  & Columna $u_U$                          \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{lstlisting}[language=Python]
+import P03_Hilo_Caliente as hwa
+
+# Constantes del script:
+COEF_M = 7.6243   # pendiente
+COEF_B = -1.8926  # ordenada
+N_KING = 3.0      # exponente
+DISCARD = 0.10    # 10% desc.
+
+# Flujo tipico:
+root = hwa.find_p3_data_root()
+per_iter = []
+for sd, fp in hwa.iter_hwa_files(root):
+    res = hwa.process_iteration_file(fp)
+    per_iter.append(res)
+per_sd = hwa.aggregate_by_sd(per_iter)
+A, B, R2 = hwa.fit_king_linear(per_sd)
+print(f"A={A:.4f}, B={B:.4f}")
+print(f"R2={R2:.4f}")
       \end{lstlisting}
-    \end{column}
-  \end{columns}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Flujo de Ejecución del Script}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{\texttt{P03\_Hilo\_Caliente.py}}\\[0.3em]
+			\scriptsize
+			\begin{enumerate}
+				\item Descubrimiento de \texttt{files/P3/AO/}
+				\item Lectura de 134 archivos \texttt{.txt}
+				\item Descarte de transitorios (10\%+10\%)
+				\item Promedios por iteración
+				\item Agregación por SD (20 condiciones)
+				\item Transformación de King ($E^2$, $U^{1/n}$)
+				\item Ajuste lineal $\to A$, $B$, $R^2$
+				\item Propagación de incertidumbre
+				\item Gráficas PNG + SVG
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{exampleblock}{Ejecución}
+				\texttt{cd Practicas/.../src}\\
+				\texttt{python P03\_Hilo\_Caliente.py}
+			\end{exampleblock}
+			\vspace{0.3em}
+			\begin{block}{Salidas}
+				\scriptsize
+				\begin{itemize}
+					\item \texttt{calibracion\_p3.csv}
+					\item \texttt{calibracion\_p3.parquet}
+					\item \texttt{*\_summary.json}
+					      -- $A$, $B$, $R^2$
+					\item \texttt{images/} -- gráficas
+					\item \texttt{p3.md} -- informe Markdown
+				\end{itemize}
+			\end{block}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % =============================================================================
-\section{Resumen}
+\section{Cuestionario y Formato}
+% =============================================================================
+
+\begin{frame}{Preguntas de Discusión}
+	\begin{enumerate}\small
+		\item ¿Cuál es la magnitud medida directamente por el CTA
+		      y cómo se relaciona con $U$?
+		\item Ventajas/desventajas de HWA vs.\ Pitot y LDA
+		\item Significado y unidades de $A$, $B$ en la ley de King
+		      para $n=3$
+		\item ¿Por qué calibrar antes de cada campaña?
+		\item Efecto de la contaminación sobre $E$ y $U$ indicada
+		\item Propósito de descartar 10\% inicio y 10\% final
+		\item Interpretar $R^2 = 0{,}995$ vs.\ $R^2 = 0{,}75$
+		\item Efecto de $\Delta T_f = \SI{5}{\degreeCelsius}$
+		      sobre la calibración
+		\item Tres fuentes de error/incertidumbre en la
+		      calibración HWA
+		\item Aplicación aeronáutica donde la HWA sea óptima
+		\item ¿Cómo se obtiene $I_u$ a partir de $E(t)$?
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Formato del Informe (AIAA)}
+	\begin{enumerate}
+		\item \textbf{Resumen:} máx.\ 200 palabras
+		\item \textbf{Introducción}
+		\item \textbf{Fundamento Teórico:} ley de King, CTA,
+		      turbulencia
+		\item \textbf{Metodología:} procesamiento + herramientas
+		\item \textbf{Resultados:} curva de calibración con
+		      $A$, $B$, $R^2$ + estadísticos de turbulencia
+		      + caso del equipo + evaluación de riesgo
+		\item \textbf{Discusión:} cuestionario + análisis de
+		      incertidumbre
+		\item \textbf{Conclusiones:} 4--6 puntos
+		\item \textbf{Referencias} (IEEE)
+		\item \textbf{Apéndice~A:} gráficas Python (ajuste, PSD)
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Conclusiones}
+% =============================================================================
 
 \begin{frame}{Conclusiones}
-  \begin{enumerate}
-    \item El HWA con CTA tiene ancho de banda hasta \SI{400}{\kHz} --
-          idóneo para turbulencia aeronáutica.
-    \item La \textbf{Ley de King} ($E^2 = A+BU^n$) calibra el sensor:
-          $A=0.914$, $B=2.549$, $n=1/3$.
-    \item $I_u \approx 7\%$ en la sección de prueba a \SI{26}{\m\per\s}.
-    \item El PSD muestra la ley $f^{-5/3}$ de Kolmogorov en el sub-rango inercial.
-    \item El notebook y el script Python automatizan todo el flujo de trabajo.
-  \end{enumerate}
-  \vspace{0.5em}
-  \begin{block}{Recursos}
-    Manual: \texttt{manuals/P03\_Hilo\_Caliente/manual\_P03.tex}\\
-    Notebook: \texttt{Practicas/P03\_Hilo\_Caliente/notebooks/P03\_Hilo\_Caliente.ipynb}\\
-    Script: \texttt{Practicas/P03\_Hilo\_Caliente/src/P03\_Hilo\_Caliente.py}
-  \end{block}
+	\begin{enumerate}
+		\item La ley de King con $n=3$ linealizada como
+		      $U^{1/3} = 0{,}274\,E^2 + 3{,}475$ describe la
+		      relación $E$--$U$ ($R^2 = 0{,}984$)
+		\item El procesamiento en 4 etapas (descarte, promedio,
+		      consolidación, transformación) proporciona puntos de
+		      calibración robustos
+		\item Intensidad de turbulencia $I_u \approx 5$--$9\%$
+		      clasifica el flujo como \textbf{moderadamente turbulento}
+		\item La PSD confirma la ley $f^{-5/3}$ de Kolmogorov en
+		      el sub-rango inercial
+		\item Contaminación y $\Delta T_f$ son las principales
+		      causas de deriva de calibración
+		\item Riesgo principal: \textbf{rotura del hilo}
+		      ($R = 16$, Alto) -- mitigable con cuidado extremo
+		\item \texttt{P03\_Hilo\_Caliente.py} automatiza todo el
+		      flujo desde datos crudos hasta la curva de calibración
+	\end{enumerate}
+
+	\vspace{0.3em}
+	\centering
+	\begin{tikzpicture}
+		\node[draw=aerogreen,thick,rounded corners,fill=aerogreen!10,
+			text width=10cm,align=center,font=\small] {
+			\textit{<<\,La anemometría de hilo caliente es insustituible
+					para la medida de turbulencia a alta frecuencia\,>>}
+			--- Bruun (1995)};
+	\end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Referencias}
-  \begin{itemize}
-    \item Bruun, H.H. (1995). \textit{Hot-Wire Anemometry}, Oxford University Press
-    \item J{\o}rgensen, F.E. (2002). \textit{How to Measure Turbulence with HWA}, Dantec
-    \item Pope, S.B. (2000). \textit{Turbulent Flows}, Cambridge University Press
-    \item Kolmogorov, A.N. (1941). Local structure of turbulence, \textit{Dokl. SSSR}
-  \end{itemize}
+\begin{frame}{}
+	\centering
+	\vspace{2cm}
+	{\Huge\color{aerogreen}\bfseries ¿Preguntas?}\\[1cm]
+	{\large P03 -- Anemometría de Hilo Caliente (CTA/HWA)}\\[0.5cm]
+	{\small Técnicas de Medida -- Ingeniería Aeronáutica}
 \end{frame}
 
 \end{document}

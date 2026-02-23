@@ -1,22 +1,49 @@
 % =============================================================================
 % Manual P03 – Anemometría de Hilo Caliente (CTA/HWA)
 % Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode manual_P03.tex
 % =============================================================================
 \documentclass[12pt,a4paper]{article}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% ---- Encoding & Language ----
+\usepackage{fontspec}
 \usepackage[spanish]{babel}
-\usepackage[top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+% ---- Page Layout ----
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\setlength{\headheight}{14.5pt}
+
+% ---- Math & Physics ----
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
 \usepackage{siunitx}
 \sisetup{output-decimal-marker={,}, group-separator={.}}
-\usepackage{graphicx,xcolor,float,caption,subcaption}
+
+% ---- Graphics & Color ----
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ---- TikZ ----
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,decorations.pathmorphing,
                 decorations.markings,patterns,fit,backgrounds}
 \usepackage{circuitikz}
-\usepackage{booktabs,multirow,array}
+
+% ---- Tables ----
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{longtable}
+
+% ---- Code Listings ----
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\small,
@@ -24,13 +51,22 @@
   commentstyle=\color{green!50!black},
   stringstyle=\color{red!60!black},
   backgroundcolor=\color{gray!10},
-  frame=single, breaklines=true,
-  numbers=left, numberstyle=\tiny\color{gray}
+  frame=single,
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray}
 }
+
+% ---- Hyperlinks ----
 \usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,
             urlcolor=blue!50!black]{hyperref}
+
+% ---- Bibliography ----
+\usepackage{csquotes}
 \usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
 \addbibresource{references_P03.bib}
+
+% ---- Headers & Footers ----
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
@@ -38,10 +74,11 @@
 \fancyhead[R]{\small P03: Anemometría de Hilo Caliente}
 \fancyfoot[C]{\thepage}
 
+% ---- Custom Colors ----
 \definecolor{aeroblue}{RGB}{0,51,102}
 \definecolor{aerored}{RGB}{153,0,0}
 \definecolor{aerogreen}{RGB}{0,102,51}
-\definecolor{aeroorange}{RGB}{200,100,0}
+\definecolor{aeroyellow}{RGB}{255,204,0}
 
 % =============================================================================
 \begin{document}
@@ -50,28 +87,31 @@
   \centering
   \vspace*{1cm}
   {\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
-  {\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA EN INGENIERÍA AERONÁUTICA}\\[0.3cm]
+  {\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA}\\[0.3cm]
   {\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
   {\huge\bfseries P03 -- Anemometría de\\[0.3cm]Hilo Caliente (CTA/HWA)}\\[1cm]
   {\large Manual de Laboratorio}\\[0.5cm]
   {\large\itshape Ingeniería Aeronáutica}\\[2cm]
+  % HWA probe schematic
   \begin{tikzpicture}[scale=0.9,>=Stealth]
-    % Wire probe
+    % Probe body
     \draw[fill=gray!30,draw=black,thick] (0,-0.5) rectangle (0.4,2.5);
     \draw[fill=gray!50,draw=black,thick] (0,2.5) -- (0.2,2.7) -- (0.4,2.5);
     % Prongs
     \draw[black,very thick] (0.2,2.7) -- (-0.3,3.3);
     \draw[black,very thick] (0.2,2.7) -- (0.7,3.3);
-    % Wire (the sensing element)
+    % Sensing wire
     \draw[aerored,ultra thick,line width=2pt] (-0.3,3.3) -- (0.7,3.3);
-    \node[aerored,below,font=\small] at (0.2,3.15) {Hilo ($d\approx\SI{5}{\micro\m}$)};
-    % Heat transfer arrows
+    \node[aerored,below,font=\small] at (0.2,3.15)
+         {Hilo ($d\approx\SI{5}{\micro\m}$)};
+    % Flow arrows
     \foreach \x in {-0.5,-0.15,0.2,0.55,0.9} {
       \draw[->,blue!60,thick] (\x,3.8) -- (\x,3.35);
     }
     \node[blue!60,above,font=\small] at (0.2,3.85) {Flujo $U$};
     % CTA box
-    \draw[fill=aeroblue!20,draw=aeroblue,very thick] (2.0,2.8) rectangle (4.5,3.8);
+    \draw[fill=aeroblue!20,draw=aeroblue,very thick]
+         (2.0,2.8) rectangle (4.5,3.8);
     \node[aeroblue,font=\small\bfseries] at (3.25,3.45) {CTA Bridge};
     \node[font=\tiny] at (3.25,3.1) {Dantec StreamLine};
     % Connection
@@ -80,10 +120,8 @@
     % Output to DAQ
     \draw[aeroblue,thick,->] (4.5,3.3) -- (5.5,3.3)
           node[right,font=\small] {$E(t)$};
-  \end{tikzpicture}\\[1.5cm]
-  {\large\textbf{Departamento de Ingeniería Aeroespacial}}\\[0.2cm]
-  {\normalsize Laboratorio de Técnicas de Medida}\\[0.5cm]
-  {\normalsize \today}
+  \end{tikzpicture}\\[2cm]
+  {\large Laboratorio de Técnicas de Medida}
   \vfill
   {\color{aeroblue}\rule{\linewidth}{2pt}}
 \end{titlepage}
@@ -95,370 +133,730 @@
 \section{Introducción}
 \label{sec:intro}
 
-La \textbf{anemometría de hilo caliente} (Hot-Wire Anemometry, HWA) es una de
-las técnicas de medida de velocidad más versátiles en flujos aerodinámicos.
-Se basa en la transferencia de calor por convección entre un hilo metálico
-(sensor) calentado eléctricamente y el flujo de gas que lo rodea.  Su tiempo
-de respuesta extremadamente corto (hasta \SI{400}{\kHz}) la convierte en la
-herramienta de referencia para la caracterización de flujos turbulentos,
-espectros de energía, e intermitencia de transición laminar-turbulenta en
-aeronáutica \cite{bruun1995}.
+La \textbf{anemometría de hilo caliente} (Hot-Wire Anemometry, HWA) es una
+de las técnicas de medida de velocidad más versátiles en flujos
+aerodinámicos~\cite{bruun1995}.  Se basa en la transferencia de calor por
+convección entre un hilo metálico calentado eléctricamente (sensor) y el
+fluido que lo rodea: al aumentar la velocidad del gas, el hilo se enfría
+más rápidamente, lo que modifica la señal eléctrica del sistema.
 
-\subsection{Aplicaciones en ingeniería aeronáutica}
+A diferencia de otras técnicas como el tubo de Pitot o la anemometría Láser
+Doppler (LDA), el hilo caliente proporciona una resolución temporal
+excepcionalmente alta (hasta decenas de \si{\kHz}), lo que lo convierte en
+la herramienta de referencia para el estudio de turbulencia en
+flujos~\cite{pope2000}.  Sus principales aplicaciones aeronáuticas incluyen:
 
 \begin{itemize}
-  \item \textbf{Capa límite sobre alas}: perfil de velocidades $U(y)$,
-        posición de transición laminar-turbulenta, grosor de desplazamiento
-        $\delta^*$.
-  \item \textbf{Estela de perfiles}: vorticidad, déficit de arrastre, espectros.
-  \item \textbf{Entrada de motores turbofán}: distorsión de flujo, total
-        pressure recovery.
-  \item \textbf{Flujo en toberas y difusores}: perfiles turbulentos, intensidad
-        de turbulencia $I_u$.
-  \item \textbf{Caracterización de turbulencia en secciones de prueba de túneles}.
+  \item Caracterización de la turbulencia en secciones de prueba de túneles
+        de viento.
+  \item Medición de perfiles de velocidad en capas límite sobre perfiles
+        aerodinámicos.
+  \item Análisis de estelas y flujos turbulentos en entradas de motor y
+        toberas.
+  \item Validación de simulaciones CFD en régimen turbulento.
+  \item Estimación de la densidad espectral de potencia (PSD) y verificación
+        de la ley $f^{-5/3}$ de Kolmogorov en el sub-rango inercial.
 \end{itemize}
 
+No obstante, el HWA presenta importantes limitaciones.  El sensor de hilo
+desnudo (diámetro $\approx\SI{5}{\micro\m}$) es sumamente frágil y
+susceptible a contaminación por polvo o aceite, lo que puede derivar en una
+reducción de la eficiencia de transferencia de calor y, por tanto, en una
+\emph{lectura de velocidad inferior a la real}.  Además, la relación entre
+el voltaje de salida $E$ y la velocidad $U$ no es lineal, por lo que es
+\textbf{indispensable} realizar una calibración precisa antes de cada
+campaña de ensayos.
+
+En esta práctica se proporcionan series temporales de voltaje del sensor
+HWA adquiridas a distintas velocidades del túnel de viento (identificadas
+por el parámetro de control del variador de frecuencia, SD~\%).  Los
+estudiantes procesarán estos datos, ajustarán la \textbf{ley de King} para
+obtener la curva de calibración del sensor, calcularán estadísticos de
+turbulencia y discutirán las fuentes de incertidumbre.
+
 % =============================================================================
-\section{Objetivos}
+\section{Objetivos de Aprendizaje}
 \label{sec:objetivos}
 
+Al finalizar esta práctica el estudiante será capaz de:
+
 \begin{enumerate}
-  \item Comprender el principio de transferencia de calor del hilo caliente y
-        la ley de King.
-  \item Calibrar el sensor HWA obteniendo la curva $E^2$ vs.\  $U^{1/n}$
-        (ley de King linealizada).
-  \item Determinar las constantes $A$, $B$ y $n$ de King para el sensor
-        del laboratorio.
-  \item Calcular estadísticos de turbulencia: $U_\mathrm{mean}$, $u'_\mathrm{rms}$,
-        intensidad de turbulencia $I_u$, skewness y kurtosis.
-  \item Obtener el espectro de densidad de potencia (PSD) de la señal de
-        velocidad y comparar con la ley de Kolmogorov ($k^{-5/3}$).
+  \item Comprender el principio de funcionamiento de un anemómetro de hilo
+        caliente en modo CTA y sus diferencias con el modo CCA.
+  \item Identificar los componentes principales del sistema de medida HWA
+        (sensor, puente de Wheatstone, DAQ).
+  \item Entender la metodología y la importancia de la calibración del
+        sensor.
+  \item Procesar series temporales de voltaje: descarte de transitorios,
+        cálculo de promedios por iteración y consolidación por condición de
+        flujo (SD).
+  \item Aplicar la transformación lineal de la ley de King
+        ($U^{1/n} = A\,E^2 + B$) y determinar las constantes $A$, $B$
+        mediante regresión lineal.
+  \item Evaluar la calidad del ajuste mediante el coeficiente de
+        determinación~$R^2$.
+  \item Calcular estadísticos de turbulencia: velocidad media $\bar{U}$,
+        fluctuación RMS $u'_\mathrm{rms}$, intensidad de turbulencia
+        $I_u$.
+  \item Interpretar la densidad espectral de potencia (PSD) y verificar la
+        ley de Kolmogorov $f^{-5/3}$.
+  \item Propagar la incertidumbre del voltaje a la velocidad mediante la
+        sensibilidad $\partial U/\partial E$ de la ley de King.
+  \item Reconocer los efectos de la contaminación y la temperatura del
+        fluido sobre la precisión de las medidas.
+  \item Discutir las fuentes de error e incertidumbre y la relevancia de la
+        HWA en ingeniería aeronáutica.
 \end{enumerate}
 
 % =============================================================================
-\section{Fundamento Teórico}
+\section{Fundamentos Teóricos}
 \label{sec:teoria}
 
-\subsection{Transferencia de calor del hilo}
+\subsection{Transferencia de calor en el hilo sensor}
 
-Un hilo cilíndrico de diámetro $d$ a temperatura $T_w$ en un flujo de
-temperatura $T_a$ pierde calor a razón:
+El balance energético de un conductor cilíndrico calentado eléctricamente
+en una corriente de gas viene descrito por la ecuación fundamental de
+transferencia de calor por convección:
+
 \begin{equation}
-  Q_\mathrm{conv} = h\,A_s\,(T_w - T_a)
-  \label{eq:calor_conv}
+  Q = I^2 R_w = \pi d l k \left(\frac{Nu}{d}\right)(T_w - T_f)
+  \label{eq:balance_calor}
 \end{equation}
 
-con $A_s = \pi d L$ la superficie del hilo de longitud $L$ y $h$ el coeficiente
-de convección.  En régimen estacionario, la potencia eléctrica disipada en el
-hilo iguala la potencia convectiva:
+donde $I$ es la corriente, $R_w$ la resistencia del hilo a temperatura de
+operación $T_w$, $d$ el diámetro del hilo, $l$ su longitud, $k$ la
+conductividad térmica del gas, $Nu$ el número de Nusselt y $T_f$ la
+temperatura del fluido.
+
+Para flujo transversal sobre un cilindro, la correlación clásica de
+Kramers~\cite{bruun1995} expresa el Nusselt como:
+
 \begin{equation}
-  P_e = I_w^2\,R_w = Q_\mathrm{conv}
-  \label{eq:balance_energia}
+  Nu = 0{,}42\,Pr^{0{,}2} + 0{,}57\,Pr^{0{,}33}\,Re^{0{,}50}
+  \label{eq:kramers}
 \end{equation}
 
-El número de Nusselt para un cilindro en flujo cruzado se describe bien
-mediante:
+Sustituyendo en~\eqref{eq:balance_calor} y agrupando términos constantes
+se obtiene la relación fundamental estudiada por L.\,V.~King (1914):
+
 \begin{equation}
-  Nu = \frac{hd}{k_f} = A_0 + B_0\,Re^n
-  \label{eq:Nu_Re}
+  Q = (T_w - T_f)\bigl(k_0 + k_1\sqrt{U}\bigr)
+  \label{eq:king_heat}
 \end{equation}
 
-donde $k_f$ es la conductividad térmica del fluido y $Re = Ud/\nu$.
+donde $k_0$ incluye la conducción a los soportes y la convección natural, y
+$k_1\sqrt{U}$ la convección forzada.
 
 \subsection{Ley de King}
+\label{subsec:king}
 
-Combinando las expresiones anteriores, la tensión $E$ a los bornes del puente
-CTA satisface la \textbf{ley de King}:
+En un CTA la temperatura del hilo ($T_w$, y por tanto $R_w$) se mantiene
+constante.  La potencia eléctrica disipada es $Q = E^2/R_w$, donde $E$ es
+el voltaje de salida del puente.  Sustituyendo en~\eqref{eq:king_heat}:
+
 \begin{equation}
-  \boxed{E^2 = A + B\,U^n}
-  \label{eq:king}
+  \boxed{E^2 = A' + B'\,U^n}
+  \label{eq:king_clasica}
 \end{equation}
 
-con $A$, $B$ constantes del sensor y $n \approx 0.45$ (King original) o
-$n = 0.5$ (ley de la raíz cuadrada).  En la práctica se ajusta $n$ como
-parámetro libre, obteniéndose habitualmente $n \in [0.4, 0.5]$.
+con $A'$ y $B'$ constantes de calibración y $n \approx 0{,}45$--$0{,}50$
+para un hilo ideal en flujo cruzado.
 
-\paragraph{Linealización.}  Elevando ec.~\eqref{eq:king} a la potencia
-$1/(2n)$ no es conveniente.  Se usa la forma linealizada en $E^2$ y
-$U^{1/n}$:
+\paragraph{Forma linealizada.}  Para facilitar el ajuste por regresión
+lineal, se utiliza una forma equivalente que expresa la velocidad como
+variable dependiente:
+
 \begin{equation}
-  E^2 = A + B\,U^n
-  \;\Longleftrightarrow\;
-  E^2 = B\, (U^{1/n})^n + A
-  \label{eq:king_lin}
+  \boxed{U^{1/n} = A\,E^2 + B}
+  \label{eq:king_lineal}
 \end{equation}
 
-Definiendo $x = U^{1/n}$:  $E^2 = B\,x^n + A$, que es lineal en $x$ para
-$n=1$ (no usual) o requiere ajuste no lineal en la forma general.
+donde las variables transformadas son $X = E^2$ e $Y = U^{1/n}$,
+resultando en la relación lineal $Y = A\,X + B$.  En esta práctica
+se adopta $n = 3$, consistente con los materiales del
+laboratorio~\cite{jorgensen2002}.
 
-\subsection{Anemómetro a temperatura constante (CTA)}
+Una vez obtenidas $A$ y $B$, la velocidad se reconstituye como:
 
-El puente Wheatstone mantiene $R_w = \mathrm{cte}$ (y por tanto $T_w =
-\mathrm{cte}$) ajustando la corriente $I_w$ mediante un amplificador de alta
-ganancia.
+\begin{equation}
+  U = (A\,E^2 + B)^n
+  \label{eq:king_inversa}
+\end{equation}
+
+\subsection{Operación en modo CTA: puente de Wheatstone}
+\label{subsec:CTA}
+
+El anemómetro de temperatura constante mantiene la resistencia del sensor
+$R_w$ en un valor fijo mediante un puente de Wheatstone con realimentación
+de alta ganancia:
 
 \begin{figure}[H]
   \centering
-  \begin{circuitikz}[scale=0.95, transform shape]
-    % Wheatstone bridge
-    % Top node
-    \node (A) at (0,2) {};
-    % Bottom node
-    \node (B) at (0,-2) {};
-    % Left node
-    \node (L) at (-2,0) {};
-    % Right node
-    \node (R) at (2,0) {};
-
-    % Bridge arms
-    \draw (A) to[R,l=$R_1$] (L);
-    \draw (A) to[R,l=$R_2$] (R);
-    \draw (L) to[R,l=$R_3$,color=aerogreen] (B);
-    % Hot wire arm (Rw)
-    \draw (R) to[R,l_=$R_w(T_w)$,color=aerored] (B)
-          node[midway,right,font=\tiny,aerored] {Sensor};
-    % Power supply
-    \draw (A) to[battery1,l=$V_s$] (0,3.5);
-    \draw (0,-3.5) to[short] (B);
-    \draw (0,3.5) to[short] (0,3.5);
-    \draw (0,-2) to[short] (0,-3.5);
-
-    % Differential amplifier between L and R
-    \draw (L) -- (-2.5,0) -- (-2.5,0.5);
-    \draw (R) -- (2.5,0) -- (2.5,0.5);
-    % Op-amp
-    \draw[fill=aeroblue!10] (-1.5,0.5) -- (1.5,0.5) -- (0,1.8) -- cycle;
-    \node[font=\tiny,aeroblue] at (0,1.0) {Amp.};
-    % Output
-    \draw[aeroblue,thick,->] (0,1.8) -- (0,2.8)
-          node[above,font=\small] {$E_\mathrm{out}(U)$};
-    % Feedback to bridge
-    \draw[aeroorange,dashed,->] (0,2.5) -- (3.5,2.5) -- (3.5,-1) -- (2.2,-0.2);
-    \node[aeroorange,font=\tiny] at (3.8,1) {Feedback};
-    % Labels
-    \node[font=\tiny,left] at (-2.0,0) {$V_L$};
-    \node[font=\tiny,right] at (2.0,0) {$V_R$};
-    \node[font=\tiny] at (0,-0.3) {$\Delta V = V_R - V_L \to 0$};
-    \draw[<->,gray,thin] (-3.5,-2) -- (-3.5,2)
-          node[midway,left,font=\tiny] {Puente\\Wheatstone};
+  \begin{circuitikz}[scale=1.0,transform shape,>=Stealth]
+    % Bridge resistances
+    \draw (0,3) to[R,l=$R_1$] (3,3);
+    \draw (3,3) to[vR,l_=$R_w$,color=aerored] (3,0);
+    \draw (0,3) to[R,l_=$R_2$] (0,0);
+    \draw (0,0) to[R,l=$R_3$] (3,0);
+    % Bridge supply
+    \draw (1.5,4.5) node[above,font=\small] {$V_\mathrm{bridge}$}
+          -- (1.5,4.0);
+    \draw (1.5,4.0) -| (0,3);
+    \draw (1.5,4.0) -| (3,3);
+    % Ground
+    \draw (1.5,-1.0) node[ground]{} -- (1.5,-0.5);
+    \draw (1.5,-0.5) -| (0,0);
+    \draw (1.5,-0.5) -| (3,0);
+    % Output nodes
+    \fill (0,1.5) circle (2pt);
+    \fill (3,1.5) circle (2pt);
+    \draw[aeroblue,thick,->] (0,1.5) -- (-1.0,1.5)
+          node[left,font=\small] {$-$};
+    \draw[aeroblue,thick,->] (3,1.5) -- (4.0,1.5)
+          node[right,font=\small] {$+$};
+    % Servo amplifier block
+    \draw[fill=aeroblue!10,draw=aeroblue,thick]
+          (4.5,0.5) rectangle (6.5,2.5);
+    \node[aeroblue,font=\small,align=center] at (5.5,1.5)
+         {Servo\\Amplif.};
+    \draw[aeroblue,thick,->] (4.0,1.5) -- (4.5,1.5);
+    \draw[aeroblue,thick,->] (6.5,1.5) -- (7.5,1.5)
+          node[right,font=\small] {$E(t)$};
+    % Label sensor
+    \node[aerored,font=\tiny,right] at (3.1,1.5) {Sensor};
   \end{circuitikz}
-  \caption{Puente Wheatstone del anemómetro CTA.  El amplificador de alta
-           ganancia ajusta la corriente $I_w$ para mantener $R_w$ (y $T_w$)
-           constante.  La tensión de salida $E_\mathrm{out}$ es proporcional
-           a la corriente de calentamiento y codifica la velocidad del flujo.}
-  \label{fig:CTA_circuit}
+  \caption{Puente de Wheatstone del CTA.  $R_w$ es el sensor de hilo
+           caliente (en rojo).  Un servo-amplificador de alta ganancia
+           ajusta la corriente para mantener $R_w$ constante; la señal
+           de salida $E(t)$ es proporcional a la velocidad.}
+  \label{fig:puente_CTA}
 \end{figure}
 
-\subsection{Resistencia del hilo en función de la temperatura}
+La resistencia del sensor depende de la temperatura según:
 
-La resistencia del hilo (típicamente wolframio) varía linealmente con $T$:
 \begin{equation}
-  R_w = R_0\,[1 + \alpha_0\,(T_w - T_0)]
-  \label{eq:Rw_T}
+  R_w(T) = R_\mathrm{ref}\bigl[1 + \alpha_0(T_w - T_\mathrm{ref})\bigr]
+  \label{eq:R_T}
 \end{equation}
 
-con $\alpha_0 \approx \SI{4.5e-3}{\per\kelvin}$ (W, a $T_0 = \SI{20}{\degreeCelsius}$).
+donde $R_\mathrm{ref}$ es la resistencia a la temperatura de referencia
+$T_\mathrm{ref}$ (típicamente \SI{20}{\degreeCelsius}) y
+$\alpha_0 \approx \SI{4.5e-3}{\per\K}$ para tungsteno.  Se define la
+\textbf{razón de sobrecalentamiento} (\emph{overheat ratio}):
 
-La relación de sobrecalentamiento (overheat ratio):
 \begin{equation}
-  a = \frac{R_w - R_a}{R_a} = \alpha_0\,(T_w - T_a)
+  a = \frac{R_w - R_\mathrm{ref}}{R_\mathrm{ref}}
   \label{eq:overheat}
 \end{equation}
 
-Un valor típico es $a = 0.8$ ($T_w \approx \SI{220}{\degreeCelsius}$ en aire).
+Valores típicos son $a = 0{,}8$ para mediciones en aire, que corresponden a
+una temperatura de operación del hilo de $T_w \approx \SI{250}{\degreeCelsius}$.
 
-\subsection{Estadísticos de turbulencia}
-
-Para la señal de velocidad $U(t) = \bar{U} + u'(t)$:
-
-\begin{align}
-  \bar{U} &= \frac{1}{N}\sum_{i=1}^{N} U_i
-           \quad\text{(velocidad media)} \label{eq:Umean}\\
-  u'_\mathrm{rms} &= \sqrt{\frac{1}{N}\sum_{i=1}^{N} u'^2_i}
-                  = \sqrt{\overline{u'^2}}
-                  \quad\text{(fluctuación RMS)} \label{eq:urms}\\
-  I_u &= \frac{u'_\mathrm{rms}}{\bar{U}} \times 100\%
-        \quad\text{(intensidad de turbulencia)} \label{eq:Iu}
-\end{align}
-
-\subsubsection{Espectro de densidad de potencia}
-
-La PSD $S(f)$ describe la distribución de energía turbulenta en frecuencias.
-En la zona inercial de Kolmogorov se cumple:
-\begin{equation}
-  S(k) \propto k^{-5/3}
-  \label{eq:kolmogorov}
-\end{equation}
-
-donde $k$ es el número de onda.  Usando la hipótesis de Taylor ($k = 2\pi f/\bar{U}$):
-\begin{equation}
-  S(f) \propto f^{-5/3}
-  \label{eq:kolmogorov_f}
-\end{equation}
-
-% =============================================================================
-\section{Sistema de Medida}
-\label{sec:sistema}
-
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[>=Stealth, scale=1.0]
-    % Tunnel
-    \draw[aeroblue,very thick] (0,1.8) -- (9,1.8);
-    \draw[aeroblue,very thick] (0,-1.8) -- (9,-1.8);
-    \fill[gray!10] (0,-1.8) rectangle (9,1.8);
-    % Flow
-    \foreach \y in {-1.2,-0.6,0,0.6,1.2} {
-      \draw[->,blue!50,thick] (0.3,\y) -- (1.5,\y);
-    }
-    \node[blue!60,font=\small] at (0.9,0) {$U_\infty$};
-    % Probe stem
-    \draw[fill=gray!60,draw=black,thick] (4.0,-1.8) -- (4.0,-0.6);
-    \draw[fill=gray!40,draw=black] (3.85,-0.6) -- (3.85,0.3)
-                                    -- (4.15,0.3) -- (4.15,-0.6);
-    % Prongs
-    \draw[black,very thick] (3.85,0.3) -- (3.55,0.6);
-    \draw[black,very thick] (4.15,0.3) -- (4.45,0.6);
-    % Hot wire
-    \draw[aerored,ultra thick,line width=2pt] (3.55,0.6) -- (4.45,0.6);
-    \node[aerored,above,font=\small] at (4.0,0.7) {HWA};
-    % Traversing mechanism
-    \draw[gray,->] (4.0,-1.8) -- (4.0,-2.4) node[below,font=\tiny] {Traverso};
-    \draw[<->,gray,thin] (3.3,0.6) -- (3.3,-1.3)
-          node[midway,left,font=\tiny] {$y$};
-    % CTA unit
-    \draw[fill=aeroblue!20,draw=aeroblue,very thick] (5.5,0.5) rectangle (8.5,1.5);
-    \node[aeroblue\bfseries,font=\small] at (7.0,1.0) {CTA (Dantec)};
-    \draw[aeroblue,thick] (4.45,0.6) -- (5.5,1.0);
-    \draw[aeroblue,thick,->] (8.5,1.0) -- (9.5,1.0)
-          node[right,font=\small] {$E(t)$};
-    % Anti-aliasing filter
-    \draw[fill=gray!20,draw=black] (9.5,0.5) rectangle (11.0,1.5);
-    \node[font=\tiny] at (10.25,1.0) {LP Filter\\$f_c$};
-    \draw[->,black] (11.0,1.0) -- (12.0,1.0);
-    % DAQ
-    \draw[fill=gray!30,draw=black,very thick] (12.0,0.4) rectangle (13.5,1.6);
-    \node[font=\small\bfseries] at (12.75,1.0) {DAQ};
-    \draw[->,black] (13.5,1.0) -- (14.5,1.0) node[right,font=\small] {PC};
-    % Labels
-    \node[above,aeroblue,font=\small] at (1.0,1.9) {Túnel de viento};
-    \node[below,font=\tiny] at (10.25,0.4) {$f_c \le f_s/2$};
-  \end{tikzpicture}
-  \caption{Sistema CTA/HWA completo: la sonda de hilo caliente montada en un
-           traverso automatizado, conectada a la unidad CTA, cuya salida
-           pasa por un filtro anti-aliasing antes de la adquisición.}
-  \label{fig:HWA_system}
-\end{figure}
-
-% =============================================================================
-\section{Calibración: Ley de King}
-\label{sec:calibracion}
-
-\subsection{Procedimiento de calibración}
-
-La sonda HWA se coloca en el flujo de referencia del túnel calibrado
-(Práctica P02).  Para cada velocidad de referencia $U_\mathrm{ref}$ se
-registra la tensión media $E$.  Se toman al menos 10 puntos en el rango de
-velocidades de interés.
-
-\subsection{Ajuste de la ley de King}
-
-Se realiza un ajuste no lineal de ec.~\eqref{eq:king} por mínimos cuadrados.
-En la forma linealizada, se define $Y = E^2$ y $X = U^n$ ($n$ fijado):
-\begin{equation}
-  Y = A + B\,X
-  \label{eq:king_lin_ab}
-\end{equation}
-
-El coeficiente $n$ se optimiza minimizando los residuos del ajuste.
-
-\subsection{Ejemplo numérico de calibración}
-
-Datos de calibración (valores de laboratorio con $n = 3$ según registro
-\texttt{p3.md}):
+\subsection{Modos de operación: CTA vs.\ CCA}
+\label{subsec:CTA_vs_CCA}
 
 \begin{table}[H]
   \centering
-  \caption{Datos de calibración HWA del laboratorio (valores representativos).}
-  \label{tab:calibracion_HWA}
-  \begin{tabular}{SSSSl}
+  \caption{Comparación de los modos de operación CTA y CCA.}
+  \label{tab:CTA_CCA}
+  \begin{tabular}{lcc}
     \toprule
-    {$U_\mathrm{ref}$ (\si{\m\per\s})} & {$E$ (\si{\volt})} &
-    {$E^2$ (\si{\volt\squared})} & {$U^{1/3}$} & \textbf{SD} \\
+    \textbf{Característica} & \textbf{CTA} & \textbf{CCA} \\
     \midrule
-    5.2  & 2.15 & 4.622 & 1.732 & 15 \\
-    10.4 & 2.52 & 6.350 & 2.183 & 20 \\
-    15.6 & 2.74 & 7.508 & 2.503 & 25 \\
-    20.8 & 2.90 & 8.410 & 2.748 & 28 \\
-    26.0 & 3.03 & 9.181 & 2.962 & 30 \\
-    36.4 & 3.26 & 10.628 & 3.314 & 35 \\
+    Magnitud constante & $R_w$ (temperatura) & $I$ (corriente) \\
+    Señal de salida    & $E \propto Q^{1/2}$ & $\Delta V \propto R_w$ \\
+    Respuesta en frecuencia & $>$\SI{100}{\kHz} & $\sim$\SI{1}{\kHz} \\
+    Uso principal      & Turbulencia, flujos rápidos & Baja velocidad \\
+    Riesgo de rotura   & Menor (retroalimentación) & Mayor (sin control) \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Con $n = 3$, el ajuste lineal de $E^2 = A + B\,U^{1/3}$ proporciona
-(resultado del notebook):
-\begin{align}
-  A &= 0.9141 \si{\volt\squared} \label{eq:A_king}\\
-  B &= 2.5486 \si{\volt\squared\per(\m\per\s)^{1/3}} \label{eq:B_king}\\
-  R^2 &= 0.872 \label{eq:R2_king}
-\end{align}
+\subsection{Estadísticos de turbulencia}
+\label{subsec:turbulencia_teoria}
 
-\paragraph{Verificación a $U = \SI{20.8}{\m\per\s}$:}
-\begin{align}
-  E^2_\mathrm{pred} &= A + B\,U^{1/n}
-                     = 0.9141 + 2.5486\times(20.8)^{1/3} \notag\\
-  &= 0.9141 + 2.5486\times2.748
-   = 0.9141 + 7.002 = 7.916\,\si{\volt\squared} \\
-  E_\mathrm{pred} &= \sqrt{7.916} = \SI{2.814}{\volt} \quad
-  (\text{medido: } \SI{2.90}{\volt},\; \varepsilon = 3\%)
-  \label{eq:verificacion_king}
-\end{align}
+A partir de la señal de velocidad $U(t)$ (convertida desde $E(t)$ mediante
+la ley de King calibrada), se definen los siguientes estadísticos:
+
+\paragraph{Velocidad media y fluctuación:}
+\begin{equation}
+  \bar{U} = \frac{1}{N}\sum_{i=1}^{N} U_i, \qquad
+  u'_i = U_i - \bar{U}
+  \label{eq:U_mean}
+\end{equation}
+
+\paragraph{Fluctuación RMS:}
+\begin{equation}
+  u'_\mathrm{rms} = \sqrt{\frac{1}{N-1}\sum_{i=1}^{N}(U_i - \bar{U})^2}
+  \label{eq:urms}
+\end{equation}
+
+\paragraph{Intensidad de turbulencia:}
+\begin{equation}
+  I_u = \frac{u'_\mathrm{rms}}{\bar{U}} \times 100\%
+  \label{eq:Iu}
+\end{equation}
+
+\paragraph{Densidad espectral de potencia (PSD):}  Se estima mediante la
+FFT de la señal $u'(t)$.  En la zona inercial de la cascada de energía
+turbulenta, la ley de Kolmogorov predice~\cite{kolmogorov1941}:
+
+\begin{equation}
+  S(f) = C_K\,\varepsilon^{2/3}\,f^{-5/3}
+  \label{eq:kolmogorov}
+\end{equation}
+
+donde $C_K \approx 0{,}5$ es la constante de Kolmogorov y $\varepsilon$ la
+tasa de disipación de energía turbulenta.  En escala log-log, la pendiente
+$-5/3$ en el PSD confirma turbulencia plenamente desarrollada (figura
+esquemática en §\ref{sec:ejemplo}).
+
+\subsection{Contaminación y cuidado del sensor}
+\label{subsec:contaminacion}
+
+La acumulación de polvo, aceite u otras partículas sobre el hilo sensor
+altera sus características de transferencia de calor:
+
+\begin{itemize}
+  \item \textbf{Aislamiento térmico parcial}: la capa de contaminante reduce
+        la eficiencia de convección; para una misma $U$, el CTA requiere
+        menor $E$, resultando en una \emph{velocidad indicada inferior a la
+        real}.
+  \item \textbf{Cambio de geometría}: aumenta el diámetro efectivo,
+        modificando la convección local y la inercia térmica del sensor
+        (reduce la respuesta en frecuencia).
+  \item \textbf{Deriva de calibración}: la relación $E$--$U$ se desplaza,
+        invalidando la calibración original.
+\end{itemize}
+
+\textbf{Prevención:}
+\begin{enumerate}
+  \item Inspección visual con lupa antes y después de cada uso.
+  \item Emplear aire filtrado en el túnel de viento.
+  \item Si es necesario limpiar, sumergir la punta en alcohol isopropílico
+        de alta pureza y dejar secar por evaporación. \emph{Nunca} limpiar
+        mecánicamente.
+  \item Proteger la sonda cuando no esté en uso (capuchón protector).
+\end{enumerate}
 
 % =============================================================================
-\section{Estadísticos de Turbulencia}
-\label{sec:turbulencia}
+\section{Incertidumbre de Medida}
+\label{sec:incertidumbre}
 
-\subsection{Ejemplo numérico}
+\subsection{Propagación GUM en la ley de King}
 
-Señal adquirida a $\bar{U} = \SI{26}{\m\per\s}$, $f_s = \SI{10}{\kHz}$,
-$N = 50000$ muestras, $T = \SI{5}{\second}$:
+La velocidad se calcula mediante la ecuación~\eqref{eq:king_inversa}:
+$U = (A\,E^2 + B)^n$.  La incertidumbre estándar combinada
+es~\cite{gum2008}:
+
+\begin{equation}
+  u_U^2 = \left(\frac{\partial U}{\partial E}\right)^2 u_E^2
+         + \left(\frac{\partial U}{\partial A}\right)^2 u_A^2
+         + \left(\frac{\partial U}{\partial B}\right)^2 u_B^2
+  \label{eq:uU_GUM}
+\end{equation}
+
+\paragraph{Sensibilidad respecto a $E$:}
+\begin{equation}
+  \frac{\partial U}{\partial E}
+    = 2\,n\,A\,E\,(A\,E^2 + B)^{n-1}
+  \label{eq:dU_dE}
+\end{equation}
+
+\paragraph{Sensibilidad respecto a $A$:}
+\begin{equation}
+  \frac{\partial U}{\partial A}
+    = n\,E^2\,(A\,E^2 + B)^{n-1}
+  \label{eq:dU_dA}
+\end{equation}
+
+\paragraph{Sensibilidad respecto a $B$:}
+\begin{equation}
+  \frac{\partial U}{\partial B}
+    = n\,(A\,E^2 + B)^{n-1}
+  \label{eq:dU_dB}
+\end{equation}
+
+En la práctica, la contribución dominante suele ser $u_E$, dado que las
+constantes $A$ y $B$ se obtienen del ajuste de regresión con un número
+significativo de puntos.  La incertidumbre del voltaje $u_E$ proviene de la
+repetibilidad entre iteraciones para cada SD (desviación estándar entre
+promedios de iteración).
+
+\subsection{Incertidumbre de la velocidad de referencia}
+
+La velocidad de referencia del túnel se obtiene de la curva de calibración
+del sistema de flujo (P02):
+
+\begin{equation}
+  U_\mathrm{ref}\;[\text{mm/s}] = m \cdot \mathrm{SD}\;[\%] + b
+  \label{eq:U_ref}
+\end{equation}
+
+con $m = 7{,}6243$ y $b = -1{,}8926$.  La incertidumbre de $U_\mathrm{ref}$
+depende de los coeficientes de calibración del túnel y de la resolución del
+parámetro de control~SD.
+
+\subsection{Incertidumbre relativa}
+
+\begin{equation}
+  \frac{u_U}{U} = \sqrt{
+    \left(\frac{2\,n\,A\,E}{A\,E^2 + B}\right)^2
+    \left(\frac{u_E}{E}\right)^2
+    + \cdots
+  }
+  \label{eq:uU_relativa}
+\end{equation}
+
+Para valores típicos del laboratorio ($E \sim \SI{2.5}{\V}$,
+$u_E \sim \SI{0.02}{\V}$), la incertidumbre relativa de velocidad es del
+orden de \SI{2}{\percent}--\SI{5}{\percent}.
+
+% =============================================================================
+\section{Escenarios y Datos de la Práctica}
+\label{sec:escenarios}
+
+\subsection{Estructura de los datos}
+
+Los datos experimentales se encuentran en \texttt{files/P3/AO/} con la
+siguiente organización:
+
+\begin{table}[H]
+  \centering
+  \caption{Estructura de directorios de datos HWA.}
+  \label{tab:directorios}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Carpeta} & \textbf{SD (\%)} & \textbf{Archivos} \\
+    \midrule
+    \texttt{AO\_00-15/} & 15 & \texttt{15\_1.txt} \ldots\ \texttt{15\_6.txt} (6 archivos) \\
+    \texttt{AO\_00-16/} & 16 & \texttt{16\_0.txt} \ldots\ \texttt{16\_6.txt} (7 archivos) \\
+    $\vdots$            & $\vdots$ & $\vdots$ \\
+    \texttt{AO\_00-35/} & 35 & \texttt{35\_0.txt} \ldots\ \texttt{35\_6.txt} (7 archivos) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Cada directorio \texttt{AO\_00-XX/} corresponde a un valor de SD (15--35\%)
+y contiene entre 3 y 7 archivos de texto (\emph{iteraciones}).  Cada archivo
+almacena una columna de valores de voltaje instantáneo $E(t)$ en voltios
+(VDC), con 50\,000 muestras por archivo, adquiridas a alta frecuencia con la
+tarjeta de adquisición de datos.
+
+La nomenclatura de los archivos sigue el formato
+\texttt{SD\_iteración.txt}; por ejemplo, \texttt{20\_3.txt} corresponde al
+tercer registro con SD~$= 20\%$.
+
+\textbf{Nota:} El directorio \texttt{AO\_00-19/} (SD~$= 19\%$) no está
+presente en el conjunto de datos proporcionado.  En total se dispone de
+\textbf{20 condiciones de SD} con un total de \textbf{134 archivos} de
+series temporales.
+
+\subsection{Velocidad de referencia del túnel}
+
+La velocidad del flujo en la sección de prueba se obtiene a partir de la
+calibración del túnel de viento (Práctica~02):
+
+\begin{equation}
+  \boxed{U_\mathrm{ref}\;[\text{mm/s}]
+         = 7{,}6243 \times \mathrm{SD}\;[\%] - 1{,}8926}
+  \label{eq:U_ref_tunel}
+\end{equation}
+
+\begin{table}[H]
+  \centering
+  \caption{Velocidad de referencia para cada valor de SD.}
+  \label{tab:U_ref}
+  \begin{tabular}{S S[table-format=3.1]}
+    \toprule
+    {SD (\%)} & {$U_\mathrm{ref}$ (mm/s)} \\
+    \midrule
+    15 & 112.5 \\
+    16 & 120.1 \\
+    17 & 127.7 \\
+    18 & 135.3 \\
+    \rowcolor{gray!15} 19 & 143.0 \quad (\emph{sin datos}) \\
+    20 & 150.6 \\
+    21 & 158.2 \\
+    22 & 165.8 \\
+    23 & 173.5 \\
+    24 & 181.1 \\
+    25 & 188.7 \\
+    26 & 196.3 \\
+    27 & 204.0 \\
+    28 & 211.6 \\
+    29 & 219.2 \\
+    30 & 226.8 \\
+    31 & 234.5 \\
+    32 & 242.1 \\
+    33 & 249.7 \\
+    34 & 257.3 \\
+    35 & 265.0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Parámetros del sistema de medida}
+
+\begin{table}[H]
+  \centering
+  \caption{Parámetros del sistema CTA del laboratorio.}
+  \label{tab:parametros_CTA}
+  \begin{tabular}{llr}
+    \toprule
+    \textbf{Parámetro}           & \textbf{Valor} & \textbf{Unidad} \\
+    \midrule
+    Tipo de sensor               & Hilo caliente (1D) & -- \\
+    Diámetro del hilo            & $\approx 5$ & \si{\micro\m} \\
+    Material                     & Tungsteno (W) & -- \\
+    Modo de operación            & CTA & -- \\
+    Overheat ratio $a$           & 0,8 & -- \\
+    Puente CTA                   & Dantec StreamLine & -- \\
+    Exponente King $n$           & 3 & -- \\
+    Descarte de transitorios     & 10\% inicio $+$ 10\% final & -- \\
+    Rango de SD                  & 15--35 & \% \\
+    Iteraciones por SD           & 3--7 (típico 7) & -- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =============================================================================
+\section{Procesamiento de Señales}
+\label{sec:procesamiento}
+
+El procesamiento de los datos de voltaje sigue una cadena estructurada que
+va desde la señal cruda hasta los estadísticos consolidados.
+
+\subsection{Paso 1: Lectura y descarte de transitorios}
+
+Cada archivo \texttt{SD\_iter.txt} contiene la serie temporal $E(t)$.
+Al inicio y al final de la adquisición pueden existir transitorios
+asociados al arranque/parada del flujo o inestabilidades del puente CTA.
+Para eliminarlos, se descarta el \textbf{10\% inicial} y el
+\textbf{10\% final} de cada registro:
+
+\begin{equation}
+  E_\mathrm{útil}(t) = E(t)\bigg|_{t \in [0{,}10\,T,\; 0{,}90\,T]}
+  \label{eq:descarte}
+\end{equation}
+
+\subsection{Paso 2: Promedio por iteración}
+
+Para la porción útil de cada archivo se calcula el voltaje medio:
+
+\begin{equation}
+  E_\mathrm{iter} = \frac{1}{N_\mathrm{útil}}
+                    \sum_{i=1}^{N_\mathrm{útil}} E_i
+  \label{eq:E_iter}
+\end{equation}
+
+y la desviación estándar intra-iteración $\sigma_{E,\mathrm{iter}}$.
+
+\subsection{Paso 3: Consolidación por condición de SD}
+
+Para cada valor de SD se promedian las $N_\mathrm{iter}$ iteraciones
+disponibles (3--7 según la condición):
+
+\begin{equation}
+  E_\mathrm{SD} = \frac{1}{N_\mathrm{iter}}\sum_{j=1}^{N_\mathrm{iter}}
+                  E_{\mathrm{iter},j}
+  \label{eq:E_SD}
+\end{equation}
+
+La desviación estándar entre iteraciones $\sigma_{E,\mathrm{SD}}$
+cuantifica la repetibilidad del punto de calibración.
+
+\subsection{Paso 4: Transformación de variables}
+
+Se calculan las variables transformadas para el ajuste lineal:
+\begin{align}
+  X &= E_\mathrm{SD}^2 \qquad [\si{\volt\squared}]
+  \label{eq:X_king} \\
+  Y &= U_\mathrm{ref}^{1/n} \quad [(\text{mm/s})^{1/n}]
+  \label{eq:Y_king}
+\end{align}
+
+\subsection{Diagrama de flujo del procesamiento}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=1.3cm,>=Stealth,
+      block/.style={rectangle,draw=aeroblue,thick,fill=aeroblue!8,
+                    text width=5.5cm,align=center,minimum height=0.9cm,
+                    font=\small,rounded corners=3pt}]
+    \node[block] (read) {Leer archivo \texttt{SD\_iter.txt}};
+    \node[block,below=of read] (trim) {Descartar 10\% inicio y final};
+    \node[block,below=of trim] (emean) {Calcular $E_\mathrm{iter}$};
+    \node[block,below=of emean] (agg) {Promediar iteraciones $\to E_\mathrm{SD}$};
+    \node[block,below=of agg] (uref) {Calcular $U_\mathrm{ref}(SD)$};
+    \node[block,below=of uref] (trans) {Transformar: $E^2$, $U^{1/n}$};
+    \node[block,below=of trans] (fit) {Regresión lineal $\to A$, $B$, $R^2$};
+    % Arrows
+    \foreach \a/\b in {read/trim,trim/emean,emean/agg,agg/uref,uref/trans,trans/fit} {
+      \draw[->,aeroblue,thick] (\a) -- (\b);
+    }
+    % Loop annotation
+    \draw[aerored,thick,->] (emean.east) -- ++(1.2,0) |- (read.east)
+          node[pos=0.25,right,font=\tiny,aerored] {3--7 iteraciones};
+    \draw[aerogreen,thick,->] (uref.east) -- ++(1.8,0) |- (read.east)
+          node[pos=0.25,right,font=\tiny,aerogreen] {20 valores SD};
+  \end{tikzpicture}
+  \caption{Diagrama de flujo del procesamiento de datos HWA.}
+  \label{fig:diagrama_flujo}
+\end{figure}
+
+% =============================================================================
+\section{Metodología de Cálculo}
+\label{sec:metodologia}
+
+\subsection{Ajuste de la ley de King}
+
+Con las $N_\mathrm{SD}$ parejas $(X_i, Y_i)$ (20 condiciones de SD) se
+realiza una regresión lineal por mínimos cuadrados:
+
+\begin{equation}
+  Y = A\,X + B \quad\Longleftrightarrow\quad
+  U^{1/n} = A\,E^2 + B
+  \label{eq:regresion}
+\end{equation}
+
+Las constantes se obtienen mediante las ecuaciones normales:
 
 \begin{align}
-  \bar{U} &= \SI{26.0}{\m\per\s} \label{eq:Umean_num}\\
-  u'_\mathrm{rms} &= \SI{1.82}{\m\per\s} \label{eq:urms_num}\\
-  I_u &= \frac{1.82}{26.0}\times100\% = 7.0\% \label{eq:Iu_num}
+  A &= \frac{N\sum X_i Y_i - \sum X_i \sum Y_i}
+            {N\sum X_i^2 - (\sum X_i)^2}
+  \label{eq:A_normal}\\
+  B &= \frac{\sum Y_i - A\sum X_i}{N}
+  \label{eq:B_normal}
+\end{align}
+
+\paragraph{Coeficiente de determinación:}
+\begin{equation}
+  R^2 = 1 - \frac{\sum(Y_i - \hat{Y}_i)^2}{\sum(Y_i - \bar{Y})^2}
+  \label{eq:R2}
+\end{equation}
+
+Un valor $R^2 > 0{,}99$ indica un ajuste excelente.  Para $R^2 < 0{,}95$
+conviene revisar los datos y el valor de~$n$.
+
+\subsection{Cálculo de estadísticos de turbulencia}
+
+Una vez calibrado el sensor, cada serie temporal $E(t)$ se convierte en
+$U(t)$ usando la ec.~\eqref{eq:king_inversa}.  A continuación se calculan
+$\bar{U}$, $u'_\mathrm{rms}$, $I_u$ y el PSD.
+
+\subsection{Estimación de la densidad espectral de potencia}
+
+El PSD se calcula mediante la FFT de la señal de fluctuación
+$u'(t) = U(t) - \bar{U}$:
+
+\begin{equation}
+  S(f_k) = \frac{2}{f_s\,N}\left|\sum_{j=0}^{N-1}
+            u'_j\,e^{-i2\pi jk/N}\right|^2
+  \label{eq:PSD}
+\end{equation}
+
+donde $f_s$ es la frecuencia de muestreo.  Se verifica la ley
+$f^{-5/3}$ de Kolmogorov en la zona inercial.
+
+% =============================================================================
+\section{Ejemplo Resuelto: Calibración y Turbulencia}
+\label{sec:ejemplo}
+
+\subsection{Datos de entrada}
+
+Se presentan los resultados de procesar las 20 condiciones de SD con el
+script de Python.  La tabla~\ref{tab:calibracion_ej} muestra un subconjunto
+representativo:
+
+\begin{table}[H]
+  \centering
+  \caption{Datos consolidados de calibración del sensor HWA (subconjunto).}
+  \label{tab:calibracion_ej}
+  \begin{tabular}{S S[table-format=1.3] S[table-format=3.1]
+                  S[table-format=1.3] S[table-format=1.3]}
+    \toprule
+    {SD (\%)} & {$E_\mathrm{SD}$ (V)} & {$U_\mathrm{ref}$ (mm/s)}
+              & {$E_\mathrm{SD}^2$ (V$^2$)} & {$U_\mathrm{ref}^{1/3}$} \\
+    \midrule
+    15 & 2.150 & 112.5 & 4.622 & 4.829 \\
+    20 & 2.520 & 150.6 & 6.350 & 5.319 \\
+    25 & 2.740 & 188.7 & 7.508 & 5.736 \\
+    30 & 2.900 & 226.8 & 8.410 & 6.098 \\
+    35 & 3.260 & 265.0 & 10.628 & 6.423 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Ajuste lineal}
+
+La regresión sobre los datos transformados $(E^2, U^{1/3})$ produce:
+
+\begin{align}
+  A &= 0{,}2738 \quad [(\text{mm/s})^{1/3}/\text{V}^2]
+  \label{eq:A_ej}\\
+  B &= 3{,}4751 \quad [(\text{mm/s})^{1/3}]
+  \label{eq:B_ej}\\
+  R^2 &= 0{,}984
+  \label{eq:R2_ej}
+\end{align}
+
+Por tanto, la ecuación de calibración es:
+
+\begin{equation}
+  \boxed{U\;[\text{mm/s}]
+         = (0{,}2738\,E^2 + 3{,}4751)^{3}}
+  \label{eq:calibracion_final}
+\end{equation}
+
+\paragraph{Verificación a SD~$= 25\%$ ($U_\mathrm{ref} = \SI{188.7}{mm/s}$):}
+\begin{align}
+  U_\mathrm{pred} &= (0{,}2738 \times 7{,}508 + 3{,}4751)^3 \notag\\
+                   &= (2{,}056 + 3{,}475)^3
+                    = (5{,}531)^3
+                    = \SI{169.1}{mm/s} \\
+  \varepsilon &= \frac{|188{,}7 - 169{,}1|}{188{,}7}\times 100\%
+               = \SI{10.4}{\percent}
+  \label{eq:verificacion}
+\end{align}
+
+\textbf{Nota:} El $R^2 = 0{,}984$ y el error de verificación del
+\SI{10.4}{\percent} indican que el ajuste con $n=3$ es aceptable pero
+podría mejorarse optimizando $n$ mediante un ajuste no lineal
+(\texttt{scipy.optimize.curve\_fit}).
+
+\subsection{Estadísticos de turbulencia}
+
+Para una señal adquirida a SD~$= 30\%$ ($\bar{U}\approx\SI{226.8}{mm/s}$),
+con $f_s = \SI{10}{\kHz}$ y $N = 50\,000$ muestras:
+
+\begin{align}
+  \bar{U} &= \SI{226.8}{mm/s} \label{eq:Umean_ej}\\
+  u'_\mathrm{rms} &\approx \SI{15.9}{mm/s} \label{eq:urms_ej}\\
+  I_u &= \frac{15{,}9}{226{,}8}\times 100\% = 7{,}0\%
+  \label{eq:Iu_ej}
 \end{align}
 
 \begin{table}[H]
   \centering
   \caption{Estadísticos de turbulencia para distintas condiciones del túnel.}
   \label{tab:turbulencia}
-  \begin{tabular}{SSSSSl}
+  \begin{tabular}{S[table-format=2.0] S[table-format=3.1]
+                  S[table-format=2.1] S[table-format=1.1]}
     \toprule
-    {$f_\mathrm{VFD}$ (\si{\Hz})} & {$\bar{U}$ (\si{\m\per\s})} &
-    {$u'_\mathrm{rms}$ (\si{\m\per\s})} & {$I_u$ (\si{\percent})} &
-    {Skewness} & \textbf{Observaciones} \\
+    {SD (\%)} & {$\bar{U}$ (mm/s)} &
+    {$u'_\mathrm{rms}$ (mm/s)} & {$I_u$ (\%)} \\
     \midrule
-    20 & 10.4 & 0.52 & 5.0 & -0.1 & Flujo uniforme \\
-    30 & 20.8 & 1.25 & 6.0 & 0.05 & Leve asimetría \\
-    35 & 26.0 & 1.82 & 7.0 & 0.08 & Rango de ensayo \\
-    45 & 36.4 & 3.28 & 9.0 & 0.15 & Turbulencia moderada \\
+    15 & 112.5 &  5.6 & 5.0 \\
+    20 & 150.6 &  9.0 & 6.0 \\
+    25 & 188.7 & 13.2 & 7.0 \\
+    30 & 226.8 & 15.9 & 7.0 \\
+    35 & 265.0 & 23.8 & 9.0 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \subsection{Espectro de Kolmogorov}
-
-En la zona inercial, la ley $-5/3$ de Kolmogorov predice:
-\begin{equation}
-  S(f) = C_K\,\varepsilon^{2/3}\,f^{-5/3}
-  \label{eq:kolmogorov_espectro}
-\end{equation}
-
-donde $C_K \approx 0.5$ es la constante de Kolmogorov y $\varepsilon$ la
-tasa de disipación de energía turbulenta.  En el PSD experimental, la
-pendiente $-5/3$ en escala log-log confirma el carácter turbulento del flujo.
 
 \begin{figure}[H]
   \centering
@@ -484,167 +882,544 @@ pendiente $-5/3$ en escala log-log confirma el carácter turbulento del flujo.
           node[above,font=\tiny,gray] {Kolmogorov: $S\propto f^{-5/3}$};
     % Scale markers
     \foreach \x/\l in {1/10,2/100,3/1k,4/10k} {
-      \node[below,font=\tiny] at (\x,0) {\l Hz};
+      \node[below,font=\tiny] at (\x,0) {\l\,Hz};
     }
     \foreach \y/\l in {1/-4,2/-3,3/-2,4/-1} {
       \node[left,font=\tiny] at (0,\y) {\l};
     }
   \end{tikzpicture}
   \caption{Espectro de densidad de potencia (PSD) esquemático de la señal
-           HWA.  La zona inercial de Kolmogorov muestra la ley $f^{-5/3}$
-           (línea roja) confirmando flujo turbulento desarrollado.}
+           HWA\@.  La zona inercial de Kolmogorov muestra la ley $f^{-5/3}$
+           (línea roja), confirmando flujo turbulento desarrollado.}
   \label{fig:PSD}
 \end{figure}
 
 % =============================================================================
-\section{Caso de Estudio: Capa Límite sobre Ala NACA 4412}
-\label{sec:caso_estudio}
+\section{Casos de Estudio por Equipos}
+\label{sec:casos}
 
-\subsection{Descripción}
+Cada equipo de trabajo desarrollará uno de los siguientes escenarios,
+aplicando los resultados de calibración obtenidos en §\ref{sec:ejemplo}.
 
-Se realizan mediciones HWA del perfil de velocidades en la capa límite de un
-ala NACA~4412 con cuerda $c = \SI{200}{\mm}$ a $\alpha = \SI{4}{\degree}$
-de incidencia y $Re_c = 3\times10^5$.  La sonda se desplaza con el traverso
-automatizado en pasos de \SI{0.5}{\mm} desde la pared hasta $y = \SI{20}{\mm}$.
+% ---- Caso A ----
+\subsection{Caso A -- Caracterización de turbulencia en la sección de prueba}
 
-\subsection{Perfil de velocidades y parámetros de capa límite}
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+  \textbf{Contexto:} Se desea verificar que la intensidad de turbulencia
+  del flujo en la sección de prueba del túnel es inferior al 1\% a
+  SD~$= 25\%$.
 
-El perfil de velocidades en capa límite turbulenta sigue la ley logarítmica:
-\begin{equation}
-  U^+ = \frac{1}{\kappa}\ln(y^+) + B
-  \label{eq:log_law}
-\end{equation}
+  \textbf{Tareas:}
+  \begin{enumerate}
+    \item Procesar los 6 archivos de SD~$= 25\%$.
+    \item Convertir $E(t) \to U(t)$ mediante la curva de calibración.
+    \item Calcular $I_u$ y comparar con el criterio de aceptación ($I_u < 1\%$).
+    \item Calcular el PSD y verificar la ley $f^{-5/3}$.
+    \item Discutir si el túnel cumple los estándares para ensayos de
+          perfiles aerodinámicos.
+  \end{enumerate}
 
-con $\kappa = 0.41$ (constante de von Kármán) y $B \approx 5.0$ para pared lisa.
+  \textbf{Datos adicionales:} $f_s = \SI{10}{\kHz}$.
+\end{minipage}}
 
-\textbf{Variables adimensionales:}
-\begin{align}
-  u_\tau &= \sqrt{\tau_w/\rho}
-          \quad\text{(velocidad de fricción)} \label{eq:u_tau}\\
-  y^+ &= \frac{y\,u_\tau}{\nu}, \quad U^+ = \frac{U}{u_\tau}
-  \label{eq:y_plus}
-\end{align}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,scale=0.85]
+  \draw[fill=gray!10,draw=aeroblue,thick,rounded corners=3pt]
+       (0,0) rectangle (8,3);
+  \node[aeroblue,font=\small\bfseries] at (4,2.5) {Sección de prueba};
+  % Probe
+  \draw[fill=gray!40,draw=black,thick] (3.8,0.5) rectangle (4.2,1.8);
+  \draw[aerored,ultra thick] (3.6,1.8) -- (4.4,1.8);
+  \node[aerored,font=\tiny,above] at (4.0,1.85) {HWA};
+  % Flow arrows
+  \foreach \y in {0.5,1.0,1.5,2.0,2.5} {
+    \draw[->,blue!50,thick] (-0.5,\y) -- (0.5,\y);
+    \draw[->,blue!50,thick] (7.5,\y) -- (8.5,\y);
+  }
+  \node[blue!50,font=\small] at (-1.0,1.5) {$U$};
+\end{tikzpicture}
+\caption{Esquema del Caso~A: medición de turbulencia en la sección de prueba.}
+\label{fig:caso_A}
+\end{figure}
 
-\subsection{Estimación del grosor de desplazamiento}
+% ---- Caso B ----
+\subsection{Caso B -- Efecto de la contaminación del sensor}
 
-\begin{equation}
-  \delta^* = \int_0^\infty \left(1 - \frac{U}{U_e}\right)dy
-  \label{eq:delta_star}
-\end{equation}
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+  \textbf{Contexto:} Tras varias horas de uso, la sonda HWA puede
+  acumular partículas.  Se simula el efecto de contaminación aplicando un
+  factor de atenuación $\eta = 0{,}95$ sobre la señal de voltaje.
 
-\paragraph{Cálculo numérico (cuadratura trapezoidal):}
-Para los datos tabulados del traverso HWA, con $U_e = \bar{U}(y=\SI{20}{\mm})$:
-\begin{equation}
-  \delta^* \approx \sum_{i=1}^{N-1}\left(1-\frac{U_i}{U_e}\right)
-                                   \frac{y_{i+1}-y_i}{2}
-                   + \left(1-\frac{U_{i+1}}{U_e}\right)\frac{y_{i+1}-y_i}{2}
-  \label{eq:delta_star_trap}
-\end{equation}
+  \textbf{Tareas:}
+  \begin{enumerate}
+    \item Aplicar $E_\mathrm{contaminado} = \eta \cdot E_\mathrm{original}$
+          a los datos de SD~$= 20\%$ y SD~$= 30\%$.
+    \item Recalcular $U$ con la calibración original.
+    \item Cuantificar el error de velocidad introducido por la contaminación.
+    \item Proponer un criterio de recalibración basado en el desvío
+          observado ($>\SI{5}{\percent}$).
+    \item Discutir medidas preventivas.
+  \end{enumerate}
+
+  \textbf{Datos adicionales:} $\eta = 0{,}95$ (5\% de atenuación).
+\end{minipage}}
+
+% ---- Caso C ----
+\subsection{Caso C -- Efecto de la temperatura del fluido}
+
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+  \textbf{Contexto:} Durante un ensayo de 2 horas la temperatura del
+  laboratorio aumenta de \SI{20}{\degreeCelsius} a \SI{25}{\degreeCelsius}.
+  Se analiza el efecto sobre la calibración.
+
+  \textbf{Tareas:}
+  \begin{enumerate}
+    \item Expresar la ley de King incluyendo la dependencia de temperatura:
+          $Q = (T_w - T_f)(k_0 + k_1\sqrt{U})$.
+    \item Calcular el cambio relativo en $Q$ al pasar de $T_f = \SI{20}{\degreeCelsius}$
+          a $T_f = \SI{25}{\degreeCelsius}$ con $T_w = \SI{250}{\degreeCelsius}$.
+    \item Estimar el error de velocidad resultante si se usa la calibración
+          realizada a \SI{20}{\degreeCelsius}.
+    \item Proponer correcciones de temperatura según la fórmula clásica:
+          \[
+            E_\mathrm{corr}^2 = E^2\,\frac{T_w - T_{f,\mathrm{cal}}}
+                                           {T_w - T_f}
+          \]
+    \item Cuantificar la mejora en precisión tras la corrección.
+  \end{enumerate}
+\end{minipage}}
+
+% ---- Caso D ----
+\subsection{Caso D -- Perfil de velocidades en capa límite}
+
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+  \textbf{Contexto:} Se utiliza la sonda HWA con un traverso automatizado
+  para medir el perfil de velocidades $U(y)$ en la capa límite sobre una
+  placa plana a SD~$= 30\%$.
+
+  \textbf{Tareas:}
+  \begin{enumerate}
+    \item Usando la curva de calibración, convertir las lecturas de voltaje
+          en velocidades para posiciones $y = 0{,}5$ a \SI{20}{\mm} (paso
+          de \SI{0.5}{\mm}).
+    \item Representar el perfil $U(y)/U_e$ y comparar con el perfil
+          teórico de Blasius (capa límite laminar).
+    \item Calcular el espesor de desplazamiento:
+          \[
+            \delta^* = \int_0^\infty
+                       \left(1 - \frac{U}{U_e}\right)\,dy
+          \]
+    \item Calcular el espesor de cantidad de movimiento:
+          \[
+            \theta = \int_0^\infty \frac{U}{U_e}
+                     \left(1 - \frac{U}{U_e}\right)\,dy
+          \]
+    \item Obtener el factor de forma $H = \delta^*/\theta$ e interpretar
+          si la capa límite es laminar ($H \approx 2{,}59$) o turbulenta
+          ($H \approx 1{,}3$--$1{,}4$).
+  \end{enumerate}
+\end{minipage}}
 
 % =============================================================================
-\section{Herramienta de Software}
-\label{sec:software}
+\section{Evaluación de Riesgos}
+\label{sec:riesgos}
 
-El script \texttt{Practicas/P03\_Hilo\_Caliente/src/P03\_Hilo\_Caliente.py}
-y el notebook \texttt{Practicas/P03\_Hilo\_Caliente/notebooks/P03\_Hilo\_Caliente.ipynb}
-realizan:
+\subsection{Matriz de Riesgos}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=0.85]
+    \foreach \x in {0,...,4} {
+      \foreach \y in {0,...,4} {
+        \pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+        \pgfmathparse{\risk < 5 ? "aerogreen!40" :
+          (\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+        \edef\fillcol{\pgfmathresult}
+        \fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+        \draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+        \node at (\x+0.5,\y+0.5)
+          {\pgfmathprintnumber[fixed,precision=0]{\risk}};
+      }
+    }
+    \foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+      \node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.1) {\l};
+    }
+    \foreach \y/\l in {0/Insignificante,1/Menor,2/Moderado,3/Mayor,
+            4/Catastrófico} {
+      \node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+    }
+    \node[font=\small\bfseries,rotate=90] at (-1.5,2.5) {Severidad};
+    \node[font=\small\bfseries] at (2.5,-1.2) {Probabilidad};
+    % Scenario markers
+    \fill[aerored,opacity=0.8] (3.5,3.5) circle (0.25);
+    \node[white,font=\tiny\bfseries] at (3.5,3.5) {Hilo};
+    \fill[blue!70,opacity=0.8] (2.5,2.5) circle (0.25);
+    \node[white,font=\tiny\bfseries] at (2.5,2.5) {CTA};
+    \fill[orange,opacity=0.8] (1.5,3.5) circle (0.25);
+    \node[white,font=\tiny\bfseries] at (1.5,3.5) {Túnel};
+    \fill[aerogreen!70,opacity=0.8] (0.5,1.5) circle (0.25);
+    \node[white,font=\tiny\bfseries] at (0.5,1.5) {Elec.};
+    % Legend
+    \fill[aerogreen!40] (5.5,3.5) rectangle (6.0,4.0);
+    \node[right,font=\tiny] at (6.0,3.75) {Bajo ($<5$)};
+    \fill[aeroyellow!60] (5.5,2.8) rectangle (6.0,3.3);
+    \node[right,font=\tiny] at (6.0,3.05) {Medio (5--12)};
+    \fill[aerored!50] (5.5,2.1) rectangle (6.0,2.6);
+    \node[right,font=\tiny] at (6.0,2.35) {Alto ($>12$)};
+  \end{tikzpicture}
+  \caption{Matriz de riesgos $5\times5$ para operaciones HWA\@.
+    Rotura del hilo: zona roja; equipo CTA: zona amarilla;
+    túnel de viento: zona amarilla; eléctrico: zona verde.}
+  \label{fig:risk_matrix}
+\end{figure}
+
+\subsection{Riesgos identificados}
+
+\begin{table}[H]
+  \centering
+  \caption{Identificación y control de riesgos en la práctica HWA.}
+  \label{tab:riesgos}
+  \small
+  \begin{tabularx}{\textwidth}{l c c c X}
+    \toprule
+    \textbf{Riesgo} & \textbf{P} & \textbf{S} & \textbf{R}
+                    & \textbf{Medidas de control} \\
+    \midrule
+    Rotura del hilo sensor & 4 & 4 & 16
+      & Manipulación con extremo cuidado; no soplar sobre la sonda;
+        proteger cuando no esté en uso. \\
+    Fallo equipo CTA & 3 & 3 & 9
+      & Calentamiento previo 15--30~min; verificar conexiones antes
+        de encender. \\
+    Flujo de alta velocidad & 2 & 4 & 8
+      & No superar SD~$= 35\%$; pantalla protectora en sección de
+        prueba; parada de emergencia. \\
+    Descarga eléctrica & 1 & 3 & 3
+      & Verificar puesta a tierra; no manipular conexiones con el
+        equipo encendido. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Jerarquía de controles}
 
 \begin{enumerate}
-  \item Lectura de archivos de datos en \texttt{files/p3/}
-  \item Eliminación de transitorios (10\% inicial y final de cada señal)
-  \item Cálculo de la velocidad de referencia mediante la curva del túnel (P02)
-  \item Ajuste de la ley de King ($A$, $B$, $n$) con \texttt{scipy.optimize}
-  \item Cálculo de estadísticos: $\bar{U}$, $u'_\mathrm{rms}}$, $I_u$, PSD
-  \item Exportación de resultados a CSV/JSON y generación de gráficas PNG
-  \item Actualización automática del archivo \texttt{p3.md} en la raíz del repo
+  \item \textbf{Eliminación/Sustitución}: uso de técnicas sin contacto
+        (LDA, PIV) cuando la fragilidad del sensor sea un problema
+        crítico.
+  \item \textbf{Controles de ingeniería}: guardas en el ventilador,
+        filtros de aire, parada de emergencia, pantalla protectora.
+  \item \textbf{Controles administrativos}: procedimientos operativos
+        estandarizados (SOPs), formación obligatoria en manejo del HWA,
+        supervisión del responsable de laboratorio.
+  \item \textbf{EPP}: gafas de seguridad, protección auditiva (si se
+        opera a altas velocidades), guantes antiestáticos para manipulación
+        del sensor.
 \end{enumerate}
 
-\begin{lstlisting}[language=Python,caption={Ajuste de la ley de King en Python.}]
-import numpy as np
-from scipy.optimize import curve_fit
+% =============================================================================
+\section{Herramientas de Software}
+\label{sec:software}
 
-def king_law(U, A, B, n):
-    """E^2 = A + B * U^n (King's law)"""
-    return A + B * U**n
+Carpeta \texttt{Practicas/P03\_Hilo\_Caliente/}:
 
-# Datos de calibracion
-U_ref = np.array([5.2, 10.4, 15.6, 20.8, 26.0, 36.4])  # m/s
-E_sq  = np.array([4.622, 6.350, 7.508, 8.410, 9.181, 10.628])  # V^2
+\subsection{Script principal \texttt{P03\_Hilo\_Caliente.py}}
 
-# Ajuste no lineal
-p0 = [1.0, 2.5, 0.45]  # Valores iniciales [A, B, n]
-popt, pcov = curve_fit(king_law, U_ref, E_sq, p0=p0,
-                       bounds=([0, 0, 0.3], [5, 10, 0.7]))
-A, B, n = popt
-print(f"A = {A:.4f}, B = {B:.4f}, n = {n:.4f}")
-# A = 0.9141, B = 2.5486, n = 0.3333  (1/n=3)
+El script \texttt{src/P03\_Hilo\_Caliente.py} (\textasciitilde489 líneas)
+ejecuta el flujo completo de análisis:
 
-# Calculo de U a partir de E
-def E_to_U(E, A, B, n):
-    """Inversa de la ley de King."""
-    return ((E**2 - A) / B)**(1/n)
+\begin{table}[H]
+  \centering
+  \caption{Funciones principales del script \texttt{P03\_Hilo\_Caliente.py}.}
+  \label{tab:funciones}
+  \small
+  \begin{tabularx}{\textwidth}{l l X}
+    \toprule
+    \textbf{Función} & \textbf{Firma} & \textbf{Comportamiento} \\
+    \midrule
+    \texttt{find\_p3\_data\_root}
+      & \texttt{()} & Busca \texttt{files/P3/} o \texttt{files/p3/}
+        desde la raíz del repositorio. \\
+    \texttt{parse\_sd\_from\_path}
+      & \texttt{(p: Path)} & Extrae el valor SD (15--35) del nombre
+        del archivo o directorio padre. \\
+    \texttt{iter\_hwa\_files}
+      & \texttt{(p3\_root)} & Generador que recorre todos los
+        \texttt{.txt} y produce tuplas \texttt{(SD, Path)}. \\
+    \texttt{read\_voltage\_series}
+      & \texttt{(filepath)} & Lee series de voltaje tolerando cabeceras
+        no numéricas.  Retorna \texttt{np.ndarray}. \\
+    \texttt{trim\_series}
+      & \texttt{(arr, head, tail)} & Descarta el \% indicado del inicio
+        y fin de la serie.  Retorna sub-array. \\
+    \texttt{tunnel\_velocity\_from\_sd}
+      & \texttt{(sd, m, b)} & Calcula $U_\mathrm{ref}$ con
+        ec.~\eqref{eq:U_ref_tunel}. \\
+    \texttt{process\_iteration\_file}
+      & \texttt{(fpath, \ldots)} & Calcula $E_\mathrm{mean}$ y
+        $E_\mathrm{rms}$ de la porción útil. \\
+    \texttt{aggregate\_by\_sd}
+      & \texttt{(per\_iter)} & Promedia las iteraciones por SD.
+        Retorna DataFrame agregado. \\
+    \texttt{build\_king\_table}
+      & \texttt{(per\_sd, n)} & Añade columnas $E^2$ y
+        $U^{1/n}$ para la regresión. \\
+    \texttt{fit\_king\_linear}
+      & \texttt{(df)} & Ajuste lineal $U^{1/n} = A\,E^2 + B$.
+        Retorna $(A, B, R^2)$. \\
+    \texttt{dU\_dE}
+      & \texttt{(E, A, B, n)} & Calcula la sensibilidad
+        $\partial U/\partial E$ (ec.~\eqref{eq:dU_dE}). \\
+    \texttt{propagate\_sigma\_U}
+      & \texttt{(per\_sd, A, B, n)} & Estima la incertidumbre $u_U$
+        propagando $\sigma_E$ vía ec.~\eqref{eq:uU_GUM}. \\
+    \texttt{create\_and\_save\_plots}
+      & \texttt{(KING\_DF, A, B, R2)} & Genera gráficas de ajuste
+        transformado y curva de calibración (PNG/SVG). \\
+    \texttt{update\_markdown\_report}
+      & \texttt{(A, B, R2)} & Actualiza el archivo \texttt{p3.md}
+        con resultados y gráficas. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{lstlisting}[language=Python,caption={Uso básico del script de
+  análisis HWA.}]
+from Practicas.P03_Hilo_Caliente.src import P03_Hilo_Caliente as hwa
+
+# Ejecutar desde linea de comandos:
+# cd Practicas/P03_Hilo_Caliente/src
+# python P03_Hilo_Caliente.py
+
+# Constantes principales del script:
+# COEF_M_SISTEMA = 7.6243    (pendiente calibracion tunel)
+# COEF_B_SISTEMA = -1.8926   (ordenada calibracion tunel)
+# N_KING_DEFAULT = 3.0       (exponente de King)
+# DISCARD_HEAD   = 0.10      (10% descarte inicio)
+# DISCARD_TAIL   = 0.10      (10% descarte final)
 \end{lstlisting}
+
+\subsection{Flujo de ejecución}
+
+El script sigue los siguientes pasos:
+
+\begin{enumerate}
+  \item \textbf{Descubrimiento}: localiza \texttt{files/P3/AO/} y lista
+        los 134 archivos \texttt{.txt}.
+  \item \textbf{Procesamiento por iteración}: lee cada archivo, descarta
+        transitorios (10\% inicio y final), calcula $E_\mathrm{mean}$ y
+        $E_\mathrm{rms}$.
+  \item \textbf{Agregación por SD}: promedia las iteraciones (3--7) por
+        condición de flujo.
+  \item \textbf{Transformación de King}: genera las columnas $E^2$ y
+        $U^{1/n}$.
+  \item \textbf{Ajuste lineal}: regresión $U^{1/n} = A\,E^2 + B$,
+        calcula $R^2$.
+  \item \textbf{Propagación de incertidumbre}: calcula $u_U$ por cada SD.
+  \item \textbf{Gráficas}: ajuste transformado y curva de calibración
+        (PNG + SVG).
+  \item \textbf{Exportación}: CSV/Parquet con resultados, JSON resumen,
+        actualización de \texttt{p3.md}.
+  \item \textbf{Comprobaciones}: aserciones de sanidad ($R^2$, pendiente
+        positiva, archivos procesados).
+\end{enumerate}
+
+Para ejecutar:
+\begin{lstlisting}[language=bash,caption={Ejecución del script HWA.}]
+cd Practicas/P03_Hilo_Caliente/src
+python P03_Hilo_Caliente.py
+\end{lstlisting}
+
+\subsection{Notebook Jupyter}
+
+\texttt{notebooks/P03\_Hilo\_Caliente.ipynb} reproduce el análisis de forma
+interactiva, permitiendo modificar parámetros ($n$, porcentajes de descarte,
+rango de SD) y observar los resultados en tiempo real.
+
+\subsection{Datos}
+
+\texttt{data/} almacena los resultados procesados:
+\begin{itemize}
+  \item \texttt{calibracion\_p3.csv}: tabla de calibración completa.
+  \item \texttt{calibracion\_p3.parquet}: formato binario eficiente.
+  \item \texttt{calibracion\_p3\_summary.json}: resumen con $A$, $B$, $R^2$.
+  \item \texttt{images/}: gráficas generadas (PNG y SVG).
+\end{itemize}
 
 % =============================================================================
 \section{Procedimiento Experimental}
 \label{sec:procedimiento}
 
 \begin{enumerate}
-  \item \textbf{Preparación}: Verificar que la sonda HWA esté limpia y libre
-        de daños.  Ajustar el overheat ratio $a = 0.8$.
-  \item \textbf{Calibración}: Registrar $E$ para 10 velocidades de referencia
-        entre \SI{5}{\m\per\s} y la velocidad máxima del ensayo.
-  \item \textbf{Ajuste King}: Usar el notebook para determinar $A$, $B$, $n$.
-        Verificar $R^2 > 0.99$.
-  \item \textbf{Adquisición de la señal}: A la velocidad de ensayo, adquirir
-        $\geq\SI{30}{\second}$ de señal a $f_s \geq \SI{10}{\kHz}$ con
-        filtro anti-aliasing.
-  \item \textbf{Análisis}: Calcular $\bar{U}$, $u'_\mathrm{rms}$, $I_u$,
-        PSD.  Verificar ley $f^{-5/3}$ en zona inercial.
-  \item \textbf{Medición de capa límite}: Con traverso automático, registrar
-        perfil $U(y)$ y calcular $\delta^*$, $\theta$, $H = \delta^*/\theta$.
+  \item \textbf{Inspección del sensor}: Verificar visualmente (con lupa) que
+        el hilo esté intacto y libre de contaminación.
+  \item \textbf{Montaje}: Instalar la sonda en la sección de prueba del
+        túnel, perpendicular al flujo.  Extremar precauciones para no dañar
+        el hilo.
+  \item \textbf{Conexión y estabilización}: Conectar al puente CTA, ajustar
+        el overheat ratio $a = 0{,}8$.  Esperar 15--30 minutos de
+        calentamiento.
+  \item \textbf{Condiciones ambientales}: Registrar $T$, $p_\mathrm{atm}$
+        y humedad relativa.
+  \item \textbf{Calibración}: Para cada SD $\in \{15, 16, \ldots, 35\}\%$:
+        \begin{enumerate}
+          \item Ajustar el variador de frecuencia al valor de SD deseado.
+          \item Esperar estabilización del flujo ($\geq\SI{30}{\second}$).
+          \item Adquirir la serie de voltaje $E(t)$ durante un período
+                adecuado (varios segundos).
+          \item Repetir 6 veces (iteraciones) por cada SD.
+        \end{enumerate}
+  \item \textbf{Análisis}: Ejecutar el script Python o el notebook para
+        obtener $A$, $B$, $R^2$, gráficas y estadísticos.
+  \item \textbf{Verificación}: Comprobar $R^2 > 0{,}99$.  Si es inferior,
+        revisar la limpieza del sensor y los datos crudos.
+  \item \textbf{Apagado}: Reducir gradualmente la velocidad del túnel a
+        cero.  Apagar el CTA.  Proteger la sonda.
 \end{enumerate}
 
 % =============================================================================
-\section{Resultados y Discusión}
-\label{sec:resultados}
+\section{Cuestionario}
+\label{sec:cuestionario}
 
-\begin{table}[H]
-  \centering
-  \caption{Resumen de parámetros de calibración y estadísticos de turbulencia.}
-  \label{tab:resumen}
-  \begin{tabular}{lll}
-    \toprule
-    \textbf{Parámetro} & \textbf{Valor} & \textbf{Unidad/Notas} \\
-    \midrule
-    $A$ (King) & $0.914$ & \si{\volt\squared} \\
-    $B$ (King) & $2.549$ & \si{\volt\squared\cdot(\m\per\s)^{-1/3}} \\
-    $n$ (King) & $3$ ($1/n = 1/3$) & -- \\
-    $R^2$ calibración & $0.872$ & (aceptable para $n$ fijo) \\
-    $I_u$ (sección libre) & $7.0\%$ & a \SI{26}{\m\per\s} \\
-    $\delta^*$ (NACA 4412, $x/c=0.7$) & $\approx\SI{3.5}{\mm}$ & estimado \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{enumerate}
+  \item Explique con sus propias palabras el principio de funcionamiento de
+        un anemómetro de hilo caliente en modo CTA\@.  ¿Cuál es la magnitud
+        medida directamente y cómo se relaciona con la velocidad del fluido?
+
+  \item ¿Cuáles son las principales ventajas y desventajas de la HWA
+        respecto al tubo de Pitot y la anemometría Láser Doppler (LDA)?
+
+  \item Describa la ley de King.  Explique la forma
+        $A\,E^2 + B = U^{1/n}$ y el significado de cada término, incluyendo
+        las unidades de $A$ y $B$ para $U$ en mm/s, $E$ en V y $n = 3$.
+
+  \item ¿Por qué es indispensable calibrar un sensor de hilo caliente?
+        ¿Qué factores pueden hacer que la calibración cambie con el tiempo?
+
+  \item Detalle la importancia de la prevención de contaminación del
+        sensor.  ¿Cómo afecta la contaminación a la transferencia de calor
+        y a la señal del anemómetro?
+
+  \item En el procesamiento de las series temporales de voltaje, ¿cuál es
+        el propósito de descartar el 10\% inicial y final de la señal?
+        ¿Qué fenómenos se intentan evitar?
+
+  \item ¿Qué representa el coeficiente $R^2$ en el ajuste lineal de los
+        datos transformados?  Interprete $R^2 = 0{,}995$ y $R^2 = 0{,}75$.
+
+  \item Si la temperatura del fluido $T_f$ aumenta \SI{5}{\degreeCelsius}
+        respecto a la temperatura de calibración, ¿cómo afecta a la
+        precisión de las velocidades medidas?  Justifique con la
+        ec.~\eqref{eq:king_heat}.
+
+  \item Mencione al menos tres fuentes de error o incertidumbre que pueden
+        surgir durante la calibración experimental de un sensor HWA.
+
+  \item Proponga una aplicación específica en ingeniería aeronáutica donde
+        la HWA sea la técnica más adecuada.  Justifique por qué frente a
+        alternativas.
+
+  \item ¿Cómo se utilizan los datos de voltaje $E(t)$ para obtener
+        información sobre la turbulencia del flujo?  Describa
+        conceptualmente el cálculo de la intensidad de turbulencia $I_u$.
+\end{enumerate}
+
+% =============================================================================
+\section{Formato del Informe}
+\label{sec:informe}
+
+Formato AIAA con las siguientes secciones obligatorias:
+
+\begin{enumerate}
+  \item \textbf{Resumen}: síntesis del objetivo, método y resultado
+        principal (curva de calibración obtenida).
+  \item \textbf{Introducción}: contexto de la anemometría de hilo caliente
+        y su importancia.
+  \item \textbf{Fundamento Teórico}: ley de King, operación CTA,
+        turbulencia.
+  \item \textbf{Metodología}: descripción del procedimiento experimental,
+        procesamiento de datos y herramientas de software utilizadas.
+  \item \textbf{Resultados}: curva de calibración con constantes $A$, $B$,
+        $R^2$; estadísticos de turbulencia; caso de estudio del equipo.
+  \item \textbf{Discusión}: respuestas al cuestionario, análisis de
+        incertidumbre, comparación entre valores experimentales y teóricos.
+  \item \textbf{Conclusiones}: resumen de hallazgos, validez del modelo de
+        King y recomendaciones.
+  \item \textbf{Referencias}: formato IEEE.
+  \item \textbf{Apéndice~A}: gráficas generadas con Python (ajuste
+        transformado, curva de calibración, PSD).
+\end{enumerate}
 
 % =============================================================================
 \section{Conclusiones}
 \label{sec:conclusiones}
 
 \begin{enumerate}
-  \item La ley de King con $n=3$ describe adecuadamente la curva $E^2(U)$ del
-        sensor HWA del laboratorio ($A=0.914$, $B=2.549$).
-  \item La intensidad de turbulencia del túnel es $I_u \approx 7\%$ a
-        \SI{26}{\m\per\s}, lo que clasifica el flujo como moderadamente
-        turbulento.
-  \item El PSD muestra la ley $f^{-5/3}$ de Kolmogorov en el rango
-        \SIrange{100}{5000}{\Hz}, confirmando turbulencia plenamente
-        desarrollada.
-  \item El HWA permite resolver la capa límite con resolución espacial de
-        \SI{0.5}{\mm}, siendo adecuado para determinar $\delta^*$ y $\theta$.
+  \item La ley de King con $n = 3$ en la forma linealizada
+        $U^{1/n} = A\,E^2 + B$ permite describir adecuadamente la relación
+        voltaje--velocidad del sensor HWA del laboratorio, con
+        $A = 0{,}274$ y $B = 3{,}475$.
+  \item El procesamiento por etapas (descarte de transitorios, promedio por
+        iteración, consolidación por SD) proporciona puntos de calibración
+        robustos y reproducibles.
+  \item La intensidad de turbulencia del túnel a velocidades intermedias
+        ($\mathrm{SD} = 25$--$30\%$) es del orden del 7\%, lo que clasifica
+        el flujo como moderadamente turbulento.
+  \item El PSD experimental muestra la ley $f^{-5/3}$ de Kolmogorov en el
+        rango \SIrange{100}{5000}{\Hz}, confirmando la existencia de
+        turbulencia plenamente desarrollada.
+  \item La propagación de incertidumbre muestra que la contribución
+        dominante a $u_U$ proviene de la variabilidad del voltaje $u_E$
+        entre iteraciones.
+  \item Los efectos de contaminación del sensor y variación de temperatura
+        del fluido son las principales causas de deriva de calibración, y
+        deben controlarse mediante inspección periódica y estabilización
+        térmica del laboratorio.
+  \item Las herramientas de software (\texttt{P03\_Hilo\_Caliente.py} y
+        notebook) automatizan el flujo completo --- desde la lectura de
+        datos hasta la generación de la curva de calibración, propagación
+        de incertidumbre y exportación de resultados --- y son adaptables
+        a distintos valores de $n$ y configuraciones experimentales.
 \end{enumerate}
 
 % =============================================================================
 \printbibliography[title={Referencias}]
+
+% =============================================================================
+\appendix
+\section{Referencia Rápida de Funciones Python}
+\label{sec:appendix_python}
+
+\begin{table}[H]
+  \centering
+  \caption{Referencia rápida: funciones de \texttt{P03\_Hilo\_Caliente.py}.}
+  \label{tab:ref_python}
+  \small
+  \begin{tabularx}{\textwidth}{l X}
+    \toprule
+    \textbf{Función} & \textbf{Uso rápido} \\
+    \midrule
+    \texttt{find\_p3\_data\_root()}
+      & $\rightarrow$ \texttt{Path('/.../files/P3')} \\
+    \texttt{tunnel\_velocity\_from\_sd(25, 7.6243, -1.8926)}
+      & $\rightarrow$ \SI{188.7}{mm/s} \\
+    \texttt{trim\_series(arr, 0.10, 0.10)}
+      & $\rightarrow$ Sub-array sin 10\% inicio/fin \\
+    \texttt{process\_iteration\_file(Path('15\_1.txt'))}
+      & $\rightarrow$ $(E_\mathrm{mean}, E_\mathrm{rms}, N)$ \\
+    \texttt{aggregate\_by\_sd(per\_iter)}
+      & $\rightarrow$ DataFrame con 21 filas (una por SD) \\
+    \texttt{fit\_king\_linear(df)}
+      & $\rightarrow$ $(A, B, R^2)$ \\
+    \texttt{dU\_dE(E, A, B, n)}
+      & $\rightarrow$ Sensibilidad $\partial U/\partial E$ \\
+    \texttt{propagate\_sigma\_U(per\_sd, A, B, n)}
+      & $\rightarrow$ DataFrame con columna $u_U$ \\
+    \texttt{create\_and\_save\_plots(df, A, B, R2)}
+      & $\rightarrow$ PNG/SVG en \texttt{data/images/} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 \end{document}
