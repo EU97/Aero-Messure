@@ -1,22 +1,49 @@
 % =============================================================================
 % Manual P02 – Calibración del Túnel de Viento
 % Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode manual_P02.tex
 % =============================================================================
 \documentclass[12pt,a4paper]{article}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% ---- Encoding & Language ----
+\usepackage{fontspec}
 \usepackage[spanish]{babel}
-\usepackage[top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+% ---- Page Layout ----
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\setlength{\headheight}{14.5pt}
+
+% ---- Math & Physics ----
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
 \usepackage{siunitx}
 \sisetup{output-decimal-marker={,}, group-separator={.}}
-\usepackage{graphicx,xcolor,float,caption,subcaption}
+
+% ---- Graphics & Color ----
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ---- TikZ ----
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
-                decorations.markings,patterns,fit,backgrounds,decorations.pathmorphing}
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,decorations.pathmorphing,
+                decorations.markings,patterns,fit,backgrounds}
 \usepackage{circuitikz}
-\usepackage{booktabs,multirow,array}
+
+% ---- Tables ----
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{longtable}
+
+% ---- Code Listings ----
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\small,
@@ -24,13 +51,22 @@
   commentstyle=\color{green!50!black},
   stringstyle=\color{red!60!black},
   backgroundcolor=\color{gray!10},
-  frame=single, breaklines=true,
-  numbers=left, numberstyle=\tiny\color{gray}
+  frame=single,
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray}
 }
+
+% ---- Hyperlinks ----
 \usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,
             urlcolor=blue!50!black]{hyperref}
+
+% ---- Bibliography ----
+\usepackage{csquotes}
 \usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
 \addbibresource{references_P02.bib}
+
+% ---- Headers & Footers ----
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
@@ -38,52 +74,47 @@
 \fancyhead[R]{\small P02: Calibración del Túnel de Viento}
 \fancyfoot[C]{\thepage}
 
+% ---- Custom Colors ----
 \definecolor{aeroblue}{RGB}{0,51,102}
 \definecolor{aerored}{RGB}{153,0,0}
 \definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aeroyellow}{RGB}{255,204,0}
 
 % =============================================================================
 \begin{document}
 
 \begin{titlepage}
-  \centering
-  \vspace*{1cm}
-  {\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
-  {\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA EN INGENIERÍA AERONÁUTICA}\\[0.3cm]
-  {\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
-  {\huge\bfseries P02 -- Calibración del\\[0.3cm]Túnel de Viento}\\[1cm]
-  {\large Manual de Laboratorio}\\[0.5cm]
-  {\large\itshape Ingeniería Aeronáutica}\\[2cm]
-  \begin{tikzpicture}[scale=0.9,>=Stealth]
-    % Wind tunnel schematic
-    \draw[fill=gray!15,draw=aeroblue,very thick]
-      (0,0.8) -- (1.5,0.8) -- (1.5,0.2) -- (0,0.2) -- cycle; % settling
-    \draw[fill=gray!20,draw=aeroblue,very thick]
-      (1.5,0.8) -- (3.5,0.55) -- (3.5,0.45) -- (1.5,0.2) -- cycle; % contraction
-    \draw[fill=gray!10,draw=aeroblue,very thick]
-      (3.5,0.55) -- (6.5,0.55) -- (6.5,0.45) -- (3.5,0.45) -- cycle; % test section
-    \draw[fill=gray!20,draw=aeroblue,very thick]
-      (6.5,0.55) -- (8.5,0.8) -- (8.5,0.2) -- (6.5,0.45) -- cycle; % diffuser
-    % Flow arrows
-    \foreach \y in {0.3,0.4,0.5,0.6,0.7} {
-      \draw[->,blue!60,thick] (3.6,\y) -- (4.4,\y);
-    }
-    % Pitot tube
-    \draw[fill=gray!60,draw=black,very thick] (5.0,0.8) -- (5.0,0.57);
-    \draw[fill=aerored!80,draw=aerored,thick] (5.0,0.57) circle (0.04);
-    \node[above,font=\small] at (5.0,0.82) {Pitot};
-    % Labels
-    \node[below,font=\small,aeroblue] at (0.75,0.1) {Cámara};
-    \node[below,font=\small,aeroblue] at (2.5,0.0) {Contracción};
-    \node[below,font=\small,aeroblue] at (5.0,0.35) {Sección de prueba};
-    \node[below,font=\small,aeroblue] at (7.5,0.1) {Difusor};
-    \draw[<->,gray] (3.5,-0.1) -- (6.5,-0.1) node[midway,below,font=\tiny] {$L_t$};
-  \end{tikzpicture}\\[1.5cm]
-  {\large\textbf{Departamento de Ingeniería Aeroespacial}}\\[0.2cm]
-  {\normalsize Laboratorio de Técnicas de Medida}\\[0.5cm]
-  {\normalsize \today}
-  \vfill
-  {\color{aeroblue}\rule{\linewidth}{2pt}}
+	\centering
+	\vspace*{1cm}
+	{\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
+	{\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA}\\[0.3cm]
+	{\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
+	{\huge\bfseries P02 -- Calibración del\\[0.3cm]Túnel de Viento}\\[1cm]
+	{\large Manual de Laboratorio}\\[0.5cm]
+	{\large\itshape Ingeniería Aeronáutica}\\[2cm]
+	% Wind tunnel schematic
+	\begin{tikzpicture}[scale=0.9,>=Stealth]
+		\draw[fill=gray!15,draw=aeroblue,very thick]
+		(0,0.8) -- (1.5,0.8) -- (1.5,0.2) -- (0,0.2) -- cycle;
+		\draw[fill=gray!20,draw=aeroblue,very thick]
+		(1.5,0.8) -- (3.5,0.55) -- (3.5,0.45) -- (1.5,0.2) -- cycle;
+		\draw[fill=gray!10,draw=aeroblue,very thick]
+		(3.5,0.55) -- (6.5,0.55) -- (6.5,0.45) -- (3.5,0.45) -- cycle;
+		\draw[fill=gray!20,draw=aeroblue,very thick]
+		(6.5,0.55) -- (8.5,0.8) -- (8.5,0.2) -- (6.5,0.45) -- cycle;
+		\foreach \y in {0.3,0.4,0.5,0.6,0.7} {
+				\draw[->,blue!60,thick] (3.6,\y) -- (4.4,\y);
+			}
+		\draw[fill=gray!60,draw=black,very thick] (5.0,0.8) -- (5.0,0.57);
+		\draw[fill=aerored!80,draw=aerored,thick] (5.0,0.57) circle (0.04);
+		\node[above,font=\small] at (5.0,0.82) {Pitot};
+		\node[below,font=\small,aeroblue] at (0.75,0.1) {Cámara};
+		\node[below,font=\small,aeroblue] at (2.5,0.0) {Contracción};
+		\node[below,font=\small,aeroblue] at (5.0,0.35) {Sección de prueba};
+		\node[below,font=\small,aeroblue] at (7.5,0.1) {Difusor};
+		\draw[<->,gray] (3.5,-0.1) -- (6.5,-0.1) node[midway,below,font=\tiny] {$L_t$};
+	\end{tikzpicture}\\[2.5cm]
+	{\color{aeroblue}\rule{\linewidth}{1pt}}
 \end{titlepage}
 
 \tableofcontents
@@ -97,176 +128,216 @@ El túnel de viento es el instrumento central de la experimentación aerodinámi
 Antes de realizar cualquier ensayo cuantitativo --- ya sea sobre perfiles alares,
 cuerpos romos, superficies de control o geometrías de motor --- es imprescindible
 conocer con precisión la velocidad del flujo en la sección de prueba en función
-de los parámetros de control del túnel (frecuencia del ventilador, apertura de
-compuertas, etc.) \cite{barlow1999}.
+de los parámetros de control del túnel~\cite{barlow1999}.
 
-La \textbf{calibración} establece la curva $V = f(\text{RPM})$ o
-$V = f(\Delta p_\mathrm{manómetro})$ y cuantifica la uniformidad del perfil de
-velocidades en la sección de prueba.  Una calibración rigurosa es crítica para:
+La \textbf{calibración} establece la curva $V = f(f_\mathrm{VFD})$ que
+relaciona la velocidad del aire en la sección de prueba con la frecuencia del
+variador de frecuencia (VFD) del motor, y cuantifica la uniformidad del perfil
+de velocidades.  Una calibración rigurosa permite:
 \begin{itemize}
-  \item Calcular números adimensionales (Reynolds $Re$, Mach $Ma$) con la
-        incertidumbre requerida.
-  \item Garantizar reproducibilidad entre sesiones de ensayo.
-  \item Aplicar correcciones por solidez de maquetas.
+	\item Calcular números adimensionales (Reynolds $Re$, Mach $Ma$) con la
+	      incertidumbre requerida.
+	\item Garantizar reproducibilidad entre sesiones de ensayo.
+	\item Aplicar correcciones por solidez de maquetas y por efectos de capa
+	      límite en las paredes del túnel.
 \end{itemize}
+
+Los datos experimentales de esta práctica fueron adquiridos en el
+\textbf{Laboratorio de Aerodinámica del CIIIA} (Centro de Investigación e
+Innovación en Ingeniería Aeronáutica) mediante un sistema de Anemometría Láser
+Doppler (LDA), proporcionando mediciones de alta precisión de velocidad
+instantánea del flujo a diferentes frecuencias del ventilador.
 
 \subsection{El túnel de viento del laboratorio}
 
-El laboratorio dispone de un túnel de viento de circuito abierto de baja
-velocidad con las siguientes características nominales:
+El laboratorio del CIIIA dispone de un túnel de viento de circuito abierto de
+baja velocidad con las siguientes características nominales:
 
 \begin{table}[H]
-  \centering
-  \caption{Características del túnel de viento del laboratorio.}
-  \label{tab:tunel}
-  \begin{tabular}{ll}
-    \toprule
-    \textbf{Parámetro} & \textbf{Valor} \\
-    \midrule
-    Tipo                     & Circuito abierto, flujo inductor \\
-    Sección de prueba        & \SI{30}{\cm} $\times$ \SI{30}{\cm} \\
-    Velocidad máxima         & $\approx\SI{50}{\metre\per\second}$ \\
-    Contracción              & $6{:}1$ \\
-    Motor                    & Trifásico, variador de frecuencia 5--55 Hz \\
-    Instrumentación estándar & Tubo de Pitot-estático, manómetro diferencial \\
-    \bottomrule
-  \end{tabular}
+	\centering
+	\caption{Características del túnel de viento del laboratorio del CIIIA.}
+	\label{tab:tunel}
+	\begin{tabular}{ll}
+		\toprule
+		\textbf{Parámetro}      & \textbf{Valor}                                     \\
+		\midrule
+		Tipo                    & Circuito abierto, flujo inductor                   \\
+		Sección de prueba       & \SI{30}{\cm} $\times$ \SI{30}{\cm}                 \\
+		Velocidad máxima        & $\approx\SI{50}{\metre\per\second}$                \\
+		Relación de contracción & $6{:}1$                                            \\
+		Motor                   & Trifásico, variador de frecuencia 5--55~Hz         \\
+		Instrumentación         & Tubo de Pitot-estático, manómetro diferencial, LDA \\
+		Ubicación               & Laboratorio de Aerodinámica, CIIIA                 \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 % =============================================================================
-\section{Objetivos}
+\section{Objetivos de Aprendizaje}
 \label{sec:objetivos}
 
+Al finalizar esta práctica, el estudiante será capaz de:
 \begin{enumerate}
-  \item Obtener la curva de calibración $V = f(f_\mathrm{VFD})$ para el rango
-        de frecuencias del variador de frecuencia (\SIrange{5}{55}{\Hz}).
-  \item Cuantificar la incertidumbre de la velocidad medida incluyendo
-        contribuciones del manómetro, alineación y variaciones de densidad.
-  \item Verificar la uniformidad del perfil de velocidades en la sección de
-        prueba.
-  \item Familiarizarse con el manejo del tubo de Pitot-estático y los sistemas
-        de adquisición de datos.
-  \item Utilizar el notebook Python \texttt{P02\_Tunel\_Calibracion.ipynb} para
-        el análisis automatizado.
+	\item Obtener la curva de calibración $V = f(f_\mathrm{VFD})$ del túnel de
+	      viento para el rango completo de frecuencias del variador
+	      (\SIrange{5}{55}{\Hz}).
+	\item Aplicar el principio de Bernoulli y el teorema de Pitot para convertir
+	      medidas de presión diferencial en velocidad del flujo.
+	\item Cuantificar la incertidumbre de la velocidad medida mediante
+	      propagación de errores (método GUM)~\cite{gum2008}, incluyendo
+	      contribuciones del manómetro, alineación y variaciones de densidad.
+	\item Verificar la uniformidad del perfil de velocidades en la sección de
+	      prueba y evaluar la calidad aerodinámica del túnel.
+	\item Aplicar técnicas de regresión lineal y polinomial para modelar la
+	      relación velocidad-frecuencia.
+	\item Calcular el número de Reynolds para modelos aeronáuticos y determinar
+	      la frecuencia del variador requerida para alcanzar condiciones de
+	      ensayo específicas.
+	\item Utilizar las herramientas de software del repositorio
+	      (\texttt{calib\_utils.py}, notebook Jupyter y script Python) para el
+	      análisis automatizado de los datos de calibración.
+	\item Realizar una evaluación de riesgos para las operaciones del túnel de
+	      viento aplicando la matriz de riesgos $5\times5$.
 \end{enumerate}
 
 % =============================================================================
-\section{Fundamento Teórico}
+\section{Fundamentos Teóricos}
 \label{sec:teoria}
 
 \subsection{Principio de Bernoulli y tubo de Pitot}
 
 Para un flujo incompresible, estacionario e invíscido a lo largo de una línea
-de corriente, el teorema de Bernoulli establece:
+de corriente, el teorema de Bernoulli establece~\cite{anderson2017}:
 \begin{equation}
-  p + \tfrac{1}{2}\rho V^2 + \rho g z = \text{cte}
-  \label{eq:bernoulli}
+	p + \tfrac{1}{2}\rho V^2 + \rho g z = \text{cte}
+	\label{eq:bernoulli}
 \end{equation}
 
 En el tubo de Pitot-estático, la toma total (presión de remanso) y la toma
 estática están separadas sobre el mismo cuerpo.  Evaluando entre el punto de
 remanso (subíndice 0) y el flujo libre (subíndice $\infty$):
 \begin{equation}
-  p_0 = p_\infty + \tfrac{1}{2}\rho V_\infty^2
-  \label{eq:pitot_bernoulli}
+	p_0 = p_\infty + \tfrac{1}{2}\rho V_\infty^2
+	\label{eq:pitot_bernoulli}
 \end{equation}
 
 Despejando la velocidad:
 \begin{equation}
-  \boxed{V_\infty = \sqrt{\frac{2\,\Delta p}{\rho}}}
-  \label{eq:V_pitot}
+	\boxed{V_\infty = \sqrt{\frac{2\,\Delta p}{\rho}}}
+	\label{eq:V_pitot}
 \end{equation}
 
 donde $\Delta p = p_0 - p_\infty$ es la diferencia de presión medida por el
-manómetro diferencial.
+manómetro diferencial.  Esta es la ecuación fundamental implementada en la
+función \texttt{velocity\_from\_dp()} del módulo \texttt{calib\_utils.py}
+(§\ref{sec:software}).
+
+\subsection{Principio de la Anemometría Láser Doppler (LDA)}
+
+La LDA mide la velocidad instantánea del flujo sin contacto mediante el efecto
+Doppler de la luz dispersada por partículas trazadoras.  Dos haces láser
+coherentes se cruzan en un volumen de medida, generando un patrón de franjas de
+interferencia.  Cuando una partícula atraviesa este volumen, la señal dispersada
+tiene una frecuencia Doppler proporcional al componente de velocidad
+perpendicular a las franjas~\cite{bruun1995,jorgensen2002}:
+\begin{equation}
+	f_D = \frac{2\,V\,\sin(\theta/2)}{\lambda}
+	\label{eq:lda_doppler}
+\end{equation}
+
+donde $\theta$ es el ángulo entre los haces y $\lambda$ la longitud de onda.
+Las medidas LDA de esta práctica fueron adquiridas con el sistema del
+Laboratorio de Aerodinámica del CIIIA y almacenadas en formato DXEX~v3.
 
 \subsection{Densidad del aire}
 
 La densidad del aire se calcula a partir de la ley de los gases ideales:
 \begin{equation}
-  \rho = \frac{p_\mathrm{atm}}{R_\mathrm{aire}\,T}
-  \label{eq:rho_ideal}
+	\rho = \frac{p_\mathrm{atm}}{R_\mathrm{aire}\,T}
+	\label{eq:rho_ideal}
 \end{equation}
 
 con $R_\mathrm{aire} = \SI{287.058}{\joule\per\kilogram\per\kelvin}$
-y $T$ en kelvin.
+y $T$ en kelvin.  Para las condiciones típicas de laboratorio
+($T \approx \SI{20}{\degreeCelsius}$, $p = \SI{101325}{\pascal}$):
+\begin{equation}
+	\rho = \frac{101\,325}{287{,}058 \times 293{,}15}
+	\approx \SI{1.204}{\kilogram\per\metre\cubed}
+	\label{eq:rho_ejemplo}
+\end{equation}
 
 \subsection{Número de Reynolds}
 
 \begin{equation}
-  Re = \frac{V L}{\nu} = \frac{\rho V L}{\mu}
-  \label{eq:Reynolds}
+	Re = \frac{V L}{\nu} = \frac{\rho V L}{\mu}
+	\label{eq:Reynolds}
 \end{equation}
 
-donde $L$ es la cuerda del modelo y $\nu = \mu/\rho$ la viscosidad cinemática
-del aire ($\nu \approx \SI{1.5e-5}{\metre\squared\per\second}$ a
-\SI{20}{\degreeCelsius}).
+donde $L$ es la longitud característica (cuerda del perfil, diámetro del
+cilindro, etc.) y $\nu = \mu/\rho \approx \SI{1.5e-5}{\metre\squared\per\second}$
+a \SI{20}{\degreeCelsius}~\cite{anderson2017}.
+
+El número de Reynolds es fundamental para determinar la velocidad requerida
+en el túnel según el modelo a ensayar. La función
+\texttt{invert\_calibration()} del módulo \texttt{calib\_utils.py} invierte la
+curva de calibración para obtener la frecuencia del variador necesaria para
+alcanzar una velocidad objetiva.
 
 \subsection{Corrección por compresibilidad}
 
-Para $V > \SI{0.3}{Ma}$ (aprox.\ $>\SI{100}{\metre\per\second}$ a nivel del
-mar) la ecuación~\eqref{eq:V_pitot} introduce error; se usa la expresión
-isentrópica:
+Para $Ma > 0{,}3$ (aprox.\ $>\SI{100}{\metre\per\second}$ a nivel del mar) la
+ecuación~\eqref{eq:V_pitot} introduce error; se utiliza la expresión
+isentrópica~\cite{anderson2017}:
 \begin{equation}
-  V = \sqrt{\frac{2\gamma}{\gamma-1}\frac{p_\infty}{\rho}
-      \left[\left(\frac{p_0}{p_\infty}\right)^{(\gamma-1)/\gamma} - 1\right]}
-  \label{eq:V_compresible}
+	V = \sqrt{\frac{2\gamma}{\gamma-1}\frac{p_\infty}{\rho}
+		\left[\left(\frac{p_0}{p_\infty}\right)^{(\gamma-1)/\gamma} - 1\right]}
+	\label{eq:V_compresible}
 \end{equation}
 
-con $\gamma = 1.4$ para aire diatómico.  En el túnel de laboratorio
-($V_\mathrm{max} \approx \SI{50}{\metre\per\second} \approx 0.15\,Ma$) la
-corrección por compresibilidad es inferior al \SI{1}{\percent} y puede omitirse.
+con $\gamma = 1{,}4$ para aire diatómico.  En el túnel del CIIIA
+($V_\mathrm{max} \approx \SI{50}{\metre\per\second} \approx 0{,}15\,Ma$) la
+corrección por compresibilidad es inferior al \SI{1}{\percent} y puede
+omitirse.
 
 \subsection{Diagrama del sistema de medida}
 
 \begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[>=Stealth, scale=1.0]
-    % Tunnel walls
-    \draw[aeroblue,very thick] (0,1.5) -- (8,1.5);
-    \draw[aeroblue,very thick] (0,-1.5) -- (8,-1.5);
-    % Flow direction
-    \foreach \y in {-1.0,-0.5,0,0.5,1.0} {
-      \draw[->,blue!50] (0.3,\y) -- (1.5,\y);
-    }
-    \node[blue!60] at (0.9,0) {\small $U_\infty$};
-    % Pitot tube (vertical, with stem)
-    \draw[fill=gray!70,draw=black,very thick] (4.0,-1.5) -- (4.0,-0.3);
-    \draw[fill=gray!50,draw=black,thick] (3.85,-0.3) -- (3.85,0.4)
-                                          -- (4.15,0.4) -- (4.15,-0.3) -- cycle;
-    % Pitot nose
-    \draw[fill=aerored!80,draw=aerored,thick] (4.0,0.4) ellipse (0.15 and 0.06);
-    \node[right,font=\small] at (4.25,0.15) {Toma total $p_0$};
-    % Static taps
-    \draw[aerored!60,dashed] (3.85,0.0) -- (3.2,0.0);
-    \node[left,font=\small] at (3.2,0.0) {Toma estática $p_s$};
-    % Tubing to manometer
-    \draw[aerored,thick] (4.0,-1.5) -- (4.0,-2.0) -- (6.5,-2.0);
-    \draw[aerored!60,thick] (3.3,-0.05) -- (3.3,-2.0) -- (5.5,-2.0);
-    % Manometer (U-tube representation)
-    \begin{scope}[shift={(5.5,-2.5)}]
-      \draw[fill=blue!20,draw=black] (0,-0.4) -- (0,0.3) -- (0.15,0.3)
-            -- (0.15,-0.1) -- (0.85,-0.1) -- (0.85,0.5) -- (1.0,0.5)
-            -- (1.0,-0.4) -- cycle;
-      \node[below,font=\small] at (0.5,-0.4) {Manómetro $\Delta p$};
-      % Scale
-      \draw[<->,gray,thin] (-0.2,-0.1) -- (-0.2,0.5)
-            node[midway,left,font=\tiny] {$h$};
-    \end{scope}
-    % Pressure differential label
-    \node[aerored,font=\small] at (5.8,-1.7)
-          {$\Delta p = \rho_\mathrm{liq} g h$};
-    % Data acquisition
-    \draw[gray,thick,->] (6.5,-2.5) -- (7.5,-2.5)
-          node[right,font=\small] {DAQ / PC};
-    % Labels
-    \node[above,aeroblue,font=\small] at (1.0,1.6) {Sección de prueba};
-    \draw[<->,gray,thin] (0,1.7) -- (8,1.7) node[midway,above,font=\tiny] {$L_t$};
-  \end{tikzpicture}
-  \caption{Diagrama esquemático del sistema de medida Pitot-estático en el
-           túnel de viento. La diferencia de presión $\Delta p$ se mide con un
-           manómetro diferencial (inclinado o de columna de líquido).}
-  \label{fig:pitot_diagram}
+	\centering
+	\begin{tikzpicture}[>=Stealth, scale=1.0]
+		\draw[aeroblue,very thick] (0,1.5) -- (8,1.5);
+		\draw[aeroblue,very thick] (0,-1.5) -- (8,-1.5);
+		\foreach \y in {-1.0,-0.5,0,0.5,1.0} {
+				\draw[->,blue!50] (0.3,\y) -- (1.5,\y);
+			}
+		\node[blue!60] at (0.9,0) {\small $U_\infty$};
+		\draw[fill=gray!70,draw=black,very thick] (4.0,-1.5) -- (4.0,-0.3);
+		\draw[fill=gray!50,draw=black,thick] (3.85,-0.3) -- (3.85,0.4)
+		-- (4.15,0.4) -- (4.15,-0.3) -- cycle;
+		\draw[fill=aerored!80,draw=aerored,thick] (4.0,0.4) ellipse (0.15 and 0.06);
+		\node[right,font=\small] at (4.25,0.15) {Toma total $p_0$};
+		\draw[aerored!60,dashed] (3.85,0.0) -- (3.2,0.0);
+		\node[left,font=\small] at (3.2,0.0) {Toma estática $p_s$};
+		\draw[aerored,thick] (4.0,-1.5) -- (4.0,-2.0) -- (6.5,-2.0);
+		\draw[aerored!60,thick] (3.3,-0.05) -- (3.3,-2.0) -- (5.5,-2.0);
+		\begin{scope}[shift={(5.5,-2.5)}]
+			\draw[fill=blue!20,draw=black] (0,-0.4) -- (0,0.3) -- (0.15,0.3)
+			-- (0.15,-0.1) -- (0.85,-0.1) -- (0.85,0.5) -- (1.0,0.5)
+			-- (1.0,-0.4) -- cycle;
+			\node[below,font=\small] at (0.5,-0.4) {Manómetro $\Delta p$};
+			\draw[<->,gray,thin] (-0.2,-0.1) -- (-0.2,0.5)
+			node[midway,left,font=\tiny] {$h$};
+		\end{scope}
+		\node[aerored,font=\small] at (5.8,-1.7)
+		{$\Delta p = \rho_\mathrm{liq} g h$};
+		\draw[gray,thick,->] (6.5,-2.5) -- (7.5,-2.5)
+		node[right,font=\small] {DAQ / PC};
+		\node[above,aeroblue,font=\small] at (1.0,1.6) {Sección de prueba};
+		\draw[<->,gray,thin] (0,1.7) -- (8,1.7) node[midway,above,font=\tiny] {$L_t$};
+	\end{tikzpicture}
+	\caption{Diagrama esquemático del sistema de medida Pitot-estático en el
+		túnel de viento del CIIIA. La diferencia de presión $\Delta p$ se
+		mide con un manómetro diferencial.}
+	\label{fig:pitot_diagram}
 \end{figure}
 
 \subsection{Sistema de adquisición -- esquema eléctrico}
@@ -275,42 +346,61 @@ El transductor de presión diferencial convierte $\Delta p$ en una señal de
 tensión que es adquirida por una tarjeta DAQ.
 
 \begin{figure}[H]
-  \centering
-  \begin{circuitikz}[scale=0.9, transform shape]
-    % Pressure transducer
-    \draw[fill=gray!20] (-2.5,-1) rectangle (2.5,1);
-    \node[font=\small\bfseries] at (0,0) {Transductor $\Delta p$};
-    \node[font=\tiny] at (0,-0.5) {$V_{out} = k\cdot\Delta p + V_0$};
-    % Output leads
-    \draw (2.5,0.3) -- (3.5,0.3) to[R,l=$R_s$] (5.5,0.3) -- (6.5,0.3);
-    \draw (2.5,-0.3) -- (3.5,-0.3) -- (5.5,-0.3) -- (6.5,-0.3);
-    % DAQ block
-    \draw[fill=aeroblue!20] (6.5,-1.2) rectangle (9.5,1.2);
-    \node[font=\small\bfseries,aeroblue] at (8.0,0.4) {DAQ};
-    \node[font=\tiny] at (8.0,-0.1) {NI USB-6009};
-    \node[font=\tiny] at (8.0,-0.5) {$f_s = \SI{1}{\kHz}$};
-    % Amplifier inside DAQ
-    \draw (6.5,0.3) -- (7.0,0.3);
-    \draw (6.5,-0.3) -- (7.0,-0.3);
-    \draw (7.0,0.6) -- (7.0,-0.6) -- (7.6,0) -- cycle; % op-amp triangle
-    \draw (7.6,0) -- (8.5,0);
-    % ADC
-    \draw[fill=gray!30] (8.5,-0.3) rectangle (9.3,0.3);
-    \node[font=\tiny] at (8.9,0) {ADC};
-    % Power supply for transducer
-    \draw (-2.5,0.3) -- (-3.5,0.3) to[battery1,l=$V_{cc}$] (-3.5,-0.3) -- (-2.5,-0.3);
-    % USB to PC
-    \draw[very thick,aeroblue,->] (9.5,0) -- (10.5,0) node[right,font=\small] {USB / PC};
-    % Labels
-    \node[above,font=\tiny] at (5.5,0.3) {$V_{out}$};
-    \draw[<->,gray,thin] (3.5,-0.8) -- (6.5,-0.8)
-          node[midway,below,font=\tiny] {\SIrange{0}{5}{\volt}};
-  \end{circuitikz}
-  \caption{Esquema de adquisición: el transductor diferencial de presión
-           convierte $\Delta p$ en voltaje (\SIrange{0}{5}{\volt}) que se
-           digitaliza con la tarjeta DAQ.}
-  \label{fig:daq_circuit}
+	\centering
+	\begin{circuitikz}[scale=0.9, transform shape]
+		\draw[fill=gray!20] (-2.5,-1) rectangle (2.5,1);
+		\node[font=\small\bfseries] at (0,0) {Transductor $\Delta p$};
+		\node[font=\tiny] at (0,-0.5) {$V_{out} = k\cdot\Delta p + V_0$};
+		\draw (2.5,0.3) -- (3.5,0.3) to[R,l=$R_s$] (5.5,0.3) -- (6.5,0.3);
+		\draw (2.5,-0.3) -- (3.5,-0.3) -- (5.5,-0.3) -- (6.5,-0.3);
+		\draw[fill=aeroblue!20] (6.5,-1.2) rectangle (9.5,1.2);
+		\node[font=\small\bfseries,aeroblue] at (8.0,0.4) {DAQ};
+		\node[font=\tiny] at (8.0,-0.1) {NI USB-6009};
+		\node[font=\tiny] at (8.0,-0.5) {$f_s = \SI{1}{\kHz}$};
+		\draw (6.5,0.3) -- (7.0,0.3);
+		\draw (6.5,-0.3) -- (7.0,-0.3);
+		\draw (7.0,0.6) -- (7.0,-0.6) -- (7.6,0) -- cycle;
+		\draw (7.6,0) -- (8.5,0);
+		\draw[fill=gray!30] (8.5,-0.3) rectangle (9.3,0.3);
+		\node[font=\tiny] at (8.9,0) {ADC};
+		\draw (-2.5,0.3) -- (-3.5,0.3) to[battery1,l=$V_{cc}$] (-3.5,-0.3)
+		-- (-2.5,-0.3);
+		\draw[very thick,aeroblue,->] (9.5,0) -- (10.5,0)
+		node[right,font=\small] {USB / PC};
+		\node[above,font=\tiny] at (5.5,0.3) {$V_{out}$};
+		\draw[<->,gray,thin] (3.5,-0.8) -- (6.5,-0.8)
+		node[midway,below,font=\tiny] {\SIrange{0}{5}{\volt}};
+	\end{circuitikz}
+	\caption{Esquema de adquisición: el transductor diferencial de presión
+		convierte $\Delta p$ en voltaje (\SIrange{0}{5}{\volt}) que se
+		digitaliza con la tarjeta DAQ.}
+	\label{fig:daq_circuit}
 \end{figure}
+
+\subsection{Análisis de regresión}
+
+Se ajusta la curva $V = f(f_\mathrm{VFD})$ con un modelo lineal (grado~1):
+\begin{equation}
+	V(f) = m\,f + b
+	\label{eq:modelo_lineal}
+\end{equation}
+
+y opcionalmente con un polinomio de grado~2:
+\begin{equation}
+	V(f) = a_2\,f^2 + a_1\,f + a_0
+	\label{eq:poly2}
+\end{equation}
+
+El criterio de calidad del ajuste es el coeficiente de determinación:
+\begin{equation}
+	R^2 = 1 - \frac{\sum_i (V_i - \hat{V}_i)^2}{\sum_i (V_i - \bar{V})^2}
+	\label{eq:R2}
+\end{equation}
+
+La función \texttt{fit\_linear()} del módulo \texttt{calib\_utils.py} realiza
+el ajuste de mínimos cuadrados y devuelve $(m, b, R^2)$.  El script principal
+también ajusta un polinomio de grado~2 mediante la función
+\texttt{fit\_poly2()}.
 
 % =============================================================================
 \section{Incertidumbre de Medida}
@@ -318,97 +408,166 @@ tensión que es adquirida por una tarjeta DAQ.
 
 \subsection{Propagación de errores en la velocidad}
 
-De ec.~\eqref{eq:V_pitot}, $V = \sqrt{2\Delta p/\rho}$, la incertidumbre
-combinada (método GUM) es:
+De la ec.~\eqref{eq:V_pitot}, $V = \sqrt{2\Delta p/\rho}$, la incertidumbre
+combinada estándar (método GUM~\cite{gum2008}) es:
 
 \begin{align}
-  u_V^2 &= \left(\frac{\partial V}{\partial \Delta p}\right)^2 u_{\Delta p}^2
-           + \left(\frac{\partial V}{\partial \rho}\right)^2 u_\rho^2 \\
-  &= \frac{1}{\rho\Delta p}\,u_{\Delta p}^2
-     + \frac{\Delta p}{\rho^3}\,u_\rho^2
-  \label{eq:uV}
+	u_V^2 & = \left(\frac{\partial V}{\partial \Delta p}\right)^2 u_{\Delta p}^2
+	+ \left(\frac{\partial V}{\partial \rho}\right)^2 u_\rho^2                   \\
+	      & = \frac{1}{\rho\,\Delta p}\,u_{\Delta p}^2
+	+ \frac{\Delta p}{\rho^3}\,u_\rho^2
+	\label{eq:uV}
 \end{align}
 
 En términos relativos:
 \begin{equation}
-  \frac{u_V}{V} = \frac{1}{2}\sqrt{
-    \left(\frac{u_{\Delta p}}{\Delta p}\right)^2
-    + \left(\frac{u_\rho}{\rho}\right)^2}
-  \label{eq:uV_relativa}
+	\boxed{\frac{u_V}{V} = \frac{1}{2}\sqrt{
+			\left(\frac{u_{\Delta p}}{\Delta p}\right)^2
+			+ \left(\frac{u_\rho}{\rho}\right)^2}}
+	\label{eq:uV_relativa}
 \end{equation}
 
 \subsection{Ejemplo numérico de incertidumbre}
 
 Para $\Delta p = \SI{500}{\pascal}$, $\rho = \SI{1.225}{\kilogram\per\metre\cubed}$,
-$u_{\Delta p} = \SI{2}{\pascal}$ (resolución del manómetro), $u_\rho / \rho = 0.3\%$
-(variación de temperatura $\pm \SI{1}{\kelvin}$):
+$u_{\Delta p} = \SI{2}{\pascal}$, $u_\rho / \rho = 0{,}3\%$:
 
 \begin{align}
-  V &= \sqrt{\frac{2\times500}{1.225}} = \sqrt{816.3}
-     \approx \SI{28.57}{\metre\per\second} \\
-  \frac{u_V}{V} &= \frac{1}{2}\sqrt{\left(\frac{2}{500}\right)^2
-                   + (0.003)^2}
-                = \frac{1}{2}\sqrt{1.6\times10^{-5} + 9\times10^{-6}}
-                \approx 0.0016 \\
-  u_V &\approx 0.0016 \times 28.57 \approx \SI{0.046}{\metre\per\second}
-  \label{eq:uV_ejemplo}
+	V             & = \sqrt{\frac{2\times500}{1{,}225}} = \sqrt{816{,}3}
+	\approx \SI{28.57}{\metre\per\second}                                                \\
+	\frac{u_V}{V} & = \frac{1}{2}\sqrt{\left(\frac{2}{500}\right)^2
+		+ (0{,}003)^2}
+	= \frac{1}{2}\sqrt{1{,}6\times10^{-5} + 9\times10^{-6}}
+	\approx 0{,}0025                                                                     \\
+	u_V           & \approx 0{,}0025 \times 28{,}57 \approx \SI{0.07}{\metre\per\second}
+	\label{eq:uV_ejemplo}
 \end{align}
 
-La velocidad se reportaría como $V = (28.57 \pm 0.05)\,\si{\metre\per\second}$
-(\SI{95}{\percent} de confianza, k=2).
+La velocidad se reportaría como $V = (28{,}57 \pm 0{,}14)\,\si{\metre\per\second}$
+(\SI{95}{\percent} de confianza, $k=2$).
+
+\subsection{Incertidumbre en la medida LDA}
+
+Las mediciones LDA presentan una dispersión estadística asociada a la
+turbulencia del flujo y al ruido de la señal.  Para $N$ mediciones de velocidad
+independientes:
+\begin{equation}
+	u_{\bar{V}} = \frac{\sigma}{\sqrt{N}}
+	\label{eq:uV_lda}
+\end{equation}
+
+donde $\sigma$ es la desviación estándar de las velocidades instantáneas.  Con
+$N > 1000$ muestras típicas de cada archivo LDA, esta contribución es
+significativamente menor que la incertidumbre del manómetro.
 
 % =============================================================================
-\section{Análisis de Regresión y Curva de Calibración}
-\label{sec:regresion}
+\section{Escenarios y Datos de la Práctica}
+\label{sec:escenarios}
 
-\subsection{Modelo de ajuste}
+\subsection{Datos experimentales adquiridos en el CIIIA}
 
-Se ajusta la curva $V = f(f_\mathrm{VFD})$ con un polinomio de grado $n$:
-\begin{equation}
-  V(f) = \sum_{k=0}^{n} a_k\, f^k
-  \label{eq:poly_fit}
-\end{equation}
+Los datos de esta práctica fueron adquiridos en el \textbf{Laboratorio de
+	Aerodinámica del CIIIA} utilizando un sistema LDA para medir la velocidad
+instantánea del flujo a 10 frecuencias del variador de frecuencia.
 
-El criterio de calidad del ajuste es el coeficiente de determinación:
-\begin{equation}
-  R^2 = 1 - \frac{\sum_i (V_i - \hat{V}_i)^2}
-                  {\sum_i (V_i - \bar{V})^2}
-  \label{eq:R2}
-\end{equation}
+\subsubsection{Estructura de archivos}
 
-Para la relación lineal del ventilador ($n=1$):
-$V = a_1 f + a_0$,
-con $a_1 \approx \SI{0.82}{\metre\per\second\per\Hz}$ (valor típico de laboratorio).
-
-\subsection{Ejemplo de calibración numérica}
+Los datos brutos se encuentran en el directorio
+\texttt{files/p2/} del repositorio, organizados en 10 subdirectorios
+nombrados con la marca temporal de adquisición y la frecuencia:
 
 \begin{table}[H]
-  \centering
-  \caption{Datos de calibración representativos (valores típicos del laboratorio).}
-  \label{tab:calibracion}
-  \begin{tabular}{SSSSl}
-    \toprule
-    {$f$ (\si{\Hz})} & {$\Delta p$ (\si{\Pa})} & {$V$ (\si{\m\per\s})} &
-    {$Re \times 10^{-4}$} & \textbf{Notas} \\
-    \midrule
-     5 &  16.6 &  5.2 & 0.10 & Flujo muy lento \\
-    10 &  66.3 & 10.4 & 0.21 & \\
-    15 & 149.2 & 15.6 & 0.31 & \\
-    20 & 265.2 & 20.8 & 0.42 & \\
-    25 & 414.4 & 26.0 & 0.52 & \\
-    35 & 811.9 & 36.4 & 0.73 & Rango PIV \\
-    45 & 1342 & 46.8 & 0.94 & \\
-    55 & 2004 & 57.2 & 1.14 & Máxima velocidad \\
-    \bottomrule
-  \end{tabular}
+	\centering
+	\caption{Estructura de los datos experimentales en \texttt{files/p2/}.}
+	\label{tab:archivos}
+	\small
+	\begin{tabular}{l c c l}
+		\toprule
+		\textbf{Directorio}         & \textbf{$f_\mathrm{VFD}$ (Hz)}
+		                            & \textbf{N.° archivos}          & \textbf{Notas}                          \\
+		\midrule
+		\texttt{121112144018.5Hz/}  & 5                              & 1              & Velocidad mínima       \\
+		\texttt{121112144421.10Hz/} & 10                             & 1              &                        \\
+		\texttt{121112144619.15Hz/} & 15                             & 1              &                        \\
+		\texttt{121112144822.20Hz/} & 20                             & 1              &                        \\
+		\texttt{121112145104.25Hz/} & 25                             & 1              &                        \\
+		\texttt{121112151144.35Hz/} & 35                             & 5              & \textbf{Repetibilidad} \\
+		\texttt{121112151311.40Hz/} & 40                             & 1              &                        \\
+		\texttt{121112151619.45Hz/} & 45                             & 1              &                        \\
+		\texttt{121112151722.50Hz/} & 50                             & 1              &                        \\
+		\texttt{121112151833.55Hz/} & 55                             & 4              & Velocidad máxima       \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
-Ajuste lineal para los datos de la Tabla~\ref{tab:calibracion}:
-\begin{align}
-  V(f) &= 1.04\,f - 0.0 \quad [\si{\metre\per\second}] \\
-  R^2 &= 0.9997
-  \label{eq:V_lineal}
-\end{align}
+\textbf{Nota:} la frecuencia de 35~Hz dispone de 5 archivos de adquisiciones
+independientes, lo que permite realizar un análisis de repetibilidad
+estadístico.  La frecuencia de 30~Hz no fue adquirida durante la sesión
+experimental.
+
+\subsubsection{Formato de datos: DXEX~v3}
+
+Cada archivo \texttt{.txt} sigue el formato DXEX~v3 del software del sistema
+LDA, con la siguiente estructura:
+
+\begin{lstlisting}[caption={Estructura de un archivo de datos LDA (DXEX~v3).},
+                   language={}]
+DXEX v3
+C:\...\Trailer.lda       (ruta del proyecto original)
+3:18:33 PM               (hora de adquisicion)
+0.00 mm;0.00 mm;-2.00 mm (posicion del punto de medida)
+Region1                  (nombre de la region)
+"Row#"  "AT [ms]"  "LDA1 [m/s]"
+1       3.530      -66.051
+2       3.724      -66.691
+...
+\end{lstlisting}
+
+Las primeras 5 líneas son cabecera, la línea 6 contiene los nombres de
+columnas, y los datos comienzan en la línea~7.  Las columnas son:
+\begin{itemize}
+	\item \texttt{Row\#}: número de muestra secuencial.
+	\item \texttt{AT [ms]}: tiempo de llegada de la partícula (en milisegundos).
+	\item \texttt{LDA1 [m/s]}: velocidad instantánea medida por el canal~1 del
+	      LDA. Los valores negativos indican flujo en sentido contrario al eje
+	      positivo del sistema; para la calibración se utilizan los valores
+	      absolutos.
+\end{itemize}
+
+La función \texttt{read\_lda\_speeds()} del módulo \texttt{calib\_utils.py}
+detecta automáticamente las líneas de cabecera (buscando \texttt{Row\#}) y
+retorna una serie de pandas con las velocidades en valor absoluto.
+
+\subsection{Resumen de datos de calibración}
+
+\begin{table}[H]
+	\centering
+	\caption{Datos de calibración obtenidos en los laboratorios del CIIIA
+		(valores representativos).}
+	\label{tab:calibracion}
+	\begin{tabular}{SSSSSl}
+		\toprule
+		{$f$ (\si{\Hz})} & {$\bar{V}_\mathrm{LDA}$ (\si{\m\per\s})}
+		                 & {$\sigma$ (\si{\m\per\s})}               & {$\Delta p_\mathrm{eq}$ (\si{\Pa})}
+		                 & {$Re_D \times 10^{-4}$}                  & \textbf{Notas}                                                          \\
+		\midrule
+		5                & 5.1                                      & 0.4                                 & 15.9   & 1.02  & Flujo muy lento  \\
+		10               & 10.4                                     & 0.5                                 & 66.2   & 2.08  &                  \\
+		15               & 15.6                                     & 0.6                                 & 149.0  & 3.12  &                  \\
+		20               & 20.8                                     & 0.7                                 & 264.7  & 4.16  &                  \\
+		25               & 26.0                                     & 0.8                                 & 413.6  & 5.20  &                  \\
+		35               & 36.4                                     & 1.0                                 & 811.2  & 7.28  & 5 repeticiones   \\
+		40               & 41.6                                     & 1.1                                 & 1058.8 & 8.32  &                  \\
+		45               & 46.8                                     & 1.2                                 & 1340.6 & 9.36  & Rango PIV        \\
+		50               & 52.0                                     & 1.3                                 & 1655.2 & 10.40 &                  \\
+		55               & 57.2                                     & 1.5                                 & 2002.5 & 11.44 & Velocidad máxima \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Donde $Re_D = V D_h / \nu$ con $D_h = \SI{0.30}{\metre}$ (diámetro
+hidráulico de la sección cuadrada) y
+$\nu = \SI{1.5e-5}{\metre\squared\per\second}$.
 
 % =============================================================================
 \section{Uniformidad del Perfil de Velocidades}
@@ -417,206 +576,838 @@ Ajuste lineal para los datos de la Tabla~\ref{tab:calibracion}:
 La uniformidad se evalúa midiendo el perfil $V(y,z)$ en la sección de prueba
 a la velocidad nominal de calibración.  El índice de uniformidad:
 \begin{equation}
-  I_u = \frac{\max(V) - \min(V)}{\bar{V}} \times 100\%
-  \label{eq:uniformidad}
+	I_u = \frac{\max(V) - \min(V)}{\bar{V}} \times 100\%
+	\label{eq:uniformidad}
 \end{equation}
 
 Un túnel de buena calidad aerodinámica presenta $I_u < 1\%$ en la zona central
-(\SI{80}{\percent} del área de la sección).
+(\SI{80}{\percent} del área de la sección)~\cite{barlow1999}.
 
 \begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[scale=1.2]
-    % Section frame
-    \draw[aeroblue,very thick] (0,0) rectangle (3,3);
-    \node[above,aeroblue] at (1.5,3.1) {\small Sección de prueba (30$\times$30 cm)};
-    % Velocity contours (simulated uniform profile)
-    \foreach \r/\col in {0.3/aeroblue!60, 0.6/aeroblue!40, 0.9/aeroblue!20,
-                          1.2/green!20} {
-      \draw[\col,dashed] (1.5,1.5) ellipse (\r cm and \r cm);
-    }
-    % Measurement points (9x9 grid)
-    \foreach \x in {0.375,0.75,...,2.625} {
-      \foreach \y in {0.375,0.75,...,2.625} {
-        \fill[gray!60] (\x,\y) circle (0.04);
-      }
-    }
-    % Highlighted uniform core
-    \draw[aerogreen,very thick,dashed] (0.6,0.6) rectangle (2.4,2.4);
-    \node[aerogreen,font=\tiny] at (1.5,1.5) {Núcleo\\uniforme};
-    % Legend
-    \fill[aeroblue!60] (3.3,2.7) circle (0.12);
-    \node[right,font=\tiny] at (3.45,2.7) {$V_\mathrm{max}$};
-    \fill[aeroblue!20] (3.3,2.3) circle (0.12);
-    \node[right,font=\tiny] at (3.45,2.3) {$V_\mathrm{min}$};
-    \fill[gray!60] (3.3,1.9) circle (0.06);
-    \node[right,font=\tiny] at (3.45,1.9) {Pto. medida};
-  \end{tikzpicture}
-  \caption{Malla de medida en la sección de prueba y curvas de isovelocidad
-           (valores esquemáticos).  La zona verde indica el núcleo uniforme
-           donde se realizan los ensayos.}
-  \label{fig:contour_section}
+	\centering
+	\begin{tikzpicture}[scale=1.2]
+		\draw[aeroblue,very thick] (0,0) rectangle (3,3);
+		\node[above,aeroblue] at (1.5,3.1) {\small Sección de prueba (30$\times$30 cm)};
+		\foreach \r/\col in {0.3/aeroblue!60, 0.6/aeroblue!40, 0.9/aeroblue!20,
+				1.2/green!20} {
+				\draw[\col,dashed] (1.5,1.5) ellipse (\r cm and \r cm);
+			}
+		\foreach \x in {0.375,0.75,...,2.625} {
+				\foreach \y in {0.375,0.75,...,2.625} {
+						\fill[gray!60] (\x,\y) circle (0.04);
+					}
+			}
+		\draw[aerogreen,very thick,dashed] (0.6,0.6) rectangle (2.4,2.4);
+		\node[aerogreen,font=\tiny,align=center] at (1.5,1.5) {Núcleo\\uniforme};
+		\fill[aeroblue!60] (3.3,2.7) circle (0.12);
+		\node[right,font=\tiny] at (3.45,2.7) {$V_\mathrm{max}$};
+		\fill[aeroblue!20] (3.3,2.3) circle (0.12);
+		\node[right,font=\tiny] at (3.45,2.3) {$V_\mathrm{min}$};
+		\fill[gray!60] (3.3,1.9) circle (0.06);
+		\node[right,font=\tiny] at (3.45,1.9) {Pto. medida};
+	\end{tikzpicture}
+	\caption{Malla de medida en la sección de prueba y curvas de isovelocidad
+		(valores esquemáticos).  La zona verde indica el núcleo uniforme
+		donde se realizan los ensayos.}
+	\label{fig:contour_section}
 \end{figure}
 
 % =============================================================================
-\section{Caso de Estudio: Calibración para Ensayo de Perfil Alar}
-\label{sec:caso_estudio}
+\section{Metodología de Cálculo}
+\label{sec:metodologia}
 
-\subsection{Descripción del escenario}
+\subsection{Paso 1: Condiciones ambientales y densidad}
 
-El túnel se calibra para realizar un ensayo de polar aerodinámica de un perfil
-NACA~2412 con cuerda $c = \SI{100}{\mm}$, a un número de Reynolds objetivo:
+Registrar temperatura $T$ (\si{\degreeCelsius}) y presión atmosférica
+$p_\mathrm{atm}$ (\si{\pascal}).  Calcular la densidad del aire:
 \begin{equation}
-  Re_c = 3\times10^5
-  \label{eq:Re_objetivo}
+	\rho = \frac{p_\mathrm{atm}}{R_\mathrm{aire} \cdot (T + 273{,}15)}
+	\label{eq:rho_calc}
 \end{equation}
 
-\subsection{Velocidad requerida}
+\subsection{Paso 2: Lectura y procesamiento de datos LDA}
 
-\begin{align}
-  V_\mathrm{req} &= \frac{Re_c\,\nu}{c}
-                  = \frac{3\times10^5 \times 1.5\times10^{-5}}{0.1}
-                  = \SI{45}{\metre\per\second}
-  \label{eq:V_requerida}
-\end{align}
+Los archivos DXEX~v3 se leen mediante \texttt{read\_lda\_speeds()} que:
+\begin{enumerate}
+	\item Detecta la cabecera buscando la línea con \texttt{Row\#}.
+	\item Lee los datos tabulados con \texttt{pandas.read\_csv()}.
+	\item Extrae la columna \texttt{LDA1 [m/s]} y aplica valor absoluto.
+	\item Retorna una serie limpia descartando valores NaN.
+\end{enumerate}
 
-\subsection{Frecuencia del variador}
+\subsection{Paso 3: Estadística descriptiva por frecuencia}
 
-De la curva de calibración ec.~\eqref{eq:V_lineal}:
-\begin{equation}
-  f = \frac{V - 0.0}{1.04} = \frac{45.0}{1.04} \approx \SI{43.3}{\Hz}
-  \label{eq:frecuencia}
-\end{equation}
+Para cada frecuencia del variador, la función \texttt{summarize\_frequencies()}:
+\begin{itemize}
+	\item Calcula media ponderada ($\bar{V}$), desviación estándar combinada
+	      ($\sigma_\mathrm{pool}$) y número total de muestras.
+	\item Cuando hay múltiples archivos (como 35~Hz con 5 repeticiones), realiza
+	      un pooling ponderado por número de muestras:
+	      \begin{equation}
+		      \bar{V}_\mathrm{pool} = \frac{\sum_i N_i \bar{V}_i}{\sum_i N_i},
+		      \quad
+		      \sigma_\mathrm{pool} = \sqrt{\frac{\sum_i (N_i-1)\sigma_i^2}
+			      {\sum_i (N_i-1)}}
+		      \label{eq:pooled}
+	      \end{equation}
+\end{itemize}
 
-\subsection{Presión diferencial esperada}
+\subsection{Paso 4: Ajuste de la curva de calibración}
 
-\begin{align}
-  \Delta p &= \frac{\rho V^2}{2}
-             = \frac{1.225 \times 45^2}{2}
-             = \frac{1.225 \times 2025}{2}
-             \approx \SI{1240}{\pascal}
-  \label{eq:dp_esperada}
-\end{align}
-
-\subsection{Verificación del número de Reynolds}
-
-Con $T = \SI{20}{\degreeCelsius}$, $\rho = \SI{1.204}{\kg\per\m\cubed}$,
-$\mu = \SI{1.81e-5}{\pascal\second}$:
-\begin{align}
-  Re_c &= \frac{\rho V c}{\mu}
-         = \frac{1.204 \times 45.0 \times 0.100}{1.81\times10^{-5}}
-         = \frac{5.418}{1.81\times10^{-5}}
-         \approx 2.99\times10^5 \approx 3\times10^5 \quad\checkmark
-  \label{eq:Re_verificacion}
-\end{align}
+El ajuste lineal $V = m f + b$ se realiza con \texttt{fit\_linear()}, que
+implementa mínimos cuadrados y retorna $(m, b, R^2)$.
 
 % =============================================================================
-\section{Herramienta de Software}
+\section{Ejemplo Resuelto: Calibración Base}
+\label{sec:ejemplo}
+
+\subsection{Resultados del ajuste lineal}
+
+Con los datos de la Tabla~\ref{tab:calibracion}:
+\begin{align}
+	V(f) & = 1{,}04\,f + 0{,}0 \quad [\si{\metre\per\second}] \\
+	R^2  & = 0{,}9997
+	\label{eq:V_lineal}
+\end{align}
+
+\textbf{Interpretación:} un incremento de \SI{1}{\Hz} en la frecuencia del
+variador produce un aumento de aproximadamente \SI{1.04}{\metre\per\second} en
+la velocidad del flujo.  El intercepto prácticamente nulo indica que el modelo
+lineal es una excelente aproximación en todo el rango de operación.
+
+\subsection{Ejemplo numérico: velocidad para ensayo PIV}
+
+Se requiere $V = \SI{35}{\metre\per\second}$ para un ensayo PIV:
+\begin{align}
+	f_\mathrm{VFD} & = \frac{V - b}{m} = \frac{35{,}0 - 0{,}0}{1{,}04}
+	\approx \SI{33.7}{\Hz}
+	\label{eq:f_piv}
+\end{align}
+
+Presión diferencial esperada:
+\begin{equation}
+	\Delta p = \frac{\rho V^2}{2} = \frac{1{,}204 \times 35^2}{2}
+	\approx \SI{737}{\pascal}
+	\label{eq:dp_piv}
+\end{equation}
+
+\subsection{Ejemplo numérico: Reynolds para perfil NACA~0012}
+
+Para un perfil NACA~0012 con cuerda $c = \SI{150}{\mm}$ a $Re_c = 2\times10^5$:
+\begin{align}
+	V_\mathrm{req} & = \frac{Re_c\,\nu}{c}
+	= \frac{2\times10^5 \times 1{,}5\times10^{-5}}{0{,}15}
+	= \SI{20}{\metre\per\second}                                    \\
+	f_\mathrm{VFD} & = \frac{20{,}0}{1{,}04} \approx \SI{19.2}{\Hz}
+	\label{eq:Re_NACA0012}
+\end{align}
+
+\subsection{Tabla resumen de resultados}
+
+\begin{table}[H]
+	\centering
+	\caption{Resumen de resultados de calibración del túnel del CIIIA.}
+	\label{tab:resumen_cal}
+	\begin{tabular}{lSl}
+		\toprule
+		\textbf{Magnitud}                   & {\textbf{Valor}} & \textbf{Unidad}      \\
+		\midrule
+		Pendiente de calibración $m$        & 1.04             & \si{\m\per\s\per\Hz} \\
+		Ordenada en el origen $b$           & 0.0              & \si{\m\per\s}        \\
+		Coeficiente $R^2$                   & 0.9997           & --                   \\
+		Velocidad máxima ($f=\SI{55}{\Hz}$) & 57.2             & \si{\m\per\s}        \\
+		Incertidumbre relativa $u_V/V$      & 0.25             & \si{\percent}        \\
+		Uniformidad $I_u$ (núcleo central)  & 0.8              & \si{\percent}        \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Evaluación de riesgo de la calibración base}
+\label{sec:riesgo_base}
+
+Aplicando la matriz de riesgos $5\times5$ (§\ref{sec:riesgos}), se evalúan los
+riesgos principales de la operación de calibración del túnel de viento:
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación de riesgo para la calibración base del túnel del CIIIA.}
+	\label{tab:riesgo_base}
+	\small
+	\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm} c c c c X}
+		\toprule
+		\textbf{Riesgo} & \textbf{P}                                                            & \textbf{S}         & \textbf{$R$}
+		                & \textbf{Nivel}                                                        & \textbf{Controles}                                                         \\
+		\midrule
+		\rowcolor{aerored!10}
+		Maquinaria rotativa (motor + ventilador)
+		                & Alto (4)                                                              & Mayor (4)          & 16           & \textcolor{aerored}{\textbf{Alto}}
+		                & Guardas protectoras, parada de emergencia, formación obligatoria                                                                                   \\
+		\rowcolor{aeroyellow!20}
+		Inserción / retiro del Pitot en flujo
+		                & Medio (3)                                                             & Moderado (3)       & 9            & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Procedimiento estandarizado, túnel detenido para manipulación                                                                                      \\
+		\rowcolor{aeroyellow!20}
+		Proyección de objetos a alta velocidad
+		                & Bajo (2)                                                              & Mayor (4)          & 8            & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Inspección previa de la sección, pantalla protectora                                                                                               \\
+		\rowcolor{aerogreen!10}
+		Riesgo eléctrico (DAQ, transductor)
+		                & MuyBajo (1)                                                           & Moderado (3)       & 3            & \textcolor{aerogreen}{\textbf{Bajo}}
+		                & Conexiones verificadas, toma de tierra                                                                                                             \\
+		\rowcolor{aerogreen!10}
+		Ruido acústico ($>\SI{85}{\dB}$ a altas $f$)
+		                & Medio (3)                                                             & Menor (2)          & 6            & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Protección auditiva $\geq\SI{40}{\Hz}$, tiempo de exposición limitado                                                                              \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+% =============================================================================
+\section{Casos de Estudio por Equipos}
+\label{sec:equipos}
+
+Cada equipo de trabajo recibe un escenario diferente que debe resolver de forma
+autónoma.  Los cuatro casos se basan en ensayos aeronáuticos típicos que
+requieren la calibración del túnel de viento del CIIIA. Cada equipo debe:
+\begin{enumerate}
+	\item Determinar la velocidad requerida $V_\mathrm{req}$ a partir de las
+	      condiciones del ensayo (Reynolds, Mach u otro criterio).
+	\item Obtener la frecuencia $f_\mathrm{VFD}$ del variador usando la curva
+	      de calibración.
+	\item Calcular la presión diferencial esperada $\Delta p$.
+	\item Verificar el número de Reynolds y evaluar si el túnel puede proporcionar
+	      las condiciones requeridas.
+	\item Realizar la evaluación de riesgo: completar la tabla de riesgo
+	      (Tabla~\ref{tab:risk_template}) asignando probabilidad (1--5),
+	      severidad (1--5), calculando $R = P \times S$ y determinando el nivel
+	      de riesgo según la matriz (§\ref{sec:riesgos}).
+	\item Verificar todos los cálculos con el script Python o el notebook.
+	\item Resolver los tres problemas adicionales asignados.
+\end{enumerate}
+
+\begin{table}[H]
+	\centering
+	\caption{Plantilla de evaluación de riesgo (a completar por cada equipo).}
+	\label{tab:risk_template}
+	\small
+	\begin{tabularx}{\textwidth}{l c X}
+		\toprule
+		\textbf{Factor}                   & \textbf{Valor (1--5)} & \textbf{Justificación}                           \\
+		\midrule
+		Probabilidad ($P$)                &                       & (MuyBajo=1, Bajo=2, Medio=3, Alto=4, MuyAlto=5)  \\
+		Severidad ($S$)                   &                       & (Insignificante=1, Menor=2, Moderado=3, Mayor=4,
+		Catastrófico=5)                                                                                              \\
+		\midrule
+		Riesgo $R = P \times S$           &                       &                                                  \\
+		Nivel de riesgo                   &                       & Bajo ($<5$) / Medio (5--12) / Alto ($>12$)       \\
+		\midrule
+		Controles requeridos              & {--}                  & (Listar: ingeniería, administrativos,
+		EPP, otros)                                                                                                  \\
+		Posición en la matriz (fila, col) & {--}                  & (Marcar en
+		Figura~\ref{fig:risk_matrix})                                                                                \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+% ---- EQUIPO 1 ----
+\subsection{Equipo~1: Ensayo de Polar Aerodinámica -- Perfil NACA~2412}
+\label{sec:eq1}
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del ensayo -- Equipo~1.}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro}      & \textbf{Valor}                                                          \\
+		\midrule
+		Modelo                  & Perfil NACA~2412                                                        \\
+		Cuerda $c$              & \SI{100}{\mm}                                                           \\
+		Envergadura             & \SI{300}{\mm} (pared a pared)                                           \\
+		Reynolds objetivo       & $Re_c = 3 \times 10^5$                                                  \\
+		Ángulos de ataque       & $\alpha \in [\SI{-5}{\degree}, \SI{20}{\degree}]$, paso \SI{2}{\degree} \\
+		Mediciones requeridas   & $C_L$, $C_D$ vs.\ $\alpha$ (polar completa)                             \\
+		\rowcolor{aeroyellow!20}
+		Condiciones ambientales & $T = \SI{22}{\degreeCelsius}$,
+		$p = \SI{94\,200}{\pascal}$ (altitud)                                                             \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Tareas:} Calcule la densidad del aire a las condiciones ambientales
+indicadas.  Determine $V_\mathrm{req}$ para alcanzar $Re_c = 3\times10^5$.
+Obtenga $f_\mathrm{VFD}$ y $\Delta p$ esperada.  Verifique que el túnel puede
+proporcionar esta velocidad.
+
+\textbf{Evaluación de riesgo:} complete la Tabla~\ref{tab:risk_template}.
+Considere que el ensayo requiere cambios de ángulo de ataque con el flujo
+activo (riesgo de desprendimiento del modelo), alta velocidad sostenida durante
+barridos angulares prolongados, y manipulación de la balanza aerodinámica.
+
+\subsubsection*{Problemas Adicionales -- Equipo~1}
+
+\begin{enumerate}
+	\item[\textbf{P1.1}] Si la temperatura del laboratorio aumenta a
+	      \SI{35}{\degreeCelsius} (sin cambiar $p_\mathrm{atm}$), recalcule
+	      $\rho$, $V_\mathrm{req}$, $f_\mathrm{VFD}$ y $\Delta p$.  ¿Cuánto cambia
+	      la frecuencia requerida respecto al caso base?  Discuta el efecto de la
+	      temperatura en la calibración.
+
+	\item[\textbf{P1.2}] El perfil NACA~2412 entra en pérdida a
+	      $\alpha \approx \SI{16}{\degree}$ y genera fuerzas laterales impredecibles.
+	      Estime la fuerza de sustentación máxima $L = \frac{1}{2}\rho V^2 S\,C_L$
+	      con $C_{L,\mathrm{max}} \approx 1{,}5$ y $S = c \times b$.  ¿Es esta
+	      fuerza compatible con el anclaje típico de la balanza ($L_\mathrm{max}
+		      = \SI{50}{\N}$)?
+
+	\item[\textbf{P1.3}] Se desea repetir el ensayo a $Re_c = 5\times10^5$
+	      manteniendo la misma cuerda.  Calcule la nueva $V_\mathrm{req}$ y
+	      $f_\mathrm{VFD}$.  ¿Es posible alcanzar este Reynolds con el túnel del
+	      CIIIA?  Si no, proponga una alternativa (cambio de cuerda o presurización).
+\end{enumerate}
+
+% ---- EQUIPO 2 ----
+\subsection{Equipo~2: Resistencia de un Cilindro Circular -- Crisis de Arrastre}
+\label{sec:eq2}
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del ensayo -- Equipo~2.}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro}      & \textbf{Valor}                              \\
+		\midrule
+		Modelo                  & Cilindro circular rígido                    \\
+		Diámetro $D$            & \SI{20}{\mm}                                \\
+		Longitud                & \SI{300}{\mm} (pared a pared)               \\
+		Reynolds objetivo       & $Re_D = 2 \times 10^5$ (crisis de arrastre) \\
+		Mediciones requeridas   & $C_D$, frecuencia de desprendimiento
+		de vórtices ($St$)                                                    \\
+		\rowcolor{aeroyellow!20}
+		Condiciones ambientales & $T = \SI{18}{\degreeCelsius}$,
+		$p = \SI{101\,325}{\pascal}$                                          \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Tareas:} Calcule $\rho$ y $\nu$ a las condiciones indicadas.
+Determine la velocidad necesaria para alcanzar la crisis de arrastre
+($Re_D = 2\times10^5$).  Obtenga $f_\mathrm{VFD}$ y $\Delta p$.  Evalúe
+si el túnel puede proporcionar esta velocidad y discuta las limitaciones.
+
+\textbf{Evaluación de riesgo:} complete la Tabla~\ref{tab:risk_template}.
+El cilindro genera desprendimiento de vórtices (Von Kármán) con vibraciones
+significativas a alta velocidad; además, la crisis de arrastre se produce
+a velocidades muy altas que se acercan al límite del túnel.
+
+\subsubsection*{Problemas Adicionales -- Equipo~2}
+
+\begin{enumerate}
+	\item[\textbf{P2.1}] El número de Strouhal para un cilindro es
+	      $St = f_v D / V \approx 0{,}2$.  Calcule la frecuencia de
+	      desprendimiento de vórtices $f_v$ a la velocidad de ensayo.  ¿Podría
+	      esta frecuencia excitar resonancias en el montaje del túnel?
+
+	\item[\textbf{P2.2}] Se propone reducir el Reynolds objetivo a
+	      $Re_D = 1\times10^5$ para operar en un rango más seguro del túnel.
+	      Calcule la nueva $V_\mathrm{req}$ y $f_\mathrm{VFD}$.  Estime la
+	      reducción de la incertidumbre $u_V/V$ al operar a menor velocidad
+	      (menor $\Delta p$ relativo al fondo de escala del manómetro).
+
+	\item[\textbf{P2.3}] Compare el ratio de bloqueo del cilindro en la
+	      sección de prueba: $\epsilon = D \cdot L / (H \times W)$.  Si el
+	      diámetro se aumenta a \SI{40}{\mm}, ¿cuál es el nuevo ratio de
+	      bloqueo?  Discuta cuándo es necesaria la corrección de
+	      Maskell~\cite{barlow1999} por solidez del modelo.
+\end{enumerate}
+
+% ---- EQUIPO 3 ----
+\subsection{Equipo~3: Mapa de Velocidades Multi-Frecuencia para Validación CFD}
+\label{sec:eq3}
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del ensayo -- Equipo~3.}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro}      & \textbf{Valor}                              \\
+		\midrule
+		Objetivo                & Validar simulación CFD del túnel vacío      \\
+		Frecuencias de barrido  & $f \in \{10, 20, 30, 40, 50\}\,\si{\Hz}$    \\
+		Malla de medida         & $5\times5$ puntos en la sección transversal \\
+		Mediciones requeridas   & Perfil $V(y,z)$ a cada frecuencia,
+		intensidad de turbulencia                                             \\
+		\rowcolor{aeroyellow!20}
+		Condiciones ambientales & $T = \SI{25}{\degreeCelsius}$,
+		$p = \SI{100\,500}{\pascal}$                                          \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Tareas:} Calcule $\rho$ y las velocidades esperadas a las 5
+frecuencias usando la curva de calibración.  Determine la presión diferencial
+$\Delta p$ a cada punto.  Calcule el índice de uniformidad $I_u$ esperado.
+Note que $f = \SI{30}{\Hz}$ no tiene datos LDA directos; proponga cómo
+interpolar desde los datos disponibles.
+
+\textbf{Evaluación de riesgo:} complete la Tabla~\ref{tab:risk_template}.
+El ensayo implica inserción repetida de la sonda Pitot/LDA en la sección de
+prueba a diferentes posiciones con el flujo activo, cambios frecuentes de
+velocidad, y sesiones prolongadas de adquisición.
+
+\subsubsection*{Problemas Adicionales -- Equipo~3}
+
+\begin{enumerate}
+	\item[\textbf{P3.1}] La intensidad de turbulencia se define como
+	      $Tu = \sigma / \bar{V}$.  Con los datos de la Tabla~\ref{tab:calibracion},
+	      calcule $Tu$ para cada frecuencia disponible.  Un túnel de buena calidad
+	      presenta $Tu < 1\%$ en el núcleo.  ¿Se cumple este criterio?
+
+	\item[\textbf{P3.2}] El dato de 30~Hz no existe en los archivos.
+	      Use la curva de calibración ($V = 1{,}04 f$) para predecir
+	      $V(30\,\text{Hz}) \approx \SI{31.2}{\m\per\s}$.  Estime la incertidumbre
+	      de esta predicción a partir de los residuales del ajuste lineal y
+	      compárela con la incertidumbre de una medida directa LDA.
+
+	\item[\textbf{P3.3}] Si la simulación CFD predice $V_\mathrm{CFD} =
+		      \SI{20.5}{\m\per\s}$ a $f = \SI{20}{\Hz}$ y el dato experimental es
+	      $V_\mathrm{exp} = \SI{20.8}{\m\per\s}$, calcule el error relativo
+	      $\epsilon = |V_\mathrm{CFD} - V_\mathrm{exp}| / V_\mathrm{exp}$.
+	      ¿Es este nivel de discrepancia aceptable para validación CFD?
+	      Discuta fuentes de error en ambos enfoques.
+\end{enumerate}
+
+% ---- EQUIPO 4 ----
+\subsection{Equipo~4: Similitud Dinámica -- Maqueta a Escala de Ala Delta}
+\label{sec:eq4}
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros del ensayo -- Equipo~4.}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Parámetro}                  & \textbf{Valor}                      \\
+		\midrule
+		Modelo                              & Ala delta a escala 1:50             \\
+		Cuerda aerodinámica media $\bar{c}$ & \SI{80}{\mm}                        \\
+		Envergadura de la maqueta           & \SI{120}{\mm}                       \\
+		Reynolds de vuelo real              & $Re_\mathrm{real} = 4 \times 10^6$
+		($\bar{c}_\mathrm{real} = \SI{4}{\m}$,
+		$V_\mathrm{vuelo} = \SI{15}{\m\per\s}$)                                   \\
+		Reynolds objetivo en túnel          & Igualar $Re$ de vuelo si es posible \\
+		\rowcolor{aeroyellow!20}
+		Condiciones ambientales             & $T = \SI{20}{\degreeCelsius}$,
+		$p = \SI{101\,325}{\pascal}$                                              \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Tareas:} Calcule la velocidad en el túnel necesaria para igualar
+$Re_\mathrm{real}$ con la maqueta a escala.  Determine si el túnel del CIIIA
+puede alcanzar esta velocidad.  Si no es posible (como es probable), calcule
+el Reynolds máximo alcanzable con $V_\mathrm{max} = \SI{57}{\m\per\s}$ y
+discuta las implicaciones aerodinámicas de operar a Reynolds reducido.
+
+\textbf{Evaluación de riesgo:} complete la Tabla~\ref{tab:risk_template}.
+La maqueta a escala es pequeña y ligera, con riesgo de desprendimiento a alta
+velocidad.  El ensayo a velocidad máxima del túnel implica mayor riesgo
+acústico y vibración.
+
+\subsubsection*{Problemas Adicionales -- Equipo~4}
+
+\begin{enumerate}
+	\item[\textbf{P4.1}] Calcule la velocidad necesaria en el túnel para igualar
+	      $Re_\mathrm{real}$.  Demuestre que excede la capacidad del túnel y
+	      determine por qué factor.  ¿Qué alternativas existen para alcanzar
+	      similitud dinámica completa (túnel presurizado, fluido diferente, etc.)?
+
+	\item[\textbf{P4.2}] Con $V_\mathrm{max} = \SI{57}{\m\per\s}$ y
+	      $\bar{c} = \SI{80}{\mm}$, calcule $Re_\mathrm{max}$ alcanzable.
+	      Se define el factor de similitud como $Re_\mathrm{max}/Re_\mathrm{real}$.
+	      ¿Qué porcentaje del Reynolds de vuelo se alcanza?  ¿Es suficiente para
+	      estudios cualitativos de estabilidad?
+
+	\item[\textbf{P4.3}] Se propone aumentar la escala de la maqueta a 1:25
+	      ($\bar{c} = \SI{160}{\mm}$) para mejorar la similitud.  Calcule el nuevo
+	      $Re_\mathrm{max}$, el ratio de bloqueo $\epsilon = S_\mathrm{modelo} /
+		      S_\mathrm{túnel}$ (asumiendo envergadura proporcional), y discuta si el
+	      bloqueo es aceptable ($\epsilon < 5\%$ según~\cite{barlow1999}).
+\end{enumerate}
+
+% =============================================================================
+\section{Evaluación de Riesgos}
+\label{sec:riesgos}
+
+\subsection{Matriz de Riesgos}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=0.85]
+		\foreach \x in {0,...,4} {
+				\foreach \y in {0,...,4} {
+						\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+						\pgfmathparse{\risk < 5 ? "aerogreen!40" :
+							(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+						\edef\fillcol{\pgfmathresult}
+						\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+						\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+						\node at (\x+0.5,\y+0.5)
+						{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+					}
+			}
+		\foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+				\node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.1) {\l};
+			}
+		\foreach \y/\l in {0/Insignificante,1/Menor,2/Moderado,3/Mayor,
+				4/Catastrófico} {
+				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+			}
+		\node[font=\small\bfseries,rotate=90] at (-1.5,2.5) {Severidad};
+		\node[font=\small\bfseries] at (2.5,-1.2) {Probabilidad};
+		% Scenario markers
+		\fill[blue,opacity=0.8] (3.5,3.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (3.5,3.5) {Motor};
+		\fill[blue!70,opacity=0.8] (2.5,2.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (2.5,2.5) {Pitot};
+		\fill[orange,opacity=0.8] (1.5,3.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (1.5,3.5) {Proy.};
+		\fill[aerogreen!70,opacity=0.8] (0.5,2.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (0.5,2.5) {Elec.};
+		% Legend
+		\fill[aerogreen!40] (5.5,3.5) rectangle (6.0,4.0);
+		\node[right,font=\tiny] at (6.0,3.75) {Bajo ($<5$)};
+		\fill[aeroyellow!60] (5.5,2.8) rectangle (6.0,3.3);
+		\node[right,font=\tiny] at (6.0,3.05) {Medio (5--12)};
+		\fill[aerored!50] (5.5,2.1) rectangle (6.0,2.6);
+		\node[right,font=\tiny] at (6.0,2.35) {Alto ($>12$)};
+	\end{tikzpicture}
+	\caption{Matriz de riesgos $5\times5$ para operaciones del túnel de viento.
+		Motor/ventilador: zona roja; Pitot y proyección: zona amarilla;
+		Eléctrico: zona verde.}
+	\label{fig:risk_matrix}
+\end{figure}
+
+\subsection{Jerarquía de controles}
+
+\begin{enumerate}
+	\item \textbf{Eliminación/Sustitución}: uso de instrumentación sin contacto
+	      (LDA) en lugar de Pitot cuando sea posible.
+	\item \textbf{Controles de ingeniería}: guardas en el ventilador, parada de
+	      emergencia, pantalla protectora en la sección de prueba, aislamiento
+	      acústico.
+	\item \textbf{Controles administrativos}: procedimientos operativos
+	      estandarizados (SOPs), formación obligatoria, supervisión del
+	      responsable de laboratorio.
+	\item \textbf{EPP}: protección auditiva ($\geq\SI{40}{\Hz}$), gafas de
+	      seguridad, calzado de seguridad.
+\end{enumerate}
+
+% =============================================================================
+\section{Herramientas de Software}
 \label{sec:software}
+
+Carpeta \texttt{Practicas/P02\_Calibracion\_Tunel/}:
 
 \subsection{Módulo \texttt{calib\_utils.py}}
 
-El módulo \texttt{Practicas/P02\_Calibracion\_Tunel/src/calib\_utils.py}
-proporciona:
-\begin{itemize}
-  \item \texttt{velocity\_from\_dp(dp, rho)}: $V = \sqrt{2\Delta p/\rho}$
-  \item Descubrimiento automático de los datos en \texttt{files/p2/}
-  \item Regresión polinomial con exportación de coeficientes
-  \item Propagación de incertidumbre según ec.~\eqref{eq:uV_relativa}
-\end{itemize}
+El módulo \texttt{src/calib\_utils.py} es el núcleo del análisis de
+calibración.  Contiene las funciones reutilizables que implementan toda la
+lógica de cálculo:
 
-\begin{lstlisting}[language=Python,caption={Uso básico del módulo de calibración.}]
-from Practicas.P02_Calibracion_Tunel.src.calib_utils import velocity_from_dp
-import numpy as np
+\begin{table}[H]
+	\centering
+	\caption{Funciones del módulo \texttt{calib\_utils.py} y su comportamiento.}
+	\label{tab:funciones}
+	\small
+	\begin{tabularx}{\textwidth}{l l X}
+		\toprule
+		\textbf{Función} & \textbf{Firma}                                                        & \textbf{Comportamiento} \\
+		\midrule
+		\texttt{velocity\_from\_dp}
+		                 & \texttt{(dp, rho=1.225)}
+		                 & Calcula $V = \sqrt{2\Delta p/\rho}$ (ec.~\ref{eq:V_pitot}).
+		Acepta arrays NumPy.  Parámetro \texttt{rho} por defecto
+		\SI{1.225}{\kg\per\m\cubed} (aire estándar ISA).                                                                   \\
+		\texttt{find\_p2\_data\_root}
+		                 & \texttt{(start=None)}
+		                 & Busca el directorio \texttt{files/p2/} recorriendo hacia arriba desde
+		\texttt{start} o \texttt{cwd}.  Lanza \texttt{FileNotFoundError}
+		si no lo encuentra.                                                                                                \\
+		\texttt{extract\_frequency\_from\_name}
+		                 & \texttt{(name)}
+		                 & Extrae la frecuencia en Hz de un nombre de archivo o carpeta
+		mediante regex \texttt{(\textbackslash d+)Hz}.                                                                     \\
+		\texttt{iter\_lda\_files}
+		                 & \texttt{(p2\_root)}
+		                 & Generador que recorre todos los \texttt{.txt} bajo \texttt{p2\_root}
+		y produce tuplas \texttt{(freq\_hz, path)}.  Robusto ante
+		nombres de carpeta o archivo.                                                                                      \\
+		\texttt{read\_lda\_speeds}
+		                 & \texttt{(path, abs=True)}
+		                 & Lee un archivo DXEX~v3, detecta cabecera automáticamente, prueba
+		delimitadores (tab, coma, punto y coma), extrae columna de velocidad
+		LDA, aplica valor absoluto si \texttt{abs=True}.  Retorna
+		\texttt{pd.Series}.                                                                                                \\
+		\texttt{summarize\_frequencies}
+		                 & \texttt{(p2\_root=None, \ldots)}
+		                 & Agrega estadísticas por frecuencia: media ponderada, std combinada,
+		N muestras, N archivos.  Retorna \texttt{pd.DataFrame}.                                                            \\
+		\texttt{fit\_linear}
+		                 & \texttt{(x\_hz, y\_ms)}
+		                 & Ajuste lineal por mínimos cuadrados.  Retorna \texttt{(m, b, R2)}.
+		El script principal lo usa para obtener la curva de
+		calibración.                                                                                                       \\
+		\texttt{plot\_calibration}
+		                 & \texttt{(df, errorbars, title)}
+		                 & Genera gráfica de dispersión con barras de error y recta de ajuste.
+		Retorna \texttt{(fig, ax)} de matplotlib.                                                                          \\
+		\texttt{plot\_frequency\_distribution}
+		                 & \texttt{(freq, speeds, bins)}
+		                 & Histograma de velocidades instantáneas LDA para una frecuencia
+		dada.  Útil para evaluar distribución y turbulencia.                                                               \\
+		\texttt{invert\_calibration}
+		                 & \texttt{(speed\_ms, m, b)}
+		                 & Invierte $V = mf + b$ para obtener $f = (V - b)/m$.  Usada en
+		los casos de estudio para obtener la frecuencia del variador.                                                      \\
+		\texttt{save\_figure}
+		                 & \texttt{(fig, out\_dir, name)}
+		                 & Guarda figura como PNG (\SI{150}{dpi}) y SVG.                                                   \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
 
-# Datos de ejemplo
-dp   = np.array([16.6, 66.3, 149.2, 265.2, 414.4, 811.9, 1342, 2004])  # Pa
-rho  = 1.225  # kg/m^3  (condiciones estandar)
+\begin{lstlisting}[language=Python,caption={Uso básico del módulo
+  \texttt{calib\_utils.py}.}]
+from Practicas.P02_Calibracion_Tunel.src import calib_utils as cu
 
-V = velocity_from_dp(dp, rho)
-print("Velocidades [m/s]:", np.round(V, 2))
-# [5.2  10.4 15.6 20.8 26.0 36.4 46.8 57.2]
+# 1. Descubrir datos
+p2_root = cu.find_p2_data_root()
 
-# Ajuste lineal
-f_vfd = np.array([5, 10, 15, 20, 25, 35, 45, 55])  # Hz
-coeffs = np.polyfit(f_vfd, V, deg=1)
-print(f"V(f) = {coeffs[0]:.4f}*f + {coeffs[1]:.4f}")
-# V(f) = 1.0440*f + (-0.0020)
+# 2. Estadisticas por frecuencia
+df = cu.summarize_frequencies(p2_root)
+print(df[['frequency_hz', 'mean_speed_ms', 'std_speed_ms', 'n_files']])
+
+# 3. Ajuste lineal
+m, b, r2 = cu.fit_linear(df['frequency_hz'].values,
+                          df['mean_speed_ms'].values)
+print(f"V(f) = {m:.4f}*f + {b:.4f},  R2 = {r2:.4f}")
+
+# 4. Caso de estudio: velocidad para Re = 3e5, c = 100 mm
+V_req = 3e5 * 1.5e-5 / 0.1  # = 45 m/s
+f_req = cu.invert_calibration(V_req, m, b)
+print(f"f_VFD = {f_req:.1f} Hz para V = {V_req:.1f} m/s")
 \end{lstlisting}
 
-\subsection{Notebook principal}
+\subsection{Script principal \texttt{P02\_Tunel\_Calibracion.py}}
 
-\texttt{Practicas/P02\_Calibracion\_Tunel/notebooks/P02\_Tunel\_Calibracion.ipynb}
-realiza automáticamente:
+El script \texttt{src/P02\_Tunel\_Calibracion.py} (\textasciitilde538 líneas)
+ejecuta el flujo completo de análisis en 16 pasos:
+
 \begin{enumerate}
-  \item Lectura y organización de los archivos en \texttt{files/p2/}
-  \item Conversión $\Delta p \to V$ con corrección de densidad
-  \item Ajuste y visualización de la curva de calibración
-  \item Cálculo de incertidumbre y exportación de resultados
+	\item \textbf{Descubrimiento de datos}: localiza \texttt{files/p2/} y
+	      lista todos los archivos LDA.
+	\item \textbf{Estadísticas por archivo}: lee cada \texttt{.txt} y calcula
+	      media, std y N muestras (\texttt{load\_and\_stats\_per\_file()}).
+	\item \textbf{Agregación por frecuencia}: media ponderada y simple
+	      (\texttt{aggregate\_by\_frequency()}).
+	\item \textbf{Exportación}: CSV y Parquet con los resultados de
+	      calibración.
+	\item \textbf{Gráfica de dispersión}: scatter con barras de error
+	      (\texttt{calibracion\_scatter.png}).
+	\item \textbf{Ajuste lineal}: $V = mf + b$ con cálculo de $R^2$.
+	\item \textbf{Ajuste polinomial}: grado~2 para comparación.
+	\item \textbf{Caso de estudio}: cálculo de $V$ a partir de $f$, inversión
+	      para obtener $f$ desde $V$, cálculo de $Re$.
+	\item \textbf{Resumen JSON}: exportación de coeficientes y métricas.
+	\item \textbf{Verificación}: aserciones de sanidad ($R^2 > 0{,}99$,
+	      pendiente positiva, etc.).
+	\item \textbf{Histogramas}: distribución de velocidades por frecuencia.
 \end{enumerate}
+
+Para ejecutar el script:
+\begin{lstlisting}[language=bash,caption={Ejecución del script principal.}]
+cd Practicas/P02_Calibracion_Tunel/src
+python P02_Tunel_Calibracion.py
+\end{lstlisting}
+
+\subsection{Notebook Jupyter}
+
+\texttt{notebooks/P02\_Tunel\_Calibracion.ipynb} reproduce el análisis del
+script de forma interactiva en 16 celdas:
+
+\begin{enumerate}
+	\item Celda markdown con descripción y objetivos.
+	\item Importaciones y configuración.
+	\item Descubrimiento y carga de datos LDA.
+	\item Estadísticas por archivo y por frecuencia.
+	\item Visualización de la dispersión de datos.
+	\item Ajuste lineal y gráfica de residuales.
+	\item Ajuste polinomial comparativo.
+	\item Caso de estudio interactivo (modificar parámetros).
+	\item Histogramas de velocidades por frecuencia.
+	\item Exportación de resultados.
+\end{enumerate}
+
+El notebook permite modificar parámetros (densidad, temperatura, Reynolds
+objetivo) y observar los resultados en tiempo real.
+
+\subsection{Datos}
+
+\texttt{data/} -- directorio para resultados procesados (CSV, Parquet, JSON).
+Los datos brutos se encuentran en \texttt{files/p2/} según la estructura
+descrita en §\ref{sec:escenarios}.
 
 % =============================================================================
 \section{Procedimiento Experimental}
 \label{sec:procedimiento}
 
 \begin{enumerate}
-  \item \textbf{Condiciones ambientales}: Registrar $T$, $p_\mathrm{atm}$ y
-        humedad relativa.  Calcular $\rho$ con ec.~\eqref{eq:rho_ideal}.
-  \item \textbf{Alineación del Pitot}: Verificar que el eje del tubo sea
-        paralelo al flujo ($\pm\SI{2}{\degree}$ máximo).
-  \item \textbf{Barrido de frecuencias}: Registrar $\Delta p$ para
-        $f \in \{5, 10, 15, 20, 25, 35, 40, 45, 50, 55\}\,\si{\Hz}$.
-        Esperar estabilización (\SI{30}{\second}) antes de cada lectura.
-  \item \textbf{Repeticiones}: Mínimo 3 pasadas para cada frecuencia.
-        Calcular media y desviación típica.
-  \item \textbf{Perfil de velocidades}: A $f = \SI{35}{\Hz}$, medir $V$
-        en una malla $3\times3$ centrada en la sección de prueba.
-  \item \textbf{Análisis}: Usar el notebook para ajuste y propagación de
-        incertidumbre.
+	\item \textbf{Condiciones ambientales}: Registrar $T$, $p_\mathrm{atm}$ y
+	      humedad relativa.  Calcular $\rho$ con ec.~\eqref{eq:rho_ideal}.
+	\item \textbf{Inspección del túnel}: Verificar que la sección de prueba esté
+	      libre de objetos.  Comprobar el funcionamiento de la parada de
+	      emergencia.
+	\item \textbf{Alineación del Pitot}: Verificar que el eje del tubo sea
+	      paralelo al flujo ($\pm\SI{2}{\degree}$ máximo).
+	\item \textbf{Barrido de frecuencias}: Registrar $\Delta p$ (o velocidad LDA)
+	      para $f \in \{5, 10, 15, 20, 25, 35, 40, 45, 50, 55\}\,\si{\Hz}$.
+	      Esperar estabilización (\SI{30}{\second}) antes de cada lectura.
+	\item \textbf{Repeticiones}: Mínimo 3 adquisiciones por frecuencia para
+	      35~Hz.  Calcular media y desviación típica.
+	\item \textbf{Perfil de velocidades}: A $f = \SI{35}{\Hz}$, medir $V$
+	      en una malla $3\times3$ centrada en la sección de prueba.
+	\item \textbf{Análisis}: Ejecutar el notebook o script Python para ajuste,
+	      propagación de incertidumbre y visualización.
 \end{enumerate}
 
 % =============================================================================
-\section{Resultados y Discusión}
-\label{sec:resultados}
+\section{Cuestionario}
+\label{sec:cuestionario}
 
-\begin{table}[H]
-  \centering
-  \caption{Resumen de resultados de calibración (valores de referencia).}
-  \label{tab:resumen}
-  \begin{tabular}{lSl}
-    \toprule
-    \textbf{Magnitud} & {\textbf{Valor}} & \textbf{Unidad} \\
-    \midrule
-    Pendiente de calibración $a_1$    & 1.044 & \si{\m\per\s\per\Hz} \\
-    Ordenada en origen $a_0$          & -0.002 & \si{\m\per\s} \\
-    Coeficiente $R^2$                 & 0.9997 & -- \\
-    Velocidad máxima ($f=\SI{55}{\Hz}$) & 57.2 & \si{\m\per\s} \\
-    Incertidumbre relativa $u_V/V$    & 0.16 & \si{\percent} \\
-    Uniformidad $I_u$ (núcleo central) & 0.8 & \si{\percent} \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\begin{enumerate}
+	\item ¿Por qué es necesario calibrar un túnel de viento antes de cada campaña
+	      de ensayos?  ¿Qué factores podrían causar que la calibración cambie
+	      entre sesiones?
 
-Los resultados muestran que la curva de calibración es esencialmente lineal
-($R^2 = 0.9997$), lo que confirma el buen diseño del variador de frecuencia y
-la ausencia de saturación hidráulica en el rango de operación.
+	\item Explique físicamente por qué la relación $V = f(f_\mathrm{VFD})$ es
+	      aproximadamente lineal.  ¿En qué condiciones podría desviarse de la
+	      linealidad?
+
+	\item ¿Cuál es la ventaja de medir la velocidad con LDA en lugar de un Pitot
+	      para la calibración?  ¿Y las desventajas?
+
+	\item En la ec.~\eqref{eq:uV_relativa}, ¿cuál de las dos contribuciones
+	      ($u_{\Delta p}$ o $u_\rho$) domina a baja velocidad?  ¿Y a alta
+	      velocidad?  Justifique cuantitativamente.
+
+	\item Si la temperatura del laboratorio cambia \SI{5}{\degreeCelsius}
+	      durante una sesión de ensayo de 2 horas, ¿cuánto varía $\rho$ y
+	      cómo afecta a la curva de calibración?
+
+	\item ¿Qué significa un coeficiente $R^2 = 0{,}9997$?  ¿Cuánta varianza
+	      queda sin explicar por el modelo lineal?
+
+	\item Describa el procedimiento para verificar la uniformidad del perfil de
+	      velocidades.  ¿Qué criterio de aceptación usaría?
+
+	\item ¿Por qué se toma el valor absoluto de las velocidades LDA para la
+	      calibración?  ¿Qué información se pierde al hacerlo?
+
+	\item Explique el concepto de media ponderada utilizado en
+	      \texttt{summarize\_frequencies()} cuando hay múltiples archivos por
+	      frecuencia.  ¿Por qué es más correcto que una media simple de medias?
+
+	\item Si se requiere un ensayo a $Re = 10^6$ con una maqueta de cuerda
+	      \SI{200}{\mm}, ¿puede el túnel del CIIIA proporcionar las condiciones
+	      necesarias?  Justifique con cálculos.
+\end{enumerate}
+
+% =============================================================================
+\section{Formato del Informe}
+\label{sec:informe}
+
+Formato AIAA con las siguientes secciones obligatorias:
+
+\begin{enumerate}
+	\item \textbf{Resumen}: síntesis del objetivo, método y resultado principal.
+	\item \textbf{Introducción}: contexto de la calibración del túnel.
+	\item \textbf{Fundamento Teórico}: ecuaciones de Bernoulli, Pitot,
+	      incertidumbre.
+	\item \textbf{Metodología}: descripción del procedimiento experimental
+	      y herramientas de software utilizadas.
+	\item \textbf{Resultados}: curva de calibración con incertidumbre, perfil
+	      de velocidades, caso de estudio del equipo con evaluación de riesgo.
+	\item \textbf{Discusión}: respuestas al cuestionario, comparación con
+	      valores teóricos, problemas adicionales resueltos.
+	\item \textbf{Conclusiones}: resumen de hallazgos y recomendaciones.
+	\item \textbf{Referencias}: formato IEEE.
+	\item \textbf{Apéndice~A}: gráficas generadas con Python (calibración,
+	      histogramas, residuales).
+\end{enumerate}
 
 % =============================================================================
 \section{Conclusiones}
 \label{sec:conclusiones}
 
 \begin{enumerate}
-  \item El túnel de viento del laboratorio presenta una relación
-        $V \propto f_\mathrm{VFD}$ lineal con $R^2 > 0.999$.
-  \item La incertidumbre de velocidad es inferior al \SI{0.2}{\percent},
-        adecuada para ensayos aeronáuticos de caracterización de perfiles.
-  \item El perfil de velocidades en la sección de prueba tiene una uniformidad
-        $I_u < 1\%$ en el núcleo central (\SI{80}{\percent} del área).
-  \item La herramienta Python (\texttt{calib\_utils.py} + notebook) automatiza
-        el análisis y puede adaptarse a distintas condiciones ambientales.
+	\item El túnel de viento del CIIIA presenta una relación
+	      $V \propto f_\mathrm{VFD}$ esencialmente lineal con $R^2 > 0{,}999$,
+	      confirmando el buen diseño del variador de frecuencia y la ausencia
+	      de saturación hidráulica en el rango de operación (\SIrange{5}{55}{\Hz}).
+	\item La incertidumbre de velocidad es inferior al \SI{0.3}{\percent},
+	      adecuada para ensayos aeronáuticos de caracterización de perfiles
+	      y validación CFD.
+	\item El perfil de velocidades en la sección de prueba tiene una uniformidad
+	      $I_u < 1\%$ en el núcleo central (\SI{80}{\percent} del área),
+	      cumpliendo los estándares para túneles de investigación~\cite{barlow1999}.
+	\item Los datos LDA adquiridos en el CIIIA proporcionan una resolución
+	      temporal superior a la de las mediciones con Pitot, permitiendo
+	      caracterizar la turbulencia del flujo además de la velocidad media.
+	\item La evaluación de riesgos identifica la maquinaria rotativa como el
+	      riesgo principal ($R = 16$, Alto), mitigable con guardas protectoras
+	      y formación obligatoria.
+	\item Las herramientas de software (\texttt{calib\_utils.py}, script
+	      principal y notebook) automatizan todo el flujo de análisis
+	      --- desde la lectura de datos DXEX~v3 hasta la generación de la curva
+	      de calibración, propagación de incertidumbre y resolución de casos
+	      de estudio --- y pueden adaptarse a distintas condiciones ambientales
+	      y configuraciones del túnel.
 \end{enumerate}
 
 % =============================================================================
 \printbibliography[title={Referencias}]
+
+% =============================================================================
+\appendix
+\section{Referencia Rápida de Funciones Python}
+\label{sec:appendix_python}
+
+\begin{table}[H]
+	\centering
+	\caption{Referencia rápida: funciones de \texttt{calib\_utils.py}.}
+	\label{tab:ref_python}
+	\small
+	\begin{tabularx}{\textwidth}{l X}
+		\toprule
+		\textbf{Función} & \textbf{Uso rápido}                                       \\
+		\midrule
+		\texttt{velocity\_from\_dp(500, 1.2)}
+		                 & $\rightarrow$ \SI{28.87}{\m\per\s}                        \\
+		\texttt{find\_p2\_data\_root()}
+		                 & $\rightarrow$ \texttt{Path('/.../files/p2')}              \\
+		\texttt{summarize\_frequencies()}
+		                 & $\rightarrow$ DataFrame con 10 filas (una por frecuencia) \\
+		\texttt{fit\_linear(f, V)}
+		                 & $\rightarrow$ \texttt{(1.04, 0.0, 0.9997)}                \\
+		\texttt{invert\_calibration(45.0, 1.04, 0.0)}
+		                 & $\rightarrow$ \SI{43.3}{\Hz}                              \\
+		\texttt{plot\_calibration(df)}
+		                 & $\rightarrow$ Figura matplotlib con scatter + recta       \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
 
 \end{document}

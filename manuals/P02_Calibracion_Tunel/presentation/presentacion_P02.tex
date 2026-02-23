@@ -1,6 +1,7 @@
 % =============================================================================
 % Presentación Beamer P02 – Calibración del Túnel de Viento
 % Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode presentacion_P02.tex
 % =============================================================================
 \documentclass[aspectratio=169,12pt]{beamer}
 
@@ -8,395 +9,1052 @@
 \usecolortheme{seahorse}
 \usefonttheme{professionalfonts}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% ---- Encoding & Language ----
+\usepackage{fontspec}
 \usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+% ---- Math & Physics ----
 \usepackage{amsmath,amssymb}
+\usepackage{mathtools}
 \usepackage{siunitx}
 \sisetup{output-decimal-marker={,}}
+
+% ---- TikZ ----
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
+                decorations.markings,decorations.pathmorphing,patterns}
 \usepackage{circuitikz}
+
+% ---- Tables ----
 \usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{array}
+
+% ---- Code ----
 \usepackage{listings}
 \lstset{
   basicstyle=\ttfamily\tiny,
   keywordstyle=\color{blue!80}\bfseries,
   commentstyle=\color{green!50!black},
   backgroundcolor=\color{gray!10},
-  frame=single, breaklines=true
+  frame=single,
+  breaklines=true
 }
 
+% ---- Custom Colors ----
 \definecolor{aeroblue}{RGB}{0,51,102}
 \definecolor{aerored}{RGB}{153,0,0}
 \definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aeroyellow}{RGB}{204,153,0}
+\definecolor{aerogreendark}{RGB}{0,80,40}
+\definecolor{aerogreenlight}{RGB}{0,140,70}
 
-\setbeamercolor{frametitle}{bg=aeroblue,fg=white}
-\setbeamercolor{title}{bg=aeroblue,fg=white}
-\setbeamercolor{structure}{fg=aeroblue}
+% ---- GREEN THEME ----
+\setbeamercolor{frametitle}{bg=aerogreen,fg=white}
+\setbeamercolor{title}{bg=aerogreen,fg=white}
+\setbeamercolor{structure}{fg=aerogreen}
+\setbeamercolor{palette primary}{bg=aerogreen,fg=white}
+\setbeamercolor{palette secondary}{bg=aerogreenlight,fg=white}
+\setbeamercolor{palette tertiary}{bg=aerogreendark,fg=white}
+\setbeamercolor{palette quaternary}{bg=aerogreendark,fg=white}
+\setbeamercolor{section in toc}{fg=aerogreen}
+\setbeamercolor{subsection in toc}{fg=aerogreendark}
+\setbeamercolor{block title}{bg=aerogreen,fg=white}
+\setbeamercolor{block body}{bg=aerogreen!10,fg=black}
+\setbeamercolor{block title alerted}{bg=aerored,fg=white}
+\setbeamercolor{block body alerted}{bg=aerored!10,fg=black}
+\setbeamercolor{block title example}{bg=aerogreenlight,fg=white}
+\setbeamercolor{block body example}{bg=aerogreenlight!10,fg=black}
+\setbeamercolor{item}{fg=aerogreen}
+\setbeamercolor{itemize item}{fg=aerogreen}
+\setbeamercolor{enumerate item}{fg=aerogreen}
 
-\title[P02 -- Calibración Túnel]{P02: Calibración del Túnel de Viento}
+% ---- Title Info ----
+\title[P02 -- Calibración Túnel]{P02: Calibración del\\Túnel de Viento}
 \subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
 \author{Laboratorio de Técnicas de Medida}
-\institute{Departamento de Ingeniería Aeroespacial}
-\date{\today}
+\date{}
 
 % =============================================================================
 \begin{document}
 
 \begin{frame}
-  \titlepage
+	\titlepage
 \end{frame}
 
-\begin{frame}{Contenido}
-  \tableofcontents
-\end{frame}
-
-% =============================================================================
-\section{Motivación}
-
-\begin{frame}{¿Por qué calibrar el túnel?}
-  \begin{columns}
-    \begin{column}{0.55\textwidth}
-      \begin{itemize}
-        \item Ensayos aerodinámicos requieren conocer $V_\infty$ con
-              \textbf{incertidumbre $< 1\%$}
-        \item El variador de frecuencia (VFD) no da velocidad directamente
-        \item $Re$, $C_L$, $C_D$ dependen críticamente de $V_\infty$
-      \end{itemize}
-      \vspace{0.5em}
-      \begin{alertblock}{Objetivo}
-        Curva $V = f(f_\mathrm{VFD})$ con incertidumbre cuantificada.
-      \end{alertblock}
-      \vspace{0.5em}
-      \textbf{Túnel del laboratorio:}\\
-      Sección $\SI{30}{\cm}\times\SI{30}{\cm}$,
-      $V_\mathrm{max}\approx\SI{50}{\m\per\s}$,\\
-      VFD $f \in [5,55]\,\si{\Hz}$
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{tikzpicture}[scale=0.75,>=Stealth]
-        \draw[aeroblue,very thick] (0,1.0) -- (6,1.0);
-        \draw[aeroblue,very thick] (0,-1.0) -- (6,-1.0);
-        \draw[fill=gray!15,draw=aeroblue] (0,-1.0) rectangle (1.0,1.0);
-        \draw[fill=gray!20,draw=aeroblue] (1.0,1.0) -- (2.5,0.55)
-              -- (2.5,-0.55) -- (1.0,-1.0) -- cycle;
-        \draw[fill=gray!10,draw=aeroblue] (2.5,0.55) -- (4.5,0.55)
-              -- (4.5,-0.55) -- (2.5,-0.55) -- cycle;
-        \draw[fill=gray!20,draw=aeroblue] (4.5,0.55) -- (6.0,1.0)
-              -- (6.0,-1.0) -- (4.5,-0.55) -- cycle;
-        \foreach \y in {-0.3,0,0.3} {
-          \draw[->,blue!60] (2.7,\y) -- (3.5,\y);
-        }
-        \draw[fill=gray!70,draw=black,very thick] (3.5,-0.55) -- (3.5,-0.05);
-        \fill[aerored] (3.5,-0.05) circle (0.08);
-        \node[above,font=\tiny] at (3.5,0) {Pitot};
-        \node[below,font=\tiny,aeroblue] at (3.5,-0.65) {Secc.~prueba};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{Índice}
+	\tableofcontents
 \end{frame}
 
 % =============================================================================
-\section{Teoría: Tubo de Pitot}
+\section{Introducción}
+% =============================================================================
+
+\begin{frame}{¿Por qué calibrar el túnel de viento?}
+	\begin{columns}
+		\begin{column}{0.55\textwidth}
+			\begin{itemize}
+				\item Ensayos aerodinámicos requieren conocer $V_\infty$ con
+				      incertidumbre $< 1\%$
+				\item El variador de frecuencia (VFD) controla el motor,
+				      no indica velocidad directamente
+				\item $Re$, $C_L$, $C_D$ dependen críticamente de $V_\infty$
+				\item Calibración garantiza \textbf{reproducibilidad}
+				      entre sesiones
+			\end{itemize}
+			\vspace{0.3em}
+			\begin{alertblock}{Objetivo}
+				Curva $V = f(f_\mathrm{VFD})$ con incertidumbre cuantificada
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.42\textwidth}
+			\begin{tikzpicture}[scale=0.75,>=Stealth]
+				\draw[fill=gray!15,draw=aerogreen,very thick]
+				(0,-1.0) rectangle (1.0,1.0);
+				\draw[fill=gray!20,draw=aerogreen,very thick]
+				(1.0,1.0) -- (2.5,0.55)
+				-- (2.5,-0.55) -- (1.0,-1.0) -- cycle;
+				\draw[fill=gray!10,draw=aerogreen,very thick]
+				(2.5,0.55) -- (4.5,0.55)
+				-- (4.5,-0.55) -- (2.5,-0.55) -- cycle;
+				\draw[fill=gray!20,draw=aerogreen,very thick]
+				(4.5,0.55) -- (6.0,1.0)
+				-- (6.0,-1.0) -- (4.5,-0.55) -- cycle;
+				\foreach \y in {-0.3,0,0.3} {
+						\draw[->,blue!60,thick] (2.7,\y) -- (3.5,\y);
+					}
+				\draw[fill=gray!70,draw=black,very thick] (3.5,-0.55) -- (3.5,-0.05);
+				\fill[aerored] (3.5,-0.05) circle (0.08);
+				\node[above,font=\tiny] at (3.5,0.05) {Pitot};
+				\node[below,font=\tiny,aerogreen] at (0.5,-1.1) {Cám.};
+				\node[below,font=\tiny,aerogreen] at (1.75,-0.8) {Contr.};
+				\node[below,font=\tiny,aerogreen] at (3.5,-0.65) {Secc. prueba};
+				\node[below,font=\tiny,aerogreen] at (5.25,-0.8) {Dif.};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Túnel de Viento del CIIIA}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\centering\small
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Parámetro} & \textbf{Valor}             \\
+				\midrule
+				Tipo               & Circuito abierto           \\
+				Sección            & $30\times30$ cm            \\
+				$V_\mathrm{max}$   & $\approx\SI{50}{\m\per\s}$ \\
+				Contracción        & $6{:}1$                    \\
+				Motor              & Trifásico, VFD             \\
+				VFD                & 5--55 Hz                   \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{block}{Instrumentación}
+				\begin{itemize}
+					\item Tubo de Pitot-estático
+					\item Manómetro diferencial
+					\item Sistema LDA (Anemometría Láser Doppler)
+					\item Tarjeta DAQ (NI USB)
+				\end{itemize}
+			\end{block}
+			\vspace{0.2em}
+			\begin{exampleblock}{Ubicación}
+				Laboratorio de Aerodinámica,\\
+				\textbf{CIIIA}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Objetivos de Aprendizaje}
+	\begin{enumerate}
+		\item Obtener curva $V = f(f_\mathrm{VFD})$ en todo el rango
+		      (\SIrange{5}{55}{\Hz})
+		\item Aplicar Bernoulli y Pitot para convertir $\Delta p$ en $V$
+		\item Cuantificar incertidumbre (método GUM)
+		\item Verificar uniformidad del perfil de velocidades
+		\item Aplicar regresión lineal y polinomial al ajuste
+		\item Calcular $Re$ y determinar $f_\mathrm{VFD}$ para ensayos
+		\item Usar las herramientas Python del repositorio
+		\item Realizar evaluación de riesgos con la matriz $5\times5$
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Fundamentos Teóricos}
+% =============================================================================
 
 \begin{frame}{Principio de Bernoulli -- Tubo de Pitot}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Ecuación de Bernoulli (incompresible):}
-      \begin{equation*}
-        p + \tfrac{1}{2}\rho V^2 = \text{cte}
-      \end{equation*}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Bernoulli (incompresible):}
+			\begin{equation*}
+				p + \tfrac{1}{2}\rho V^2 = \text{cte}
+			\end{equation*}
 
-      \textbf{En el punto de remanso:} $V = 0$
-      \begin{equation*}
-        p_0 = p_\infty + \tfrac{1}{2}\rho V_\infty^2
-      \end{equation*}
+			\textbf{En el punto de remanso:}
+			\begin{equation*}
+				p_0 = p_\infty + \tfrac{1}{2}\rho V_\infty^2
+			\end{equation*}
 
-      \vspace{0.3em}
-      \begin{block}{Velocidad Pitot}
-        \begin{equation*}
-          \boxed{V_\infty = \sqrt{\frac{2\,\Delta p}{\rho}}}
-        \end{equation*}
-        $\Delta p = p_0 - p_s$, medida con manómetro
-      \end{block}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.8,>=Stealth]
-        % Flow arrows
-        \foreach \y in {0.6,0.3,0,-0.3,-0.6} {
-          \draw[->,blue!60,thick] (0,\y) -- (1.5,\y);
-        }
-        % Pitot body
-        \draw[fill=gray!40,draw=black,thick]
-          (1.5,-0.5) rectangle (1.8,0.5);
-        % Stagnation point
-        \fill[aerored] (1.8,0) circle (0.1);
-        \node[aerored,right,font=\tiny] at (1.9,0) {$p_0$ (total)};
-        % Static tap
-        \draw[aerored!60,dashed,thick] (1.65,0.3) -- (2.5,0.3);
-        \node[right,font=\tiny] at (2.5,0.3) {$p_s$ (estática)};
-        % Differential
-        \draw[<->,gray] (2.1,-0.4) -- (2.1,0.4)
-              node[midway,right,font=\tiny] {$\Delta p$};
-        \node[left,font=\tiny,blue!60] at (0.7,0.6) {$V_\infty$};
-        % Stagnation streamline
-        \draw[aerored!60,thick,->] (0.5,0) -- (1.75,0);
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+			\vspace{0.3em}
+			\begin{block}{Velocidad Pitot}
+				\begin{equation*}
+					\boxed{V_\infty = \sqrt{\frac{2\,\Delta p}{\rho}}}
+				\end{equation*}
+				$\Delta p = p_0 - p_s$
+			\end{block}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.85,>=Stealth]
+				% Flow arrows
+				\foreach \y in {0.8,0.4,0,-0.4,-0.8} {
+						\draw[->,blue!60,thick] (0,\y) -- (1.5,\y);
+					}
+				% Pitot body
+				\draw[fill=gray!40,draw=black,thick]
+				(1.5,-0.6) rectangle (1.85,0.6);
+				% Stagnation point
+				\fill[aerored] (1.85,0) circle (0.1);
+				\node[aerored,right,font=\tiny] at (1.95,0) {$p_0$ (total)};
+				% Static tap
+				\draw[aerored!60,dashed,thick] (1.67,0.4) -- (2.7,0.4);
+				\node[right,font=\tiny] at (2.7,0.4) {$p_s$ (estática)};
+				% Differential
+				\draw[<->,gray] (2.3,-0.5) -- (2.3,0.5)
+				node[midway,right,font=\tiny] {$\Delta p$};
+				\node[left,font=\tiny,blue!60] at (0.7,0.8) {$V_\infty$};
+				% Stagnation streamline
+				\draw[aerored!60,thick,->] (0.5,0) -- (1.8,0);
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\begin{frame}{Densidad del aire y compresibilidad}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Densidad (gas ideal):}
-      \begin{equation*}
-        \rho = \frac{p_\mathrm{atm}}{R_\mathrm{aire}\,T},
-        \quad R_\mathrm{aire} = \SI{287}{\J\per\kg\per\K}
-      \end{equation*}
-
-      \vspace{0.3em}
-      \textbf{Corrección por compresibilidad:}
-      Para $Ma < 0.3$ ($V < \SI{100}{\m\per\s}$):
-      \begin{equation*}
-        \varepsilon = \frac{V - V_\mathrm{inc}}{V_\mathrm{inc}} < 1\%
-      \end{equation*}
-      \textit{En nuestro túnel: $\varepsilon < 0.3\%$. Se puede omitir.}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.85]
-        \draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$Ma$};
-        \draw[->] (0,0) -- (0,3) node[above,font=\tiny] {Error (\%)};
-        \draw[aeroblue,thick] (0,0) .. controls (1,0.02) and (2.5,0.1)
-              .. (3,0.5) .. controls (3.5,1.0) .. (4.5,2.5);
-        \draw[aerored,dashed] (1.5,0) -- (1.5,3);
-        \node[aerored,below,font=\tiny] at (1.5,0) {$Ma=0.3$};
-        \draw[gray,dashed] (0,0.15) -- (1.5,0.15);
-        \node[gray,left,font=\tiny] at (0,0.15) {1\%};
-        \fill[aeroblue!20,opacity=0.5] (0,0) rectangle (1.5,3);
-        \node[aeroblue,font=\tiny] at (0.75,2.5) {Nuestro\\rango};
-        \draw[->,aerored] (0.5,0.1) node[below,font=\tiny] {$Ma_\mathrm{max}=0.15$}
-              (0.5,0) -- (0.5,0.1);
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{Anemometría Láser Doppler (LDA)}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Principio}
+				Dos haces láser se cruzan creando franjas de interferencia.
+				Partículas trazadoras dispersan luz con frecuencia Doppler:
+			\end{block}
+			\begin{equation*}
+				\boxed{f_D = \frac{2\,V\,\sin(\theta/2)}{\lambda}}
+			\end{equation*}
+			\begin{itemize}\small
+				\item Medida sin contacto
+				\item Resolución temporal alta
+				\item Adquirido en el \textbf{CIIIA}
+				\item Formato DXEX~v3
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.85,>=Stealth]
+				% Laser beams
+				\draw[green!60!black,thick,->] (0,1.5) -- (2.5,0);
+				\draw[green!60!black,thick,->] (0,-1.5) -- (2.5,0);
+				% Measurement volume
+				\fill[green!30,opacity=0.5] (2.5,0) ellipse (0.3 and 0.15);
+				\node[font=\tiny] at (2.5,0.35) {Vol. medida};
+				% Fringes
+				\foreach \x in {2.25,2.35,2.45,2.55,2.65,2.75} {
+						\draw[green!40,thin] (\x,-0.1) -- (\x,0.1);
+					}
+				% Particle
+				\draw[->,aerored,thick] (1.8,-0.3) -- (3.0,-0.1);
+				\fill[aerored] (2.4,-0.2) circle (0.06);
+				\node[aerored,font=\tiny,below] at (2.4,-0.35) {Partícula};
+				% Scattered light
+				\draw[aeroyellow,dashed,->] (2.5,0) -- (4.0,1.0);
+				\node[font=\tiny,right] at (4.0,1.0) {Detector};
+				% Angle
+				\draw[gray,<->] (1.5,0.75) arc[start angle=30,end angle=-30,radius=1.5];
+				\node[gray,font=\tiny,right] at (1.6,0) {$\theta$};
+				% Labels
+				\node[green!60!black,font=\tiny,left] at (0,1.5) {Haz 1};
+				\node[green!60!black,font=\tiny,left] at (0,-1.5) {Haz 2};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-% =============================================================================
-\section{Cálculo Numérico}
+\begin{frame}{Densidad y Compresibilidad}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Densidad (gas ideal):}
+			\begin{equation*}
+				\rho = \frac{p_\mathrm{atm}}{R_\mathrm{aire}\,T},
+				\quad R_\mathrm{aire} = \SI{287}{\J\per\kg\per\K}
+			\end{equation*}
 
-\begin{frame}{Calibración numérica -- Ejemplo}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Datos ($\rho = \SI{1.225}{\kg\per\m\cubed}$):}
-      \begin{table}
-        \centering
-        \tiny
-        \begin{tabular}{SSS}
-          \toprule
-          {$f$ (Hz)} & {$\Delta p$ (Pa)} & {$V$ (m/s)} \\
-          \midrule
-           5 &   16.6 &  5.2 \\
-          15 &  149.2 & 15.6 \\
-          25 &  414.4 & 26.0 \\
-          35 &  811.9 & 36.4 \\
-          45 & 1342   & 46.8 \\
-          55 & 2004   & 57.2 \\
-          \bottomrule
-        \end{tabular}
-      \end{table}
-      \vspace{0.3em}
-      \textbf{Ajuste lineal:}
-      \begin{equation*}
-        V(f) = 1.044\,f - 0.002 \quad R^2 = 0.9997
-      \end{equation*}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.75]
-        \draw[->] (0,0) -- (6,0) node[right,font=\tiny] {$f$ (Hz)};
-        \draw[->] (0,0) -- (0,5) node[above,font=\tiny] {$V$ (m/s)};
-        % Grid
-        \foreach \x in {1,2,3,4,5} {
-          \draw[gray!30] (\x,0) -- (\x,5);
-          \node[below,font=\tiny] at (\x,0) {\pgfmathprintnumber[precision=0]{\x0}};
-        }
-        \foreach \y in {1,2,3,4} {
-          \draw[gray!30] (0,\y) -- (6,\y);
-          \node[left,font=\tiny] at (0,\y) {\pgfmathprintnumber[precision=0]{\y5}};
-        }
-        % Data points
-        \fill[aerored] (0.5,1.04) circle (0.08);
-        \fill[aerored] (1.5,3.12) circle (0.08);
-        \fill[aerored] (2.5,5.2/12) circle (0.08);
-        % Trend line
-        \draw[aeroblue,thick] (0,0) -- (5.5,4.78);
-        \node[aeroblue,font=\tiny,rotate=42] at (3.5,3.0) {$V=1.044f$};
-        % Labels y
-        \node[left,font=\tiny] at (0,1.04) {5.2};
-        \node[left,font=\tiny] at (0,2.34) {26.0};
-        \node[left,font=\tiny] at (0,4.34) {46.8};
-        % Points all
-        \foreach \f/\v in {5/5.2, 10/10.4, 15/15.6, 20/20.8, 25/26.0, 35/36.4, 45/46.8, 55/57.2} {
-          \pgfmathsetmacro{\fx}{\f/10}
-          \pgfmathsetmacro{\vy}{\v/12}
-          \fill[aerored] (\fx,\vy) circle (0.07);
-        }
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+			\textbf{Número de Reynolds:}
+			\begin{equation*}
+				Re = \frac{V\,L}{\nu}, \quad
+				\nu \approx \SI{1.5e-5}{\m\squared\per\s}
+			\end{equation*}
+
+			\vspace{0.3em}
+			\textbf{Compresibilidad:}
+			$Ma < 0{,}3 \Rightarrow$ error $< 1\%$\\
+			Nuestro túnel: $Ma_\mathrm{max} \approx 0{,}15$
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.85]
+				\draw[->] (0,0) -- (5,0) node[right,font=\tiny] {$Ma$};
+				\draw[->] (0,0) -- (0,3) node[above,font=\tiny] {Error (\%)};
+				\draw[aerogreen,thick] (0,0) .. controls (1,0.02) and (2.5,0.1)
+				.. (3,0.5) .. controls (3.5,1.0) .. (4.5,2.5);
+				\draw[aerored,dashed] (1.5,0) -- (1.5,3);
+				\node[aerored,below,font=\tiny] at (1.5,0) {$Ma=0{,}3$};
+				\draw[gray,dashed] (0,0.15) -- (1.5,0.15);
+				\node[gray,left,font=\tiny] at (0,0.15) {1\%};
+				\fill[aerogreen!20,opacity=0.5] (0,0) rectangle (1.5,3);
+				\node[aerogreen,font=\tiny,align=center] at (0.75,2.5)
+				{Nuestro\\rango};
+				\fill[aerored] (0.5,0.03) circle (0.07);
+				\node[aerored,below,font=\tiny] at (0.5,-0.1)
+				{$Ma_\mathrm{max}$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\begin{frame}{Incertidumbre de velocidad}
-  \textbf{Propagación de errores (GUM):}
-  \begin{equation*}
-    \frac{u_V}{V} = \frac{1}{2}\sqrt{
-      \left(\frac{u_{\Delta p}}{\Delta p}\right)^2
-      + \left(\frac{u_\rho}{\rho}\right)^2}
-  \end{equation*}
+\begin{frame}{Regresión y Calidad del Ajuste}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Modelo lineal:}
+			\begin{equation*}
+				V(f) = m\,f + b
+			\end{equation*}
 
-  \vspace{0.3em}
-  \textbf{Ejemplo: $V = \SI{28.57}{\m\per\s}$ ($\Delta p = \SI{500}{\Pa}$)}
+			\textbf{Modelo polinomial (grado~2):}
+			\begin{equation*}
+				V(f) = a_2\,f^2 + a_1\,f + a_0
+			\end{equation*}
 
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item $u_{\Delta p} = \SI{2}{\Pa}$ (manómetro)
-        \item $u_\rho/\rho = 0.3\%$ ($\pm\SI{1}{\K}$)
-      \end{itemize}
-      \begin{align*}
-        \frac{u_V}{V} &= \frac{1}{2}\sqrt{(0.004)^2 + (0.003)^2}\\
-                      &\approx 0.0025 = 0.25\%
-      \end{align*}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{alertblock}{Resultado}
-        \centering
-        $V = (28.57 \pm 0.07)\,\si{\m\per\s}$\\
-        (95\% confianza, $k=2$)
-      \end{alertblock}
-      \vspace{0.3em}
-      Adecuado para:
-      \begin{itemize}\small
-        \item Ensayos polares de perfil alar
-        \item Medición de $Re$ con $<1\%$ de error
-        \item Calibración de HWA y LDA
-      \end{itemize}
-    \end{column}
-  \end{columns}
+			\vspace{0.3em}
+			\textbf{Coeficiente de determinación:}
+			\begin{equation*}
+				R^2 = 1 - \frac{\sum_i (V_i - \hat{V}_i)^2}
+				{\sum_i (V_i - \bar{V})^2}
+			\end{equation*}
+
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{alertblock}{Funciones clave}
+				\begin{itemize}\small
+					\item \texttt{fit\_linear()} $\to (m,b,R^2)$
+					\item \texttt{fit\_poly2()} $\to$ coefs.
+					\item \texttt{summarize\_frequencies()}\\
+					      $\to$ media ponderada + $\sigma_\mathrm{pool}$
+				\end{itemize}
+			\end{alertblock}
+			\vspace{0.3em}
+			\begin{exampleblock}{Media ponderada}
+				\begin{equation*}
+					\bar{V}_\mathrm{pool} = \frac{\sum N_i \bar{V}_i}{\sum N_i}
+				\end{equation*}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % =============================================================================
-\section{Caso de Estudio}
+\section{Datos Experimentales}
+% =============================================================================
 
-\begin{frame}{Caso: Polar aerodinámica de NACA 2412}
-  \begin{block}{Escenario}
-    Calibración para ensayo de perfil NACA~2412 ($c = \SI{100}{\mm}$)
-    a $Re_c = 3\times10^5$.
-  \end{block}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Velocidad requerida:}
-      \begin{equation*}
-        V = \frac{Re_c\,\nu}{c} = \frac{3\!\times\!10^5 \times 1.5\!\times\!10^{-5}}{0.1}
-          = \SI{45}{\m\per\s}
-      \end{equation*}
-      \textbf{Frecuencia del VFD:}
-      \begin{equation*}
-        f = \frac{45.0}{1.044} \approx \SI{43.1}{\Hz}
-      \end{equation*}
-      \textbf{$\Delta p$ esperada:}
-      \begin{equation*}
-        \Delta p = \frac{1.225\times45^2}{2} \approx \SI{1240}{\Pa}
-      \end{equation*}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.8]
-        % Airfoil NACA 2412 approximate shape
-        \draw[aeroblue,very thick]
-          (0,0) .. controls (0.5,0.35) and (1.0,0.4) .. (1.5,0.25)
-               .. controls (2.0,0.1) .. (3.0,0)
-               .. controls (2.5,-0.05) and (1.0,-0.08) .. (0,0);
-        \draw[->,gray!60,thick] (-0.5,0.15) -- (0.5,0.15)
-              node[right,font=\tiny] {$U_\infty=\SI{45}{\m\per\s}$};
-        \draw[<->,gray] (0,-0.25) -- (3.0,-0.25)
-              node[midway,below,font=\tiny] {$c=\SI{100}{\mm}$};
-        \node[aeroblue,above,font=\small] at (1.5,0.5) {NACA 2412};
-        \node[below,font=\tiny] at (1.5,-0.4) {$Re_c = 3\times10^5$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+\begin{frame}{Estructura de Datos -- CIIIA}
+	\begin{columns}
+		\begin{column}{0.45\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ccl}
+				\toprule
+				\textbf{$f$ (Hz)} & \textbf{Archivos} & \textbf{Notas}         \\
+				\midrule
+				5                 & 1                 & Mín.                   \\
+				10                & 1                 &                        \\
+				15                & 1                 &                        \\
+				20                & 1                 &                        \\
+				25                & 1                 &                        \\
+				\rowcolor{aerogreen!15}
+				35                & 5                 & \textbf{Repetibilidad} \\
+				40                & 1                 &                        \\
+				45                & 1                 &                        \\
+				50                & 1                 &                        \\
+				55                & 4                 & Máx.                   \\
+				\bottomrule
+			\end{tabular}
+			\vspace{0.3em}
+
+			\textit{\tiny 30~Hz no adquirido}
+		\end{column}
+		\begin{column}{0.52\textwidth}
+			\begin{block}{Formato DXEX~v3}
+				\scriptsize
+				\begin{itemize}
+					\item 5 líneas de cabecera
+					\item Columnas: \texttt{Row\#}, \texttt{AT [ms]},
+					      \texttt{LDA1 [m/s]}
+					\item Velocidades negativas $\to$ valor absoluto
+					\item $N > 1000$ muestras por archivo
+				\end{itemize}
+			\end{block}
+			\vspace{0.2em}
+			\begin{exampleblock}{Lectura automática}
+				\scriptsize
+				\texttt{read\_lda\_speeds(path)}\\
+				Detecta cabecera, prueba delimitadores,\\
+				extrae velocidades como \texttt{pd.Series}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Datos de Calibración}
+	\centering\small
+	\begin{tabular}{SSSSSl}
+		\toprule
+		{$f$ (Hz)} & {$\bar{V}$ (m/s)} & {$\sigma$ (m/s)}
+		           & {$\Delta p$ (Pa)} & {$Re_D \times 10^{-4}$}
+		           & \textbf{Notas}                                                                  \\
+		\midrule
+		5          & 5.1               & 0.4                     & 15.9   & 1.02  & Flujo lento      \\
+		10         & 10.4              & 0.5                     & 66.2   & 2.08  &                  \\
+		15         & 15.6              & 0.6                     & 149.0  & 3.12  &                  \\
+		20         & 20.8              & 0.7                     & 264.7  & 4.16  &                  \\
+		25         & 26.0              & 0.8                     & 413.6  & 5.20  &                  \\
+		\rowcolor{aerogreen!10}
+		35         & 36.4              & 1.0                     & 811.2  & 7.28  & 5 repet.         \\
+		40         & 41.6              & 1.1                     & 1058.8 & 8.32  &                  \\
+		45         & 46.8              & 1.2                     & 1340.6 & 9.36  &                  \\
+		50         & 52.0              & 1.3                     & 1655.2 & 10.40 &                  \\
+		55         & 57.2              & 1.5                     & 2002.5 & 11.44 & $V_\mathrm{max}$ \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.3em}
+	{\scriptsize $Re_D = V D_h / \nu$ con $D_h = \SI{0.30}{\m}$,
+		$\nu = \SI{1.5e-5}{\m\squared\per\s}$}
 \end{frame}
 
 % =============================================================================
-\section{Notebook Jupyter}
+\section{Calibración Numérica}
+% =============================================================================
 
-\begin{frame}[fragile]{P02\_Tunel\_Calibracion.ipynb}
-  \begin{columns}
-    \begin{column}{0.55\textwidth}
-      \textbf{Ruta:}\\
-      \texttt{\small Practicas/P02\_Calibracion\_Tunel/\\notebooks/P02\_Tunel\_Calibracion.ipynb}
+\begin{frame}{Ajuste Lineal -- Resultados}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Curva de calibración}
+				\begin{equation*}
+					\boxed{V(f) = 1{,}04\,f + 0{,}0}
+					\quad R^2 = 0{,}9997
+				\end{equation*}
+			\end{block}
+			\vspace{0.3em}
+			\textbf{Interpretación:}
+			\begin{itemize}\small
+				\item $+\SI{1}{\Hz} \to +\SI{1.04}{\m\per\s}$
+				\item Intercepto $\approx 0$: excelente linealidad
+				\item Solo \SI{0.03}{\percent} de varianza sin explicar
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.68]
+				\draw[->] (0,0) -- (6.2,0) node[right,font=\tiny] {$f$ (Hz)};
+				\draw[->] (0,0) -- (0,5.5) node[above,font=\tiny] {$V$ (m/s)};
+				% Grid
+				\foreach \x/\lab in {1/10,2/20,3/30,4/40,5/50} {
+						\draw[gray!20] (\x,0) -- (\x,5.5);
+						\node[below,font=\tiny] at (\x,0) {\lab};
+					}
+				\foreach \y/\lab in {1/10,2/20,3/30,4/40,5/50} {
+						\draw[gray!20] (0,\y) -- (6.2,\y);
+						\node[left,font=\tiny] at (0,\y) {\lab};
+					}
+				% Trend line
+				\draw[aerogreen,thick] (0,0) -- (5.7,5.7*1.04/10);
+				\node[aerogreen,font=\tiny,rotate=42] at (4.0,3.6)
+				{$V=1{,}04f$};
+				% Data points
+				\foreach \f/\v in {5/5.1, 10/10.4, 15/15.6, 20/20.8,
+						25/26.0, 35/36.4, 40/41.6, 45/46.8,
+						50/52.0, 55/57.2} {
+						\pgfmathsetmacro{\fx}{\f/10}
+						\pgfmathsetmacro{\vy}{\v/10}
+						\fill[aerored] (\fx,\vy) circle (0.08);
+					}
+				% Error bars for 35 Hz
+				\draw[aerored,thin] (3.5,3.44) -- (3.5,3.84);
+				\draw[aerored,thin] (3.4,3.44) -- (3.6,3.44);
+				\draw[aerored,thin] (3.4,3.84) -- (3.6,3.84);
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
 
-      \vspace{0.5em}
-      \textbf{Funciones del módulo \texttt{calib\_utils.py}:}
-      \begin{itemize}\small
-        \item \texttt{velocity\_from\_dp(dp, rho)} -- ec. Bernoulli
-        \item Lectura automática de \texttt{files/p2/}
-        \item Regresión polinomial con \texttt{numpy.polyfit}
-        \item Propagación de incertidumbre (GUM)
-        \item Exportación a CSV y gráficas
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{lstlisting}[language=Python]
-from calib_utils import velocity_from_dp
-import numpy as np
+\begin{frame}{Incertidumbre de Velocidad (GUM)}
+	\textbf{Propagación de errores:}
+	\begin{equation*}
+		\frac{u_V}{V} = \frac{1}{2}\sqrt{
+			\left(\frac{u_{\Delta p}}{\Delta p}\right)^2
+			+ \left(\frac{u_\rho}{\rho}\right)^2}
+	\end{equation*}
 
-dp  = np.array([16.6, 149.2,
-                414.4, 1342, 2004])
-rho = 1.225  # kg/m^3
+	\vspace{0.3em}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Ejemplo: $\Delta p = \SI{500}{\Pa}$,
+				$\rho = \SI{1.225}{\kg\per\m\cubed}$}
+			\begin{itemize}\small
+				\item $u_{\Delta p} = \SI{2}{\Pa}$
+				\item $u_\rho/\rho = 0{,}3\%$
+			\end{itemize}
+			\begin{align*}
+				V     & = \sqrt{2\times500/1{,}225}
+				\approx \SI{28.57}{\m\per\s}        \\
+				u_V/V & \approx 0{,}25\%
+			\end{align*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{alertblock}{Resultado}
+				\centering
+				$V = (28{,}57 \pm 0{,}14)\;\si{\m\per\s}$\\
+				(\SI{95}{\percent} confianza, $k=2$)
+			\end{alertblock}
+			\vspace{0.3em}
+			\begin{exampleblock}{Incertidumbre LDA}
+				\begin{equation*}
+					u_{\bar{V}} = \sigma / \sqrt{N}
+				\end{equation*}
+				Con $N > 1000$: contribución menor
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
 
-V = velocity_from_dp(dp, rho)
-# array([ 5.2, 15.6, 26.0,
-#         46.8, 57.2])
+\begin{frame}{Ejemplos Numéricos}
+	\begin{columns}
+		\begin{column}{0.48\textwidth}
+			\begin{block}{Ensayo PIV a $V = \SI{35}{\m\per\s}$}
+				\begin{align*}
+					f_\mathrm{VFD} & = \frac{35{,}0}{1{,}04}
+					\approx \SI{33.7}{\Hz}                           \\
+					\Delta p       & = \frac{1{,}204 \times 35^2}{2}
+					\approx \SI{737}{\Pa}
+				\end{align*}
+			\end{block}
+			\vspace{0.2em}
+			\begin{block}{NACA~0012 ($c=\SI{150}{\mm}$, $Re_c=2\!\times\!10^5$)}
+				\vspace{-0.5em}
+				\begin{align*}
+					V & = \frac{Re\,\nu}{c}
+					= \frac{2\!\times\!10^5 \times 1{,}5\!\times\!10^{-5}}{0{,}15}
+					= \SI{20}{\m\per\s}                    \\
+					f & = 20/1{,}04 \approx \SI{19.2}{\Hz}
+				\end{align*}
+				\vspace{-0.5em}
+			\end{block}
+		\end{column}
+		\begin{column}{0.48\textwidth}
+			\centering\small
+			\begin{tabular}{lSl}
+				\toprule
+				\textbf{Magnitud} & {\textbf{Valor}} & \textbf{Unidad} \\
+				\midrule
+				$m$               & 1.04             & m/s/Hz          \\
+				$b$               & 0.0              & m/s             \\
+				$R^2$             & 0.9997           & --              \\
+				$V_\mathrm{max}$  & 57.2             & m/s             \\
+				$u_V/V$           & 0.25             & \%              \\
+				$I_u$             & 0.8              & \%              \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+	\end{columns}
+\end{frame}
 
-f = np.array([5, 15, 25, 45, 55])
-c = np.polyfit(f, V, deg=1)
-print(f"V = {c[0]:.3f}*f + {c[1]:.3f}")
-# V = 1.044*f + (-0.002)
+% =============================================================================
+\section{Evaluación de Riesgos}
+% =============================================================================
+
+\begin{frame}{Riesgos de la Calibración del Túnel}
+	\centering\small
+	\begin{tabular}{>{\raggedright\arraybackslash}p{2.8cm} c c c c l}
+		\toprule
+		\textbf{Riesgo} & \textbf{P}                             & \textbf{S}         & $\boldsymbol{R}$
+		                & \textbf{Nivel}                         & \textbf{Controles}                    \\
+		\midrule
+		\rowcolor{aerored!15}
+		Maquinaria rotativa (motor + ventil.)
+		                & 4                                      & 4                  & 16
+		                & \textcolor{aerored}{\textbf{Alto}}
+		                & Guardas, parada emerg.                                                         \\
+		\rowcolor{aeroyellow!15}
+		Inserción Pitot en flujo
+		                & 3                                      & 3                  & 9
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Proc. estandarizado                                                            \\
+		\rowcolor{aeroyellow!15}
+		Proyección objetos
+		                & 2                                      & 4                  & 8
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Pantalla protectora                                                            \\
+		\rowcolor{aerogreen!15}
+		Riesgo eléctrico
+		                & 1                                      & 3                  & 3
+		                & \textcolor{aerogreen}{\textbf{Bajo}}
+		                & Toma de tierra                                                                 \\
+		\rowcolor{aeroyellow!15}
+		Ruido $>\SI{85}{\dB}$
+		                & 3                                      & 2                  & 6
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Protección auditiva                                                            \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.4em}
+	\begin{block}{$R = \text{Probabilidad} \times \text{Severidad}$}
+		Bajo ($<5$) \quad | \quad Medio (5--12) \quad | \quad Alto ($>12$)
+	\end{block}
+\end{frame}
+
+\begin{frame}{Matriz de Riesgos $5\times5$}
+	\centering
+	\begin{tikzpicture}[scale=0.65]
+		\foreach \x in {0,...,4} {
+				\foreach \y in {0,...,4} {
+						\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+						\pgfmathparse{\risk < 5 ? "aerogreen!40" :
+							(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+						\edef\fillcol{\pgfmathresult}
+						\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+						\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+						\node[font=\tiny] at (\x+0.5,\y+0.5)
+						{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+					}
+			}
+		\foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+				\node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.1) {\l};
+			}
+		\foreach \y/\l in {0/Insignif.,1/Menor,2/Moder.,3/Mayor,
+				4/Catastrófico} {
+				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+			}
+		\node[font=\tiny\bfseries,rotate=90] at (-1.3,2.5) {Severidad};
+		\node[font=\tiny\bfseries] at (2.5,-1) {Probabilidad};
+		% Markers
+		\fill[blue,opacity=0.8] (3.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (3.5,3.5) {Mot.};
+		\fill[blue!70,opacity=0.8] (2.5,2.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (2.5,2.5) {Pitot};
+		\fill[orange,opacity=0.8] (1.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (1.5,3.5) {Proy.};
+		\fill[aerogreen!70,opacity=0.8] (0.5,2.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (0.5,2.5) {Elec.};
+	\end{tikzpicture}
+
+	\vspace{0.3cm}
+	\begin{tikzpicture}[scale=0.7,every node/.style={font=\small}]
+		\fill[aerogreendark] (0,0) -- (5,0) -- (4.2,0.8) -- (0.8,0.8) -- cycle;
+		\fill[aerogreen] (0.8,0.8) -- (4.2,0.8) -- (3.4,1.6) -- (1.6,1.6) -- cycle;
+		\fill[aeroyellow!80] (1.6,1.6) -- (3.4,1.6) -- (2.8,2.4) -- (2.2,2.4) -- cycle;
+		\fill[aerored!60] (2.2,2.4) -- (2.8,2.4) -- (2.5,3.0) -- cycle;
+		\node[white,font=\tiny\bfseries] at (2.5,0.4) {Eliminación / Sustitución};
+		\node[white,font=\tiny\bfseries] at (2.5,1.2) {Ingeniería};
+		\node[font=\tiny\bfseries] at (2.5,2.0) {Admin.};
+		\node[white,font=\tiny\bfseries] at (2.5,2.6) {EPP};
+		\draw[->,gray,very thick] (5.3,2.8) -- (5.3,-0.1);
+		\node[gray,font=\tiny,rotate=90] at (5.6,1.3) {Más efectivo};
+	\end{tikzpicture}
+\end{frame}
+
+% =============================================================================
+\section{Casos de Estudio por Equipos}
+% =============================================================================
+
+\begin{frame}{Trabajo por Equipos: 4 Escenarios}
+	\begin{block}{Instrucciones}
+		Cada equipo recibe un escenario aeronáutico diferente. Deben:
+		\begin{enumerate}
+			\item Determinar $V_\mathrm{req}$ a partir de las condiciones
+			      del ensayo ($Re$, modelo, escala)
+			\item Obtener $f_\mathrm{VFD}$ con la curva de calibración
+			\item Calcular $\Delta p$ esperada y verificar viabilidad
+			\item Evaluar riesgo: $P$ (1--5), $S$ (1--5),
+			      $R = P \times S$, ubicar en la matriz
+			\item Resolver 3 problemas adicionales
+			\item Verificar con el script Python / notebook
+		\end{enumerate}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Equipo~1: Polar Aerodinámica -- NACA~2412}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.} & \textbf{Valor}                        \\
+				\midrule
+				Modelo        & NACA~2412                             \\
+				$c$           & \SI{100}{\mm}                         \\
+				$b$           & \SI{300}{\mm}                         \\
+				$Re_c$        & $3\times10^5$                         \\
+				$\alpha$      & $[\SI{-5}{\degree},\SI{20}{\degree}]$ \\
+				$T$           & \SI{22}{\degreeCelsius}               \\
+				$p$           & \SI{94200}{\Pa}                       \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Alta $V$ sostenida,\\
+				cambios de $\alpha$ con\\
+				flujo activo, modelo\\
+				puede desprenderse.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P1.1] $T$ a \SI{35}{\degreeCelsius}
+					\item[P1.2] $L_\mathrm{max}$ en pérdida
+					\item[P1.3] $Re_c = 5\times10^5$
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.55]
+				\draw[aerogreen,very thick]
+				(0,0) .. controls (0.5,0.3) and (1,0.35) .. (1.5,0.2)
+				.. controls (2,0.08) .. (2.5,0)
+				.. controls (2,-0.03) and (1,-0.06) .. (0,0);
+				\node[aerogreen,font=\tiny,above] at (1.2,0.35) {2412};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~2: Cilindro Circular -- Crisis de Arrastre}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.} & \textbf{Valor}          \\
+				\midrule
+				Modelo        & Cilindro                \\
+				$D$           & \SI{20}{\mm}            \\
+				$L$           & \SI{300}{\mm}           \\
+				$Re_D$        & $2\times10^5$           \\
+				$T$           & \SI{18}{\degreeCelsius} \\
+				$p$           & \SI{101325}{\Pa}        \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Vórtices Von Kármán,\\
+				vibraciones altas,\\
+				velocidad cerca del\\
+				límite del túnel.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P2.1] Strouhal $f_v$
+					\item[P2.2] $Re_D = 10^5$
+					\item[P2.3] Bloqueo $D = 40$~mm
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.55]
+				\draw[aerogreen,very thick] (1,0) circle (0.4);
+				\draw[->,blue!50] (0,0) -- (0.5,0);
+				\draw[aerored!50,decorate,decoration={snake,amplitude=1.5pt,
+							segment length=5pt}] (1.4,0.15) -- (2.5,0.3);
+				\draw[aerored!50,decorate,decoration={snake,amplitude=1.5pt,
+							segment length=5pt}] (1.4,-0.15) -- (2.5,-0.3);
+				\node[font=\tiny] at (2.5,0) {$St\approx0{,}2$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~3: Mapa Multi-Frecuencia -- Validación CFD}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.} & \textbf{Valor}          \\
+				\midrule
+				Objetivo      & Valid. CFD              \\
+				Frecs.        & 10,20,30,40,50 Hz       \\
+				Malla         & $5\times5$ puntos       \\
+				$T$           & \SI{25}{\degreeCelsius} \\
+				$p$           & \SI{100500}{\Pa}        \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Inserción repetida de\\
+				sonda con flujo activo,\\
+				sesiones prolongadas,\\
+				cambios frecuentes de $f$.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P3.1] $Tu$ por frecuencia
+					\item[P3.2] Interpolar 30~Hz
+					\item[P3.3] Error CFD vs exp.
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.55]
+				\draw[aerogreen,thick] (0,0) rectangle (2,2);
+				\foreach \x in {0.4,0.8,1.2,1.6} {
+						\foreach \y in {0.4,0.8,1.2,1.6} {
+								\fill[aerored] (\x,\y) circle (0.05);
+							}
+					}
+				\node[font=\tiny,below] at (1,0) {$5\times5$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~4: Similitud Dinámica -- Ala Delta 1:50}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}      & \textbf{Valor}          \\
+				\midrule
+				Modelo             & Ala delta 1:50          \\
+				$\bar{c}$          & \SI{80}{\mm}            \\
+				$b$                & \SI{120}{\mm}           \\
+				$Re_\mathrm{real}$ & $4\times10^6$           \\
+				$T$                & \SI{20}{\degreeCelsius} \\
+				$p$                & \SI{101325}{\Pa}        \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Maqueta ligera, riesgo\\
+				desprendimiento a $V_\mathrm{max}$,\\
+				ruido y vibración altos.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P4.1] $V$ para $Re_\mathrm{real}$
+					\item[P4.2] $Re_\mathrm{max}$ alcanzable
+					\item[P4.3] Escala 1:25, bloqueo
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.55]
+				\draw[aerogreen,very thick]
+				(0,0) -- (2.5,0.8) -- (2.5,-0.8) -- cycle;
+				\node[font=\tiny,aerogreen] at (1.5,0) {$\Delta$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Herramientas de Software}
+% =============================================================================
+
+\begin{frame}[fragile]{Módulo \texttt{calib\_utils.py}}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Ruta}
+				\scriptsize
+				\texttt{Practicas/P02\_Calibracion\_Tunel/\\
+					src/calib\_utils.py}\\
+				\texttt{src/P02\_Tunel\_Calibracion.py}\\
+				\texttt{notebooks/P02\_Tunel\_Cal...ipynb}
+			\end{block}
+			\vspace{0.2em}
+			\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Función}                & \textbf{Resultado}          \\
+				\midrule
+				\texttt{velocity\_from\_dp}     & $V = \sqrt{2\Delta p/\rho}$ \\
+				\texttt{find\_p2\_data\_root}   & Path a \texttt{files/p2/}   \\
+				\texttt{read\_lda\_speeds}      & \texttt{pd.Series}          \\
+				\texttt{summarize\_frequencies} & DataFrame                   \\
+				\texttt{fit\_linear}            & $(m, b, R^2)$               \\
+				\texttt{invert\_calibration}    & $f$ desde $V$               \\
+				\texttt{plot\_calibration}      & Fig. matplotlib             \\
+				\texttt{save\_figure}           & PNG + SVG                   \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{lstlisting}[language=Python]
+import calib_utils as cu
+
+# Descubrir datos
+root = cu.find_p2_data_root()
+
+# Estadisticas por frecuencia
+df = cu.summarize_frequencies(root)
+
+# Ajuste lineal
+m, b, r2 = cu.fit_linear(
+    df['frequency_hz'].values,
+    df['mean_speed_ms'].values)
+print(f"V = {m:.3f}*f + {b:.3f}")
+print(f"R2 = {r2:.4f}")
+
+# Caso de estudio
+V_req = 3e5 * 1.5e-5 / 0.1
+f_req = cu.invert_calibration(
+    V_req, m, b)
+print(f"f = {f_req:.1f} Hz")
       \end{lstlisting}
-    \end{column}
-  \end{columns}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Script Principal (16 Pasos)}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{\texttt{P02\_Tunel\_Calibracion.py}}\\[0.3em]
+			\scriptsize
+			\begin{enumerate}
+				\item Descubrimiento de datos (\texttt{files/p2/})
+				\item Estadísticas por archivo
+				\item Agregación por frecuencia
+				\item Exportación CSV / Parquet
+				\item Gráfica de dispersión
+				\item Ajuste lineal ($R^2$)
+				\item Ajuste polinomial (grado~2)
+				\item Caso de estudio ($V \to f$, $f \to V$)
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\scriptsize
+			\begin{enumerate}
+				\setcounter{enumi}{8}
+				\item Resumen JSON
+				\item Verificaciones de sanidad
+				\item Histogramas por frecuencia
+				\item Inversión de calibración
+				\item Cálculo de Reynolds
+				\item Análisis de repetibilidad (35 Hz)
+				\item Uniformidad ($I_u$)
+				\item Informe final en consola
+			\end{enumerate}
+			\vspace{0.3em}
+			\begin{exampleblock}{Ejecución}
+				\texttt{cd Practicas/.../src}\\
+				\texttt{python P02\_Tunel\_Calibracion.py}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 % =============================================================================
-\section{Resumen}
+\section{Cuestionario y Formato}
+% =============================================================================
+
+\begin{frame}{Preguntas de Discusión}
+	\begin{enumerate}\small
+		\item ¿Por qué calibrar antes de cada campaña de ensayos?
+		\item ¿Por qué $V \propto f$ es aproximadamente lineal?
+		\item Ventaja de LDA vs.\ Pitot para calibración (y desventajas)
+		\item ¿Qué contribución domina $u_V/V$ a baja $V$?
+		\item Efecto de $\Delta T = \SI{5}{\degreeCelsius}$ en $\rho$ y la curva
+		\item ¿Qué significa $R^2 = 0{,}9997$?
+		\item Criterio de aceptación para uniformidad del perfil
+		\item ¿Por qué usar valor absoluto de velocidades LDA?
+		\item Media ponderada vs.\ media simple de medias
+		\item ¿Puede el túnel alcanzar $Re = 10^6$ con $c = \SI{200}{\mm}$?
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Formato del Informe (AIAA)}
+	\begin{enumerate}
+		\item \textbf{Resumen:} máx.\ 200 palabras
+		\item \textbf{Introducción}
+		\item \textbf{Fundamento Teórico:} Bernoulli, Pitot, incertidumbre
+		\item \textbf{Metodología:} procedimiento + herramientas software
+		\item \textbf{Resultados:} curva con incertidumbre + caso del equipo
+		      + evaluación de riesgo
+		\item \textbf{Discusión:} cuestionario + comparación teórica
+		\item \textbf{Conclusiones:} 4--6 puntos
+		\item \textbf{Referencias} (IEEE)
+		\item \textbf{Apéndice~A:} gráficas Python
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Conclusiones}
+% =============================================================================
 
 \begin{frame}{Conclusiones}
-  \begin{enumerate}
-    \item La calibración establece $V = 1.044\,f_\mathrm{VFD}$
-          con $R^2 = 0.9997$ (relación \textbf{lineal}).
-    \item La incertidumbre relativa $u_V/V < 0.3\%$, adecuada para
-          ensayos aeronáuticos de precisión.
-    \item La \textbf{uniformidad} del perfil $I_u < 1\%$ en el núcleo
-          central confirma la calidad aerodinámica del túnel.
-    \item El módulo \texttt{calib\_utils.py} y el notebook automatizan
-          todo el proceso de calibración.
-  \end{enumerate}
-  \vspace{0.5em}
-  \begin{block}{Recursos}
-    Manual: \texttt{manuals/P02\_Calibracion\_Tunel/manual\_P02.tex}\\
-    Notebook: \texttt{Practicas/P02\_Calibracion\_Tunel/notebooks/P02\_Tunel\_Calibracion.ipynb}\\
-    Código: \texttt{Practicas/P02\_Calibracion\_Tunel/src/calib\_utils.py}
-  \end{block}
+	\begin{enumerate}
+		\item El túnel del CIIIA presenta $V = 1{,}04\,f_\mathrm{VFD}$ con
+		      $R^2 = 0{,}9997$ (relación \textbf{lineal})
+		\item Incertidumbre relativa $u_V/V < 0{,}3\%$, adecuada para ensayos
+		      aeronáuticos de precisión
+		\item Uniformidad $I_u < 1\%$ en el núcleo central confirma la calidad
+		      aerodinámica del túnel
+		\item Los datos LDA del CIIIA permiten caracterizar tanto velocidad
+		      media como turbulencia
+		\item Maquinaria rotativa: riesgo principal ($R = 16$, Alto) --
+		      mitigable con guardas y formación
+		\item \texttt{calib\_utils.py} + script + notebook automatizan todo
+		      el flujo de calibración
+	\end{enumerate}
+
+	\vspace{0.3cm}
+	\centering
+	\begin{tikzpicture}
+		\node[draw=aerogreen,very thick,rounded corners,fill=aerogreen!10,
+			text width=8cm,align=center,font=\normalsize\bfseries] {
+			Una calibración rigurosa es el primer paso\\
+			de cualquier campaña experimental en túnel.
+		};
+	\end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Referencias}
-  \begin{itemize}
-    \item Barlow, Rae \& Pope (1999). \textit{Low-Speed Wind Tunnel Testing}, 3ª ed., Wiley
-    \item Anderson, J.D. (2017). \textit{Fundamentals of Aerodynamics}, 6ª ed., McGraw-Hill
-    \item JCGM 100:2008 -- \textit{Guide to the Expression of Uncertainty in Measurement}
-  \end{itemize}
+\begin{frame}{}
+	\centering
+	\vspace{2cm}
+	{\Huge\color{aerogreen}\bfseries ¿Preguntas?}\\[1cm]
+	{\large P02 -- Calibración del Túnel de Viento}\\[0.5cm]
+	{\small Técnicas de Medida -- Ingeniería Aeronáutica}
 \end{frame}
 
 \end{document}
