@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1771633000.32648 "presentacion_P01.xdv" "presentacion_P01.pdf" "presentacion_P01" 1771633000.74523 0
-  "presentacion_P01.xdv" 1771632999 516548 0e34df6c6f39ae9ca80ad527f1f028fb "xelatex"
+["xdvipdfmx"] 1771867921.68062 "presentacion_P01.xdv" "presentacion_P01.pdf" "presentacion_P01" 1771867922.03909 0
+  "presentacion_P01.xdv" 1771867921 639320 c5bd4319fcdff430272d4e725f5d1b62 "xelatex"
   (generated)
   "presentacion_P01.pdf"
   (rewritten before read)
-["xelatex"] 1771632997.0238 "presentacion_P01.tex" "presentacion_P01.xdv" "presentacion_P01" 1771633000.69412 0
+["xelatex"] 1771867918.76816 "presentacion_P01.tex" "presentacion_P01.xdv" "presentacion_P01" 1771867922.03038 0
   "C:/Users/edgar/AppData/Local/MiKTeX/miktex/data/le/xetex/xelatex.fmt" 1771362162 27176672 7be2c69dba28e56525a1962f25c2996a ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136793854 1528 7e12f4c0fcf5a072cebdcfbfc610f54c ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1233951848 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
@@ -20,6 +20,7 @@
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/symbols/msbm5.tfm" 1233951854 940 75ac932a52f80982a9f8ea75d03a34cf ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/symbols/msbm7.tfm" 1233951854 940 228d6584342e91276bf566bcf9716b83 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbsy10.tfm" 1136765053 1116 4e6ba9d7914baa6482fd69f67d126380 ""
+  "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx10.tfm" 1136765053 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx12.tfm" 1136765053 1324 c910af8c371558dc20f2d7822f66fe64 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx6.tfm" 1136765053 1344 8a0be4fe4d376203000810ad4dc81558 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/fonts/tfm/public/cm/cmbx8.tfm" 1136765053 1332 1fde11373e221473104d6cc5993f046e ""
@@ -235,6 +236,7 @@
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/tools/array.sty" 1761901070 15651 9d7c62df82cb29a555c00550babfe364 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/tools/calc.sty" 1761901070 10374 2ffd4f27c7f90b8a300608069537743c ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/tools/enumerate.sty" 1761901070 3468 f21ceb3448a22fec45299f924e7fc48b ""
+  "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/tools/tabularx.sty" 1761901070 7243 a2c17f18e2c9b702b84fad03d5f9c78b ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/translations/dicts/translations-basic-dictionary-spanish.trsl" 1644048522 5850 2ef40dd7b6b9ada125cd1d90b7f7b307 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/translations/translations.sty" 1644048522 44247 2188b95d0ee74e31eca4d316263c58a7 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/translator/translator-basic-dictionary-English.dict" 1622471510 3535 7dc96051305a7e943219126c49c44cd6 ""
@@ -246,12 +248,12 @@
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/translator/translator.sty" 1622471510 8765 56d370785f0143111ff9898b5adfe08e ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/edgar/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
-  "presentacion_P01.aux" 1771632999 6975 635edcbacf2034da0b68fd8be2abcbf9 "xelatex"
-  "presentacion_P01.nav" 1771632999 3770 4c7e96d92bee0cec69591a72862cf3b5 "xelatex"
-  "presentacion_P01.out" 1771632999 1263 e7b70036bc30ad8d78c41650ff4bbd12 "xelatex"
-  "presentacion_P01.tex" 1771632989 23770 660232919305f26657805d036abcced1 ""
-  "presentacion_P01.toc" 1771632999 530 ec235ae4e695e1b8e2eba602d591dba2 "xelatex"
-  "presentacion_P01.vrb" 1771632999 1053 6ab1f215b5047b65f77cc555ed5caa7a "xelatex"
+  "presentacion_P01.aux" 1771867921 8034 f47ed456c957c473697570c33e94d109 "xelatex"
+  "presentacion_P01.nav" 1771867921 4348 2eb26213be1296bd9e7352c9798e8a06 "xelatex"
+  "presentacion_P01.out" 1771867921 1334 6aaaaa995db7418e76f8feb7c595903f "xelatex"
+  "presentacion_P01.tex" 1771867621 30404 041febb86b2b6a9e376a8ae62f968504 ""
+  "presentacion_P01.toc" 1771867921 543 4a74b9e1f9d862a5bf7e5cb683d1832a "xelatex"
+  "presentacion_P01.vrb" 1771867921 1127 1bff8ea36eb62fba25a28c1e62a82920 "xelatex"
   (generated)
   "presentacion_P01.aux"
   "presentacion_P01.log"

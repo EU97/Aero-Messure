@@ -8,6 +8,7 @@
 % ---- Encoding & Language ----
 \usepackage{fontspec}
 \usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
 
 % ---- Page Layout ----
 \usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
@@ -84,7 +85,7 @@
 	\centering
 	\vspace*{1cm}
 	{\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
-	{\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA EN INGENIERÍA AERONÁUTICA}\\[0.3cm]
+	{\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA}\\[0.3cm]
 	{\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
 	{\huge\bfseries P01 -- Protección Ocular\\[0.3cm]
 	frente a Radiación Láser}\\[1cm]
@@ -100,8 +101,7 @@
 		\draw[aerogreen,very thick] (5.1,0) rectangle (5.9,0.6);
 		\node[aerogreen,font=\tiny\bfseries] at (5.5,0.3) {OD};
 		\node[below,font=\footnotesize,aerored] at (3.5,-0.1) {$\lambda,\; P,\; E$};
-	\end{tikzpicture}\\[2cm]
-	{\small\today}\\[0.5cm]
+	\end{tikzpicture}\\[2.5cm]
 	{\color{aeroblue}\rule{\linewidth}{1pt}}
 \end{titlepage}
 
@@ -549,6 +549,49 @@ $P = \SI{4.5}{\mW} = \SI{4.5e-3}{\watt}$:
 	\end{tabular}
 \end{table}
 
+\subsection{Evaluación de Riesgo de los Escenarios Base}
+\label{sec:riesgo_base}
+
+Aplicando la matriz de riesgos 5$\times$5 (§\ref{sec:riesgos}), cada escenario
+se evalúa según su probabilidad de exposición y severidad del daño potencial.
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación de riesgo para los tres escenarios base.}
+	\label{tab:riesgo_base}
+	\small
+	\begin{tabularx}{\textwidth}{l c c c c X}
+		\toprule
+		\textbf{Escenario} & \textbf{Prob.}                                   & \textbf{Sev.}                 & \textbf{$R$}
+		                   & \textbf{Nivel}                                   & \textbf{Controles requeridos}                                                         \\
+		\midrule
+		\rowcolor{aerored!15}
+		L1 -- PIV (Clase~4)
+		                   & Alto (4)                                         & Mayor (4)                     & 16           & \textcolor{aerored}{\textbf{Alto}}
+		                   & EPO obligatorio, interlock, señalización Clase~4                                                                                         \\
+		\rowcolor{aerored!10}
+		L2 -- LDA (Clase~4)
+		                   & Medio (3)                                        & Mayor (4)                     & 12           & \textcolor{aeroyellow}{\textbf{Medio}}
+		                   & EPO obligatorio, cortinas, SOPs                                                                                                          \\
+		\rowcolor{aerogreen!10}
+		L3 -- Alin. (Clase~3R)
+		                   & MuyBajo (1)                                      & Menor (2)                     & 2            & \textcolor{aerogreen}{\textbf{Bajo}}
+		                   & EPO recomendado, señalización                                                                                                            \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\textbf{Justificación:}
+\begin{itemize}
+	\item \textbf{PIV:} potencia pulsada elevada (200~mJ), rango visible con
+	      enfoque retiniano, operación en laboratorio abierto $\rightarrow$
+	      probabilidad alta.
+	\item \textbf{LDA:} haz CW colimado (1,5~W), visible, pero contenido en
+	      banco óptico $\rightarrow$ probabilidad media.
+	\item \textbf{Alineación:} baja potencia (4,5~mW), diámetro grande, Clase~3R
+	      $\rightarrow$ riesgo inherente bajo.
+\end{itemize}
+
 % =============================================================================
 \section{Casos de Estudio por Equipos}
 \label{sec:equipos}
@@ -559,10 +602,63 @@ aeronáuticos. Cada equipo debe:
 \begin{enumerate}
 	\item Calcular $A$, $H_0$ y $OD_{\mathrm{req}}$.
 	\item Evaluar las 12 lentes del catálogo (Tabla~\ref{tab:epo}).
-	\item Seleccionar la lente óptima (OD suficiente + mejor VLT).
-	\item Justificar si alguna lente es marginal o insuficiente.
+	\item Completar la tabla de evaluación (Tabla~\ref{tab:eval_template}).
+	\item Seleccionar la lente óptima (OD suficiente + mejor VLT), o bien
+	      justificar por qué ninguna cumple.
+	\item Realizar la evaluación de riesgo: completar la tabla de riesgo
+	      (Tabla~\ref{tab:risk_template}) asignando probabilidad (1--5),
+	      severidad (1--5), calculando $R = P \times S$ y determinando el
+	      nivel de riesgo según la matriz (§\ref{sec:riesgos}).
 	\item Verificar con el script Python o el notebook.
+	\item Resolver los tres problemas adicionales asignados.
 \end{enumerate}
+
+\begin{table}[H]
+	\centering
+	\caption{Plantilla de evaluación de lentes (a completar por cada equipo).}
+	\label{tab:eval_template}
+	\small
+	\begin{tabular}{c c c c c l}
+		\toprule
+		\textbf{Lente} & \textbf{OD @ $\lambda$} & \textbf{$\ge OD_{\mathrm{req}}$?}
+		               & \textbf{Margen}         & \textbf{VLT}                      & \textbf{Veredicto}      \\
+		\midrule
+		L-01           &                         &                                   &                    &  & \\
+		L-02           &                         &                                   &                    &  & \\
+		L-03           &                         &                                   &                    &  & \\
+		L-04           &                         &                                   &                    &  & \\
+		L-05           &                         &                                   &                    &  & \\
+		L-06           &                         &                                   &                    &  & \\
+		L-07           &                         &                                   &                    &  & \\
+		L-08           &                         &                                   &                    &  & \\
+		L-09           &                         &                                   &                    &  & \\
+		L-10           &                         &                                   &                    &  & \\
+		L-11           &                         &                                   &                    &  & \\
+		L-12           &                         &                                   &                    &  & \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\caption{Plantilla de evaluación de riesgo (a completar por cada equipo).}
+	\label{tab:risk_template}
+	\small
+	\begin{tabularx}{\textwidth}{l c X}
+		\toprule
+		\textbf{Factor}                   & \textbf{Valor (1--5)} & \textbf{Justificación}                                           \\
+		\midrule
+		Probabilidad ($P$)                &                       & (MuyBajo=1, Bajo=2, Medio=3, Alto=4, MuyAlto=5)                  \\
+		Severidad ($S$)                   &                       & (Insignificante=1, Menor=2, Moderado=3, Mayor=4, Catastrófico=5) \\
+		\midrule
+		Riesgo $R = P \times S$           &                       &                                                                  \\
+		Nivel de riesgo                   &                       & Bajo ($<5$) / Medio (5--12) / Alto ($>12$)                       \\
+		\midrule
+		Controles requeridos              & {--}                  & (Listar: EPO, ingeniería, administrativos, otros)                \\
+		Posición en la matriz (fila, col) & {--}                  & (Marcar en Figura~\ref{fig:risk_matrix})                         \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
 
 % ---- EQUIPO 1 ----
 \subsection{Equipo~1: Nd:YAG Fundamental 1064~nm (Clase~4, Pulsado)}
@@ -590,39 +686,33 @@ aeronáuticos. Cada equipo debe:
 	\end{tabular}
 \end{table}
 
-\paragraph{Solución de referencia.}
-$A = \pi(0{,}7)^2/4 = \SI{0.3848}{\centi\metre\squared}$;
-$H_0 = 0{,}5 / 0{,}3848 = \SI{1.30}{\joule\per\centi\metre\squared}$;
-$OD_{\mathrm{req}} = \log_{10}(1{,}30 / 5\times10^{-6}) = \log_{10}(2{,}60\times10^{5}) \approx \mathbf{5{,}41}$.
+\textbf{Tareas:} Calcule $A$, $H_0$ y $OD_{\mathrm{req}}$. Complete la tabla
+de evaluación para las 12 lentes a 1064~nm. Determine si alguna lente cumple o
+si debe activarse el protocolo de carencia de EPO.
 
-\begin{table}[H]
-	\centering
-	\caption{Evaluación para Equipo~1 -- 1064~nm ($OD_{\mathrm{req}} = 5{,}41$).}
-	\label{tab:eq1_eval}
-	\small
-	\begin{tabular}{c c c c c l}
-		\toprule
-		\textbf{Lente} & \textbf{OD @ 1064} & \textbf{Cumple?}
-		               & \textbf{Margen}    & \textbf{VLT}     & \textbf{Veredicto}                                              \\
-		\midrule
-		L-02           & 4                  & No               & $-1{,}41$          & 55\% & \textcolor{aerored}{Insuficiente}   \\
-		L-03           & 5                  & No               & $-0{,}41$          & 15\% & \textcolor{aerored}{Insuficiente}   \\
-		L-08           & 5                  & No               & $-0{,}41$          & 25\% & \textcolor{aerored}{Insuficiente}   \\
-		L-09           & 4                  & No               & $-1{,}41$          & 45\% & \textcolor{aerored}{Insuficiente}   \\
-		\midrule
-		\multicolumn{6}{l}{\footnotesize L-01, L-04, L-05, L-06, L-07, L-10, L-11, L-12: sin banda a 1064~nm $\rightarrow$ N/A.} \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+\textbf{Evaluación de riesgo:} complete la Tabla~\ref{tab:risk_template} para
+este escenario. Considere que el haz es infrarrojo (invisible), pulsado con
+alta energía y Clase~4. Ubique el escenario en la matriz de riesgos
+(Figura~\ref{fig:risk_matrix}) y justifique los controles necesarios.
 
-\textbf{Resultado:}
-\textcolor{aerored}{\textbf{Ninguna lente del catálogo cumple}} ($OD_{\mathrm{req}} = 5{,}41$,
-máximo disponible = OD~5). El equipo debe:
-\begin{itemize}
-	\item Informar la carencia al LSO.
-	\item Proponer adquisición de gafas OD~$\ge 6$ a 1064~nm.
-	\item Suspender operaciones con este láser hasta disponer de EPO adecuado.
-\end{itemize}
+\subsubsection*{Problemas Adicionales -- Equipo~1}
+
+\begin{enumerate}
+	\item[\textbf{P1.1}] Si la energía del láser se reduce a 100~mJ/pulso
+	      manteniendo el resto de parámetros, ¿cuánto cambia $OD_{\mathrm{req}}$?
+	      ¿Alguna lente del catálogo cumple ahora?
+
+	\item[\textbf{P1.2}] La reflexión especular del haz de 1064~nm sobre una
+	      superficie metálica conserva el 60\% de la energía original. Calcule
+	      $OD_{\mathrm{req}}$ para la reflexión y determine si las gafas
+	      seleccionadas (o la falta de ellas) siguen siendo válidas.
+
+	\item[\textbf{P1.3}] El mismo Nd:YAG genera simultáneamente el segundo
+	      armónico a 532~nm con $E = 50$~mJ y $a = 4$~mm. Calcule
+	      $OD_{\mathrm{req}}$ a 532~nm (use la MPE de L1 del ejemplo resuelto)
+	      y proponga la combinación de protección necesaria para trabajar con
+	      ambas longitudes de onda simultáneamente.
+\end{enumerate}
 
 % ---- EQUIPO 2 ----
 \subsection{Equipo~2: CO$_2$ CW a 10\,600~nm (Clase~4)}
@@ -648,33 +738,33 @@ máximo disponible = OD~5). El equipo debe:
 	\end{tabular}
 \end{table}
 
-\paragraph{Solución de referencia.}
-$A = \pi(0{,}8)^2/4 = \SI{0.5027}{\centi\metre\squared}$;
-$H_0 = 50 / 0{,}5027 = \SI{99.5}{\watt\per\centi\metre\squared}$;
-$OD_{\mathrm{req}} = \log_{10}(99{,}5 / 0{,}1) = \log_{10}(995) \approx \mathbf{3{,}00}$.
+\textbf{Tareas:} Calcule $A$, $H_0$ y $OD_{\mathrm{req}}$. Evalúe las 12
+lentes a 10\,600~nm. Indique cuántas ofrecen cobertura a esa longitud de onda
+y si alguna cumple. Justifique el protocolo adecuado si ninguna es suficiente.
 
-\begin{table}[H]
-	\centering
-	\caption{Evaluación para Equipo~2 -- CO$_2$ 10\,600~nm ($OD_{\mathrm{req}} = 3{,}00$).}
-	\label{tab:eq2_eval}
-	\small
-	\begin{tabular}{c c c c c l}
-		\toprule
-		\textbf{Lente} & \textbf{OD @ 10\,600} & \textbf{Cumple?}
-		               & \textbf{Margen}       & \textbf{VLT}     & \textbf{Veredicto}                                            \\
-		\midrule
-		L-04           & 2                     & No               & $-1{,}00$          & 90\% & \textcolor{aerored}{Insuficiente} \\
-		\midrule
-		\multicolumn{6}{l}{\footnotesize L-01 a L-03, L-05 a L-12: sin banda a 10\,600~nm $\rightarrow$ N/A.}                     \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+\textbf{Evaluación de riesgo:} complete la Tabla~\ref{tab:risk_template}.
+Considere que el CO$_2$ tiene muy alta potencia (50~W), el haz es IR lejano
+(invisible, daño corneal no retiniano), y se usa en modo CW continuo.
+Compare la severidad corneal vs.\ retiniana.
 
-\textbf{Resultado:}
-\textcolor{aerored}{\textbf{Ninguna lente cumple}} ($OD_{\mathrm{req}} = 3{,}00$, L-04 solo
-ofrece OD~2). Mismo protocolo: informar al LSO e iniciar adquisición. Nótese que
-a $>$1400~nm el riesgo es corneal (no retiniano), pero un CO$_2$ Clase~4 a 50~W
-puede causar quemaduras corneales graves.
+\subsubsection*{Problemas Adicionales -- Equipo~2}
+
+\begin{enumerate}
+	\item[\textbf{P2.1}] A 10\,600~nm el daño principal es corneal, no
+	      retiniano. Explique por qué la MPE es relativamente alta
+	      (\SI{0.1}{\watt\per\centi\metre\squared}) comparada con las MPE en
+	      el rango visible (400--700~nm). ¿Significa que el láser CO$_2$ es
+	      menos peligroso que un láser visible de igual potencia?
+
+	\item[\textbf{P2.2}] Si la potencia del láser se reduce a 5~W (modo
+	      alineación), recalcule $OD_{\mathrm{req}}$. ¿La lente L-04
+	      ($OD = 2$ a 10\,600~nm) es ahora suficiente?
+
+	\item[\textbf{P2.3}] El haz CO$_2$ se enfoca con una lente convergente a
+	      un punto de $a = 0{,}5$~mm para corte. Con los 50~W originales,
+	      calcule la nueva $H_0$ y $OD_{\mathrm{req}}$. Compare con el caso
+	      sin enfocar y discuta la importancia del diámetro del haz.
+\end{enumerate}
 
 % ---- EQUIPO 3 ----
 \subsection{Equipo~3: Diodo 808~nm CW (Clase~3B)}
@@ -700,37 +790,36 @@ puede causar quemaduras corneales graves.
 	\end{tabular}
 \end{table}
 
-\paragraph{Solución de referencia.}
-$A = \pi(0{,}2)^2/4 = \SI{3.142e-2}{\centi\metre\squared}$;
-$H_0 = 0{,}3 / 3{,}142\times10^{-2} = \SI{9.55}{\watt\per\centi\metre\squared}$;
-$OD_{\mathrm{req}} = \log_{10}(9{,}55 / 2{,}5\times10^{-3}) = \log_{10}(3820) \approx \mathbf{3{,}58}$.
+\textbf{Tareas:} Calcule $A$, $H_0$ y $OD_{\mathrm{req}}$. Complete la tabla
+de evaluación a 808~nm. Identifique todas las lentes que cumplen y seleccione
+la óptima justificando con el criterio OD + VLT.
 
-\begin{table}[H]
-	\centering
-	\caption{Evaluación para Equipo~3 -- Diodo 808~nm ($OD_{\mathrm{req}} = 3{,}58$).}
-	\label{tab:eq3_eval}
-	\small
-	\begin{tabular}{c c c c c l}
-		\toprule
-		\textbf{Lente} & \textbf{OD @ 808} & \textbf{Cumple?}
-		               & \textbf{Margen}   & \textbf{VLT}     & \textbf{Veredicto}                                                   \\
-		\midrule
-		\rowcolor{aerogreen!15}
-		L-02           & 4                 & Sí               & $+0{,}42$          & 55\% & \textcolor{aerogreen}{\textbf{Adecuada}} \\
-		\rowcolor{aerogreen!15}
-		L-05           & 6                 & Sí               & $+2{,}42$          & 30\% & \textcolor{aerogreen}{Adecuada}          \\
-		\rowcolor{aerogreen!15}
-		L-08           & 5                 & Sí               & $+1{,}42$          & 25\% & \textcolor{aerogreen}{Adecuada}          \\
-		\rowcolor{aerogreen!15}
-		L-09           & 4                 & Sí               & $+0{,}42$          & 45\% & \textcolor{aerogreen}{\textbf{Adecuada}} \\
-		\midrule
-		\multicolumn{6}{l}{\footnotesize L-01, L-03, L-04, L-06, L-07, L-10, L-11, L-12: sin banda a 808~nm $\rightarrow$ N/A.}      \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+\textbf{Evaluación de riesgo:} complete la Tabla~\ref{tab:risk_template}.
+El diodo 808~nm es infrarrojo cercano (invisible), Clase~3B con potencia
+moderada. Considere que el haz alcanza la retina (400--1400~nm) y evalúe la
+probabilidad en un entorno de laboratorio con banco óptico cerrado.
 
-\textbf{Selección: L-02} (OD~4, margen +0,42; \textbf{mejor VLT = 55\%}).
-L-09 es segunda opción (VLT 45\%).
+\subsubsection*{Problemas Adicionales -- Equipo~3}
+
+\begin{enumerate}
+	\item[\textbf{P3.1}] El diodo se emplea para bombear un cristal Nd:YVO$_4$
+	      que emite a 1064~nm con $P = 200$~mW y $a = 0{,}8$~mm. Calcule
+	      $OD_{\mathrm{req}}$ para el haz de 1064~nm
+	      ($H_{\mathrm{MPE}} = \SI{5.0e-3}{\watt\per\centi\metre\squared}$,
+	      CW, 0,25~s). ¿La misma lente seleccionada para 808~nm protege
+	      también a 1064~nm?
+
+	\item[\textbf{P3.2}] Compare la VLT de todas las lentes que cumplen a
+	      808~nm. Si el operador necesita distinguir colores en una pantalla
+	      durante el experimento, ¿cuál es la VLT mínima recomendable?
+	      Justifique la selección final considerando ergonomía.
+
+	\item[\textbf{P3.3}] Si la exposición se prolonga a $>$10~s, la MPE a
+	      808~nm se reduce a
+	      $H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$.
+	      Recalcule $OD_{\mathrm{req}}$ y determine si alguna de las lentes
+	      que antes cumplían ahora se vuelve marginal o insuficiente.
+\end{enumerate}
 
 % ---- EQUIPO 4 ----
 \subsection{Equipo~4: He-Ne CW a 632,8~nm (Clase~3R) + LDA Prolongada}
@@ -739,6 +828,8 @@ L-09 es segunda opción (VLT 45\%).
 Este equipo tiene un caso compuesto: primero evalúa un He-Ne de alineación y
 luego reevalúa el L2 (LDA 514,5~nm) bajo exposición prolongada ($>$10~s,
 $H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$).
+
+\paragraph{Caso~A -- He-Ne 632,8~nm.}
 
 \begin{table}[H]
 	\centering
@@ -760,72 +851,44 @@ $H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$).
 	\end{tabular}
 \end{table}
 
-\paragraph{Caso~A -- He-Ne 632,8~nm.}
-$A = \pi(0{,}15)^2/4 = \SI{1.767e-2}{\centi\metre\squared}$;
-$H_0 = 0{,}01 / 1{,}767\times10^{-2} = \SI{0.566}{\watt\per\centi\metre\squared}$;
-$OD_{\mathrm{req}} = \log_{10}(0{,}566 / 2{,}5\times10^{-3}) \approx \mathbf{2{,}35}$.
+\textbf{Tareas Caso~A:} Calcule $A$, $H_0$ y $OD_{\mathrm{req}}$ a 632,8~nm.
+Complete la tabla de evaluación. Seleccione la lente óptima.
 
-\begin{table}[H]
-	\centering
-	\caption{Evaluación para Equipo~4, Caso~A -- He-Ne 632,8~nm ($OD_{\mathrm{req}} = 2{,}35$).}
-	\label{tab:eq4a_eval}
-	\small
-	\begin{tabular}{c c c c c l}
-		\toprule
-		\textbf{Lente} & \textbf{OD @ 633} & \textbf{Cumple?}
-		               & \textbf{Margen}   & \textbf{VLT}     & \textbf{Veredicto}                                                   \\
-		\midrule
-		L-02           & 2                 & No               & $-0{,}35$          & 55\% & \textcolor{aerored}{Insuficiente}        \\
-		\rowcolor{aerogreen!15}
-		L-08           & 3                 & Sí               & $+0{,}65$          & 25\% & \textcolor{aerogreen}{\textbf{Adecuada}} \\
-		L-11           & 1                 & No               & $-1{,}35$          & 60\% & \textcolor{aerored}{Insuficiente}        \\
-		\rowcolor{aerogreen!15}
-		L-12           & 5                 & Sí               & $+2{,}65$          & 22\% & \textcolor{aerogreen}{Adecuada}          \\
-		\midrule
-		\multicolumn{6}{l}{\footnotesize Resto: sin banda a 633~nm $\rightarrow$ N/A.}                                               \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-\textbf{Selección Caso~A: L-08} (OD~3, margen +0,65; VLT 25\%).
-L-02 queda corta ($OD=2 < 2{,}35$): este es un ejemplo donde una lente
-«aparentemente cercana» no cumple.
+\textbf{Evaluación de riesgo (ambos casos):} complete una
+Tabla~\ref{tab:risk_template} para el Caso~A y otra para el Caso~B. El He-Ne
+es visible y de baja potencia (Clase~3R), mientras que la LDA prolongada es
+Clase~4 con exposición extendida. Compare cómo la duración de exposición
+afecta la probabilidad y, por tanto, el nivel de riesgo.
 
 \paragraph{Caso~B -- LDA 514,5~nm con exposición prolongada.}
-Reutilizando $H_0 = \SI{132.6}{\watt\per\centi\metre\squared}$ del L2 con
-$H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$:
-\begin{align}
-	OD_{\mathrm{req}} & = \log_{10}\!\left(\frac{132{,}6}{1{,}0\times10^{-3}}\right) \approx \mathbf{5{,}12}
-	\label{eq:OD_L2_long}
-\end{align}
 
-\begin{table}[H]
-	\centering
-	\caption{Reevaluación L2 -- LDA 514,5~nm prolongada ($OD_{\mathrm{req}} = 5{,}12$).}
-	\label{tab:eq4b_eval}
-	\small
-	\begin{tabular}{c c c c c l}
-		\toprule
-		\textbf{Lente} & \textbf{OD @ 514,5} & \textbf{Cumple?}
-		               & \textbf{Margen}     & \textbf{VLT}     & \textbf{Veredicto}                                                               \\
-		\midrule
-		L-01           & 5                   & Sí*              & $-0{,}12$          & 40\% & \textcolor{aeroyellow}{Marginal (5+ $\approx$ 5,12)} \\
-		L-03           & 7                   & Sí               & $+1{,}88$          & 15\% & \textcolor{aerogreen}{Adecuada (baja VLT)}           \\
-		\rowcolor{aerogreen!15}
-		L-05           & 7                   & Sí               & $+1{,}88$          & 30\% & \textcolor{aerogreen}{\textbf{Adecuada}}             \\
-		L-10           & 6                   & Sí               & $+0{,}88$          & 20\% & \textcolor{aerogreen}{Adecuada}                      \\
-		\midrule
-		\multicolumn{6}{l}{\footnotesize L-06 (OD~3), L-07 (OD~4), L-09 (OD~2), L-12 (OD~4): Insuficientes.}                                       \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+Reutilice los datos completos del láser L2 (Tabla~\ref{tab:lasers}), pero
+considere exposición prolongada $>$10~s con
+$H_{\mathrm{MPE}} = \SI{1.0e-3}{\watt\per\centi\metre\squared}$.
 
-\textbf{Selección Caso~B: L-05} (OD~7, margen +1,88; VLT 30\%).
+\textbf{Tareas Caso~B:} Calcule $OD_{\mathrm{req}}$ bajo la nueva MPE.
+Compare con el $OD_{\mathrm{req}} = 4{,}72$ del ejemplo resuelto (0,25~s).
+¿Alguna lente que cumplía antes ahora es insuficiente o marginal?
 
-\textbf{Conclusión del Equipo~4:} la exposición prolongada incrementó
-$OD_{\mathrm{req}}$ de 4,72 a 5,12. L-01, antes adecuada, ahora es
-\textcolor{aeroyellow}{marginal}. Este caso ilustra la importancia de considerar
-la duración real de exposición.
+\subsubsection*{Problemas Adicionales -- Equipo~4}
+
+\begin{enumerate}
+	\item[\textbf{P4.1}] Para el Caso~A, si la potencia del He-Ne se duplica
+	      a 20~mW (un modelo de mayor potencia), recalcule $OD_{\mathrm{req}}$.
+	      ¿La lente seleccionada sigue siendo adecuada o debe cambiar?
+
+	\item[\textbf{P4.2}] Si un operador necesita gafas que protejan
+	      simultáneamente contra el He-Ne (632,8~nm) y el LDA (514,5~nm,
+	      exposición prolongada), ¿existe alguna lente en el catálogo que
+	      cumpla ambos requisitos de OD al mismo tiempo? Identifique las
+	      candidatas y seleccione la óptima.
+
+	\item[\textbf{P4.3}] El LSO propone instalar un obturador automático que
+	      limita la exposición máxima a 0,25~s para el LDA. ¿Cómo afecta esto
+	      la selección de EPO? Calcule la nueva $OD_{\mathrm{req}}$ y compare
+	      el número de lentes adecuadas con y sin obturador. Discuta si el
+	      control de ingeniería puede ampliar las opciones de protección.
+\end{enumerate}
 
 % =============================================================================
 \section{Evaluación de Riesgos}
@@ -889,8 +952,8 @@ Carpeta \texttt{Practicas/P01\_Proteccion\_Laser/}:
 
 \subsection{Notebook Jupyter}
 \texttt{notebooks/P01\_Proteccion\_Laser.ipynb} -- cálculo interactivo de $H_0$
-y OD para los 3 escenarios base, verificación contra catálogo CSV, gráficas de
-margen OD.
+y OD para los 3 escenarios base, evaluación de riesgo con matriz 5$\times$5,
+verificación contra catálogo CSV, gráficas de margen OD.
 
 \subsection{Script Python}
 \texttt{src/P01\_Proteccion\_Laser.py} -- funciones de cálculo reutilizables:
@@ -904,6 +967,13 @@ def area_cm2_from_diameter_mm(a_mm):
 def od_required(H0, HMPE):
     if H0 <= HMPE: return 0.0
     return math.log10(H0 / HMPE)
+
+def risk_assessment(prob, severity):
+    """Devuelve (R, nivel, color)."""
+    R = prob * severity
+    if R < 5:   return R, 'Bajo', 'green'
+    if R < 13:  return R, 'Medio', 'yellow'
+    return R, 'Alto', 'red'
 \end{lstlisting}
 
 \subsection{Datos}
@@ -920,8 +990,11 @@ def od_required(H0, HMPE):
 	\item Calcular $A$, $H_0$ y $OD_{\mathrm{req}}$.
 	\item Evaluar las 12 lentes del catálogo.
 	\item Seleccionar la lente óptima y justificar.
-	\item Verificar con el notebook / script Python.
-	\item Elaborar matriz de riesgos.
+	\item Completar la evaluación de riesgo (Tabla~\ref{tab:risk_template}):
+	      asignar probabilidad y severidad, calcular $R$, determinar nivel
+	      y ubicar el escenario en la matriz (Figura~\ref{fig:risk_matrix}).
+	\item Verificar con el notebook / script Python (incluyendo evaluación
+	      de riesgo automatizada).
 	\item Registrar resultados en el informe.
 \end{enumerate}
 
@@ -938,7 +1011,8 @@ def od_required(H0, HMPE):
 	\item Entre dos lentes de igual OD, una con VLT~45\% y otra 20\%: ¿cuál
 	      elegir y por qué?
 	\item ¿Gafas para 1064~nm protegen a 532~nm del mismo Nd:YAG? Justifique.
-	\item ¿Qué protocolo se sigue cuando ninguna lente cumple (Equipos~1 y~2)?
+	\item ¿Qué protocolo se sigue cuando ninguna lente del catálogo cumple
+	      el $OD_{\mathrm{req}}$?
 \end{enumerate}
 
 % =============================================================================
@@ -956,16 +1030,18 @@ Metodología, Resultados (escenarios base + caso del equipo), Discusión
 \begin{enumerate}
 	\item El catálogo de 12 lentes permite evaluar escenarios desde UV hasta
 	      IR lejano, incluyendo situaciones donde \textbf{ninguna lente cumple}.
-	\item El sistema PIV (532~nm, Clase~4) requiere $OD \ge 6{,}31$: solo L-05
-	      cumple con certeza.
-	\item El sistema LDA (514,5~nm, Clase~4) requiere $OD \ge 4{,}72$
-	      (0,25~s) o $\ge 5{,}12$ (prolongada): L-01 es adecuada para
-	      exposición breve; L-05 es necesaria para prolongada.
-	\item El diodo de alineación (635~nm, Clase~3R) requiere $OD \ge 1{,}41$:
-	      L-02 es suficiente con VLT 55\%.
-	\item Cuando el catálogo es insuficiente (Equipos~1 y~2), el protocolo es
-	      informar al LSO y suspender operaciones.
-	\item Las herramientas Python automatizan todo el flujo de evaluación.
+	\item La selección de EPO debe considerar simultáneamente: cobertura
+	      espectral a $\lambda$ del láser, OD $\ge OD_{\mathrm{req}}$ y la
+	      mayor VLT posible para garantizar la ergonomía.
+	\item La duración de la exposición puede modificar la MPE y, por tanto,
+	      la $OD_{\mathrm{req}}$: un mismo escenario puede requerir gafas
+	      distintas según el tiempo de operación.
+	\item Cuando el catálogo disponible es insuficiente, el protocolo es
+	      informar al LSO y suspender operaciones hasta disponer de EPO
+	      adecuado.
+	\item Las herramientas Python automatizan todo el flujo de evaluación
+	      (OD, selección de lentes y evaluación de riesgo) y facilitan la
+	      verificación de los cálculos manuales.
 \end{enumerate}
 
 % =============================================================================

@@ -12,6 +12,7 @@
 % ---- Encoding & Language ----
 \usepackage{fontspec}
 \usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
 
 % ---- Math & Physics ----
 \usepackage{amsmath,amssymb}
@@ -27,6 +28,7 @@
 % ---- Tables ----
 \usepackage{booktabs}
 \usepackage{colortbl}
+\usepackage{tabularx}
 
 % ---- Code ----
 \usepackage{listings}
@@ -71,7 +73,7 @@
 \title[P01 -- Protección Láser]{P01: Protección Ocular frente a\\Radiación Láser}
 \subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
 \author{Laboratorio de Técnicas de Medida}
-\date{\today}
+\date{}
 
 % =============================================================================
 \begin{document}
@@ -122,9 +124,9 @@
 		\item Identificar peligros de radiación láser en el laboratorio
 		\item Aplicar clasificación de seguridad (IEC~60825 / ANSI~Z136.1)
 		\item Calcular la Exposición Potencial ($H_0$) y la OD requerida
-		\item Seleccionar EPO adecuado para \textbf{3 escenarios láser}
-		\item Analizar un caso de estudio con exposición prolongada
-		\item Usar herramientas Python para automatizar los cálculos
+		\item Seleccionar EPO adecuado de un catálogo de \textbf{12 lentes}
+		\item Resolver un caso de estudio asignado por equipo (4~equipos)
+		\item Usar herramientas Python para automatizar y verificar
 	\end{enumerate}
 \end{frame}
 
@@ -274,29 +276,44 @@
 	\end{tabular}
 \end{frame}
 
-\begin{frame}{Catálogo de Gafas EPO}
+\begin{frame}{Catálogo de Gafas EPO (12 Lentes)}
 	\centering
-	\small
-	\begin{tabular}{llll}
+	\tiny
+	\begin{tabular}{cllc}
 		\toprule
-		\textbf{ID} & \textbf{Lente}  & \textbf{OD Especificada}               & \textbf{VLT} \\
+		\textbf{ID} & \textbf{Lente}  & \textbf{Bandas de protección (OD @ $\lambda$)}       & \textbf{VLT} \\
 		\midrule
-		EPO-001     & Naranja         & OD~5+ @ 190--540~nm                    & 40\%         \\
-		EPO-002     & Verde           & OD~2+ @ 630--670~nm                    & 55\%         \\
-		EPO-003     & Azul Cobalto    & OD~7+ @ 190--400~nm; OD~6+ @ 532~nm    & 15\%         \\
-		EPO-004     & Transparente    & OD~2+ @ 10\,600~nm (CO$_2$)            & 90\%         \\
-		EPO-005     & Multi-$\lambda$ & OD~7 @ 190--534~nm; OD~6 @ 800--820~nm & 30\%         \\
+		L-01        & Naranja         & OD~5+ @ 190--540~nm                                  & 40\%         \\
+		L-02        & Verde           & OD~2+ @ 630--670~nm; OD~4+ @ 800--1100~nm            & 55\%         \\
+		L-03        & Azul cobalto    & OD~7+ @ 190--400~nm; OD~6+ @ 532~nm; OD~5+ @ 1064~nm & 15\%         \\
+		L-04        & Transparente    & OD~2+ @ 10\,600~nm (CO$_2$)                          & 90\%         \\
+		L-05        & Multi-$\lambda$ & OD~7 @ 190--534~nm; OD~6 @ 800--820~nm               & 30\%         \\
+		L-06        & Ámbar           & OD~3+ @ 190--532~nm                                  & 50\%         \\
+		L-07        & Rojo oscuro     & OD~4+ @ 488--540~nm                                  & 35\%         \\
+		L-08        & Gris            & OD~3+ @ 630--694~nm; OD~5+ @ 800--1100~nm            & 25\%         \\
+		L-09        & Naranja claro   & OD~2+ @ 315--532~nm; OD~4+ @ 808--1100~nm            & 45\%         \\
+		L-10        & Verde jade      & OD~6+ @ 190--540~nm                                  & 20\%         \\
+		L-11        & Rosa            & OD~1+ @ 585--650~nm                                  & 60\%         \\
+		L-12        & Multi-$\lambda$ & OD~4+ @ 190--534~nm; OD~5+ @ 630--700~nm             & 22\%         \\
 		\bottomrule
 	\end{tabular}
+\end{frame}
 
-	\vspace{0.5cm}
-	\begin{block}{Valores de MPE}
+\begin{frame}{Valores de MPE de Referencia}
+	\begin{block}{MPE para los Escenarios Base}
 		\begin{itemize}
 			\item \textbf{L1} (532~nm, pulsado): $H_\mathrm{MPE} = 5{,}0\times10^{-7}$ J/cm$^2$
 			\item \textbf{L2} (514,5~nm, CW 0,25~s): $H_\mathrm{MPE} = 2{,}5\times10^{-3}$ W/cm$^2$
 			\item \textbf{L3} (635~nm, CW 0,25~s): $H_\mathrm{MPE} = 2{,}5\times10^{-3}$ W/cm$^2$
 		\end{itemize}
 	\end{block}
+	\vspace{0.3cm}
+	\begin{alertblock}{Exposición Prolongada ($>$10~s)}
+		\begin{itemize}
+			\item L2 (514,5~nm): $H_\mathrm{MPE} = 1{,}0\times10^{-3}$ W/cm$^2$
+			\item L3 (635~nm): misma consideración aplica
+		\end{itemize}
+	\end{alertblock}
 \end{frame}
 
 % =============================================================================
@@ -315,15 +332,16 @@
 			\end{block}
 		\end{column}
 		\begin{column}{0.45\textwidth}
-			\begin{alertblock}{Selección EPO}
+			\begin{alertblock}{Evaluación (extracto)}
 				\begin{itemize}
-					\item EPO-001: OD~5+ \textcolor{aerored}{\textbf{$\times$ Insuf.}}
-					\item EPO-003: OD~6+ \textcolor{aerored}{\textbf{$\times$ Insuf.}}
-					\item EPO-005: OD~7 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}}
+					\item L-01: OD~5 \textcolor{aerored}{\textbf{$\times$ Insuf.}}
+					\item L-03: OD~6 \textcolor{aerored}{\textbf{$\times$ Insuf.}}
+					\item L-05: OD~7 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}}
+					\item L-10: OD~6+ \textcolor{aeroyellow}{\textbf{? Marginal}}
 				\end{itemize}
 			\end{alertblock}
 			\vspace{0.2cm}
-			$\Rightarrow$ \textbf{EPO-005} (VLT 30\%)
+			$\Rightarrow$ \textbf{L-05} (VLT 30\%)
 		\end{column}
 	\end{columns}
 \end{frame}
@@ -340,14 +358,15 @@
 			\end{block}
 		\end{column}
 		\begin{column}{0.45\textwidth}
-			\begin{exampleblock}{Selección EPO}
+			\begin{exampleblock}{Evaluación (extracto)}
 				\begin{itemize}
-					\item EPO-001: OD~5+ \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 40\%)
-					\item EPO-005: OD~7 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 30\%)
+					\item L-01: OD~5 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 40\%)
+					\item L-05: OD~7 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 30\%)
+					\item L-10: OD~6 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 20\%)
 				\end{itemize}
 			\end{exampleblock}
 			\vspace{0.2cm}
-			$\Rightarrow$ \textbf{EPO-001} (mejor VLT: 40\%)
+			$\Rightarrow$ \textbf{L-01} (mejor VLT: 40\%)
 		\end{column}
 	\end{columns}
 \end{frame}
@@ -364,15 +383,18 @@
 			\end{block}
 		\end{column}
 		\begin{column}{0.45\textwidth}
-			\begin{exampleblock}{Selección EPO}
+			\begin{exampleblock}{Evaluación (extracto)}
 				\begin{itemize}
-					\item EPO-002: OD~2+ @ 630--670~nm \textcolor{aerogreen}{\textbf{$\checkmark$ OK}}
+					\item L-02: OD~2 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 55\%)
+					\item L-08: OD~3 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 25\%)
+					\item L-11: OD~1 \textcolor{aerored}{\textbf{$\times$ Insuf.}}
+					\item L-12: OD~5 \textcolor{aerogreen}{\textbf{$\checkmark$ OK}} (VLT 22\%)
 				\end{itemize}
 			\end{exampleblock}
 			\vspace{0.2cm}
-			$\Rightarrow$ \textbf{EPO-002} (VLT 55\%)
+			$\Rightarrow$ \textbf{L-02} (mejor VLT: 55\%)
 
-			\vspace{0.3cm}
+			\vspace{0.2cm}
 			\begin{block}{Nota}
 				Clase~3R: protección recomendada pero no estrictamente obligatoria.
 			\end{block}
@@ -385,14 +407,14 @@
 	\begin{tabular}{lcccc}
 		\toprule
 		\textbf{Láser (Clase)}   & $\boldsymbol{\lambda}$         & $\boldsymbol{H_0}$
-		                         & $\boldsymbol{OD_\mathrm{req}}$ & \textbf{EPO}                        \\
+		                         & $\boldsymbol{OD_\mathrm{req}}$ & \textbf{Lente}                   \\
 		\midrule
 		\rowcolor{aerored!15}
-		1 -- PIV (\textbf{4})    & 532~nm                         & 1,02 J/cm$^2$      & 6,31 & EPO-005 \\
+		1 -- PIV (\textbf{4})    & 532~nm                         & 1,02 J/cm$^2$      & 6,31 & L-05 \\
 		\rowcolor{aerored!10}
-		2 -- LDA (\textbf{4})    & 514,5~nm                       & 132,6 W/cm$^2$     & 4,72 & EPO-001 \\
+		2 -- LDA (\textbf{4})    & 514,5~nm                       & 132,6 W/cm$^2$     & 4,72 & L-01 \\
 		\rowcolor{aeroyellow!15}
-		3 -- Alin. (\textbf{3R}) & 635~nm                         & 0,064 W/cm$^2$     & 1,41 & EPO-002 \\
+		3 -- Alin. (\textbf{3R}) & 635~nm                         & 0,064 W/cm$^2$     & 1,41 & L-02 \\
 		\bottomrule
 	\end{tabular}
 
@@ -406,33 +428,208 @@
 	\end{tikzpicture}
 \end{frame}
 
+\begin{frame}{Evaluación de Riesgo -- Escenarios Base}
+	\centering
+	\small
+	\begin{tabular}{l c c c c l}
+		\toprule
+		\textbf{Escenario} & \textbf{Prob.}                                  & \textbf{Sev.}      & $\boldsymbol{R}$
+		                   & \textbf{Nivel}                                  & \textbf{Controles}                    \\
+		\midrule
+		\rowcolor{aerored!15}
+		PIV (Clase~4)      & Alto (4)                                        & Mayor (4)          & 16
+		                   & \textcolor{aerored}{\textbf{Alto}}              & EPO + interlock                       \\
+		\rowcolor{aeroyellow!15}
+		LDA (Clase~4)      & Medio (3)                                       & Mayor (4)          & 12
+		                   & \textcolor{aeroyellow!80!black}{\textbf{Medio}} & EPO + cortinas                        \\
+		\rowcolor{aerogreen!15}
+		Alin. (3R)         & MuyBajo (1)                                     & Menor (2)          & 2
+		                   & \textcolor{aerogreen}{\textbf{Bajo}}            & Señalización                          \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.4cm}
+	\begin{block}{$R = \text{Probabilidad} \times \text{Severidad}$}
+		Bajo ($<5$) \quad | \quad Medio (5--12) \quad | \quad Alto ($>12$)
+	\end{block}
+\end{frame}
+
 % =============================================================================
-\section{Caso de Estudio}
+\section{Casos de Estudio por Equipos}
 % =============================================================================
 
-\begin{frame}{Caso: LDA con Exposición Prolongada ($>$10~s)}
+\begin{frame}{Trabajo por Equipos: 4 Escenarios}
+	\begin{block}{Instrucciones}
+		Cada equipo recibe un láser diferente. Deben:
+		\begin{enumerate}
+			\item Calcular $A$, $H_0$ y $OD_{\mathrm{req}}$
+			\item Evaluar las 12 lentes del catálogo
+			\item Seleccionar la óptima (o justificar si ninguna cumple)
+			\item \textbf{Evaluar el riesgo:} asignar $P$ (1--5), $S$ (1--5),
+			      calcular $R = P \times S$ y ubicar en la matriz
+			\item Resolver 3 problemas adicionales
+			\item Verificar con Python / notebook
+		\end{enumerate}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Equipo~1: Nd:YAG 1064~nm (Clase~4, Pulsado)}
 	\begin{columns}
-		\begin{column}{0.5\textwidth}
-			\begin{alertblock}{Escenario}
-				Operador trabaja cerca del haz LDA durante $>$10~s.\\
-				Reflejo de aversión (0,25~s) no aplica.
-			\end{alertblock}
-			\vspace{0.2cm}
-			\begin{block}{MPE reducida}
-				$H_\mathrm{MPE} = 1{,}0\times10^{-3}$ W/cm$^2$\\
-				(antes: $2{,}5\times10^{-3}$)
-			\end{block}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}      & \textbf{Valor}                    \\
+				\midrule
+				$\lambda$          & 1064~nm                           \\
+				Modo               & Pulsado                           \\
+				$E$                & 500~mJ                            \\
+				$\tau$             & 10~ns                             \\
+				$f$                & 10~Hz                             \\
+				$a$                & 7~mm                              \\
+				$H_{\mathrm{MPE}}$ & $5{,}0\!\times\!10^{-6}$~J/cm$^2$ \\
+				\rowcolor{aerored!15}
+				Clase              & \textbf{4}                        \\
+				\bottomrule
+			\end{tabular}
 		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				IR invisible, pulsado,\\
+				alta energía.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P1.1] $E$ a 100~mJ
+					\item[P1.2] Refl. 60\%
+					\item[P1.3] Doble $\lambda$
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~2: CO$_2$ CW a 10\,600~nm (Clase~4)}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}      & \textbf{Valor} \\
+				\midrule
+				$\lambda$          & 10\,600~nm     \\
+				Modo               & CW             \\
+				$P$                & 50~W           \\
+				$a$                & 8~mm           \\
+				$H_{\mathrm{MPE}}$ & 0,1~W/cm$^2$   \\
+				\rowcolor{aerored!15}
+				Clase              & \textbf{4}     \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				IR lejano, 50~W CW,\\
+				daño corneal.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P2.1] MPE corneal
+					\item[P2.2] $P$ a 5~W
+					\item[P2.3] Haz enfocado
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~3: Diodo 808~nm CW (Clase~3B)}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}      & \textbf{Valor}                    \\
+				\midrule
+				$\lambda$          & 808~nm                            \\
+				Modo               & CW                                \\
+				$P$                & 300~mW                            \\
+				$a$                & 2~mm                              \\
+				$H_{\mathrm{MPE}}$ & $2{,}5\!\times\!10^{-3}$~W/cm$^2$ \\
+				\rowcolor{aeroyellow!25}
+				Clase              & \textbf{3B}                       \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				IR cercano invisible,\\
+				daño retiniano.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P3.1] Bombeo 1064~nm
+					\item[P3.2] VLT y ergonomía
+					\item[P3.3] Exp. $>$10~s
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~4: He-Ne 632,8~nm (3R) + LDA Prolongada}
+	\begin{columns}
 		\begin{column}{0.45\textwidth}
-			\begin{block}{Recálculo OD}
-				\[OD = \log_{10}\!\left(\frac{132{,}6}{1{,}0\times10^{-3}}\right) \approx \mathbf{5{,}12}\]
-			\end{block}
-			\vspace{0.2cm}
-			\begin{itemize}
-				\item EPO-001 (OD~5+): \textcolor{aeroyellow}{\textbf{Marginal}}
-				\item EPO-005 (OD~7): \textcolor{aerogreen}{\textbf{$\checkmark$ Segura}}
-			\end{itemize}
-			$\Rightarrow$ \textbf{EPO-005} (margen = 1,88)
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\multicolumn{2}{c}{\textbf{Caso~A: He-Ne}}             \\
+				\midrule
+				$\lambda$          & 632,8~nm                          \\
+				$P$                & 10~mW                             \\
+				$a$                & 1,5~mm                            \\
+				$H_{\mathrm{MPE}}$ & $2{,}5\!\times\!10^{-3}$~W/cm$^2$ \\
+				\rowcolor{aeroyellow!20}
+				Clase              & \textbf{3R}                       \\
+				\midrule
+				\multicolumn{2}{c}{\textbf{Caso~B: LDA prolongada}}    \\
+				\midrule
+				$H_{\mathrm{MPE}}$ & $1{,}0\!\times\!10^{-3}$~W/cm$^2$ \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.25\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				A: visible, baja $P$.\\
+				B: exposición larga.\\
+				Evaluar ambos.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.27\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P4.1] 20~mW
+					\item[P4.2] Dual $\lambda$
+					\item[P4.3] Obturador
+				\end{enumerate}
+			\end{exampleblock}
 		\end{column}
 	\end{columns}
 \end{frame}
@@ -525,7 +722,7 @@
 					\item \texttt{area\_cm2\_from...()}
 					\item \texttt{h0\_exposure()}
 					\item \texttt{od\_required()}
-					\item \texttt{evaluate\_against\_lenses()}
+					\item \texttt{risk\_assessment()}
 					\item \texttt{evaluate\_and\_plot()}
 				\end{itemize}
 			\end{exampleblock}
@@ -551,7 +748,7 @@ print(od_required(H0, 5e-7))       # 6.31
 		\item ¿Qué 3 parámetros se necesitan para calcular $OD_\mathrm{req}$?
 		\item Entre dos gafas con igual OD, una VLT~45\% y otra 20\%: ¿cuál elegir?
 		\item ¿Gafas para 1064~nm protegen a 532~nm del mismo Nd:YAG?
-		\item ¿Qué es un LSO?
+		\item ¿Qué protocolo se sigue cuando ninguna lente del catálogo cumple?
 	\end{enumerate}
 \end{frame}
 
@@ -561,7 +758,7 @@ print(od_required(H0, 5e-7))       # 6.31
 		\item \textbf{Introducción}
 		\item \textbf{Fundamento Teórico:} propiedades, clasificación, MPE, OD
 		\item \textbf{Metodología}
-		\item \textbf{Resultados:} 3 láseres + caso de estudio
+		\item \textbf{Resultados:} 3 escenarios base + caso del equipo + evaluación de riesgo
 		\item \textbf{Discusión:} (incluir cuestionario)
 		\item \textbf{Conclusiones:} 4--6 puntos
 		\item \textbf{Referencias} (IEEE/AIAA)
@@ -575,11 +772,16 @@ print(od_required(H0, 5e-7))       # 6.31
 
 \begin{frame}{Conclusiones}
 	\begin{enumerate}
-		\item PIV (Nd:YAG 532~nm, \textbf{Clase~4}): $OD \ge 6{,}31$ $\Rightarrow$ \textbf{EPO-005}
-		\item LDA (Ar-Ion 514,5~nm, \textbf{Clase~4}): $OD \ge 4{,}72$ (0,25~s) o $\ge 5{,}12$ (prolongada)
-		\item Alineación (Diodo 635~nm, \textbf{Clase~3R}): $OD \ge 1{,}41$ $\Rightarrow$ \textbf{EPO-002}
+		\item Catálogo de 12 lentes cubre escenarios de UV a IR lejano,
+		      incluyendo casos donde \textbf{ninguna lente cumple}
+		\item La selección de EPO requiere: cobertura a $\lambda$,
+		      $OD \ge OD_{\mathrm{req}}$ y máxima VLT posible
+		\item La duración de exposición modifica la MPE y puede cambiar
+		      la lente requerida
 		\item Jerarquía de controles: eliminación $>$ ingeniería $>$ admin. $>$ EPP
-		\item Script Python automatiza $H_0$, OD y selección del catálogo EPO
+		\item Script Python automatiza $H_0$, OD y evaluación del catálogo
+		\item Cada caso de estudio requiere evaluación de riesgo ($R = P \times S$)
+		      con ubicación en la matriz 5$\times$5
 	\end{enumerate}
 
 	\vspace{0.5cm}

@@ -2,9 +2,9 @@
 \beamer@sectionintoc {1}{Introducción}{3}{0}{1}
 \beamer@sectionintoc {2}{Fundamentos Teóricos}{5}{0}{2}
 \beamer@sectionintoc {3}{Escenarios Láser}{9}{0}{3}
-\beamer@sectionintoc {4}{Cálculos de Protección}{11}{0}{4}
-\beamer@sectionintoc {5}{Caso de Estudio}{15}{0}{5}
-\beamer@sectionintoc {6}{Controles de Seguridad}{16}{0}{6}
-\beamer@sectionintoc {7}{Herramientas de Software}{18}{0}{7}
-\beamer@sectionintoc {8}{Cuestionario y Formato}{19}{0}{8}
-\beamer@sectionintoc {9}{Conclusiones}{21}{0}{9}
+\beamer@sectionintoc {4}{Cálculos de Protección}{12}{0}{4}
+\beamer@sectionintoc {5}{Casos de Estudio por Equipos}{17}{0}{5}
+\beamer@sectionintoc {6}{Controles de Seguridad}{22}{0}{6}
+\beamer@sectionintoc {7}{Herramientas de Software}{24}{0}{7}
+\beamer@sectionintoc {8}{Cuestionario y Formato}{25}{0}{8}
+\beamer@sectionintoc {9}{Conclusiones}{27}{0}{9}

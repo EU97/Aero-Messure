@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.2.17)  20 FEB 2026 18:16
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.12) (preloaded format=xelatex 2026.2.17)  23 FEB 2026 11:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1122,27 +1122,37 @@ Package: colortbl 2024/10/29 v1.0k Color table columns (DPC)
 \minrowclearance=\skip73
 \rownum=\count406
 )
+(C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty
+Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
+\TX@col@width=\dimen360
+\TX@old@table=\dimen361
+\TX@old@col=\dimen362
+\TX@target=\dimen363
+\TX@delta=\dimen364
+\TX@cols=\count407
+\TX@ftn=\toks51
+)
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
-\lst@mode=\count407
+\lst@mode=\count408
 \lst@gtempboxa=\box96
-\lst@token=\toks51
-\lst@length=\count408
-\lst@currlwidth=\dimen360
-\lst@column=\count409
-\lst@pos=\count410
-\lst@lostspace=\dimen361
-\lst@width=\dimen362
-\lst@newlines=\count411
-\lst@lineno=\count412
-\lst@maxwidth=\dimen363
+\lst@token=\toks52
+\lst@length=\count409
+\lst@currlwidth=\dimen365
+\lst@column=\count410
+\lst@pos=\count411
+\lst@lostspace=\dimen366
+\lst@width=\dimen367
+\lst@newlines=\count412
+\lst@lineno=\count413
+\lst@maxwidth=\dimen368
 
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
 File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
 )
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
-\c@lstnumber=\count413
-\lst@skipnumbers=\count414
+\c@lstnumber=\count414
+\lst@skipnumbers=\count415
 \lst@framebox=\box97
 )
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
@@ -1163,26 +1173,26 @@ Package babel Info: 'spanish' activates 'spanish' shorthands.
 )
 \openout1 = `presentacion_P01.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 79.
+LaTeX Font Info:    ... okay on input line 79.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -1218,7 +1228,7 @@ LaTeX Font Info:    ... okay on input line 78.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring OFF on input line 78.
+Package hyperref Info: Link coloring OFF on input line 79.
 (presentacion_P01.out) (presentacion_P01.out)
 \@outlinefile=\write5
 \openout5 = `presentacion_P01.out'.
@@ -1255,58 +1265,58 @@ Package fontspec Info:
 
 \symlegacymaths=\mathgroup6
 LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 78.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 78.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 78.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 78.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 78.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 78.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 78.
-LaTeX Font Info:    Redeclaring math accent \check on input line 78.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 78.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 78.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 78.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 78.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 78.
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 79.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 79.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 79.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 79.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 79.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 79.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 79.
+LaTeX Font Info:    Redeclaring math accent \check on input line 79.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 79.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 79.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 79.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 79.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 79.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 78.
+(Font)              `operators' in the math version `normal' on input line 79.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 78.
+(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 79.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 78.
+(Font)              `operators' in the math version `bold' on input line 79.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> TU/lmr/m/n on input line 78.
+(Font)                  OT1/cmr/bx/n --> TU/lmr/m/n on input line 79.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  TU/lmr/m/n --> TU/lmr/m/n on input line 78.
+(Font)                  TU/lmr/m/n --> TU/lmr/m/n on input line 79.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 78.
+(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 79.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/lmr/b/n on input line 78.
+(Font)                  OT1/cmr/bx/n --> TU/lmr/b/n on input line 79.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 78.
+(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 79.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 78.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 79.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  TU/lmr/m/n --> TU/lmr/b/n on input line 78.
+(Font)                  TU/lmr/m/n --> TU/lmr/b/n on input line 79.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> TU/lmr/b/it on input line 78.
+(Font)                  OT1/cmr/bx/it --> TU/lmr/b/it on input line 79.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 78.
+(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 79.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 78.
-LaTeX Info: Redefining \. on input line 78.
-LaTeX Info: Redefining \% on input line 78.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 79.
+LaTeX Info: Redefining \. on input line 79.
+LaTeX Info: Redefining \% on input line 79.
 
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/translations/dicts\tran
 slations-basic-dictionary-spanish.trsl
@@ -1314,255 +1324,83 @@ File: translations-basic-dictionary-spanish.trsl (spanish translation file `tra
 nslations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `spanish'. on input line 78.
-\c@lstlisting=\count415
- (presentacion_P01.nav)
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 78--78
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 82--82
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[1
+or `spanish'. on input line 79.
+\c@lstlisting=\count416
+ (presentacion_P01.nav) [1
 
 ]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 86--86
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
 (presentacion_P01.toc
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
-)
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[2
+) [2
 
 ]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 119--119
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-LaTeX Font Info:    Trying to load font information for U+msa on input line 119
+LaTeX Font Info:    Trying to load font information for U+msa on input line 120
 .
+
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 119
+LaTeX Font Info:    Trying to load font information for U+msb on input line 120
 .
 
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
 [3
 
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 130--130
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [4
 
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[4
+] [5
 
 ]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 158--158
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[5
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 187--187
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (11.68947pt too wide) in paragraph at lines 187--187
+Overfull \hbox (11.68947pt too wide) in paragraph at lines 188--188
  [][] 
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
  []
 
 [6
 
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 221--221
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [7
 
+] [8
 
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [9
 
-[7
+] [10
 
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 251--251
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [11
 
+] [12
 
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [13
 
-[8
+] [14
 
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 276--276
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [15
 
+] [16
 
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [17
 
-[9
+] [18
+
+] [19
+
+] [20
+
+] [21
 
 ]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 301--301
- [][]  \TU/lmss/m/n/6 ([])  
- []
+[22
 
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[10
+] [23
 
 ]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 330--330
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[11
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 354--354
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[12
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 382--382
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[13
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 408--408
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[14
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 439--439
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[15
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 470--470
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[16
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 505--505
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[17
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 511--511
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
 \openout4 = `presentacion_P01.vrb'.
 
-
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 542--542
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-(presentacion_P01.vrb
+ (presentacion_P01.vrb
 Overfull \hbox (9.29445pt too wide) in paragraph at lines 8--9
 \TU/lmtt/m/n/12 notebooks/P01_Proteccion_Laser.ipynb  
- []
-
-
-Overfull \hbox (6.005pt too wide) in paragraph at lines 19--20
-\TU/lmtt/m/n/12 evaluate_against_lenses()  
  []
 
 (C:\Users\edgar\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
@@ -1570,60 +1408,15 @@ File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <6> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 30.
-)
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
+) [24
 
-[18
+] [25
 
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 557--557
- [][]  \TU/lmss/m/n/6 ([])  
- []
+] [26
 
+] [27
 
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[19
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 571--571
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[20
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 594--594
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[21
-
-]
-Overfull \hbox (58.41026pt too wide) in paragraph at lines 602--602
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-
-Overfull \hbox (58.41026pt too wide) has occurred while \output is active
- [][]  \TU/lmss/m/n/6 ([])  
- []
-
-[22
+] [28
 
 ]
 \tf@nav=\write6
@@ -1644,15 +1437,15 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `presentacion_P01.out' has not changed.
-(rerunfilecheck)             Checksum: E7B70036BC30AD8D78C41650FF4BBD12;1263.
+(rerunfilecheck)             Checksum: 6AAAAA995DB7418E76F8FEB7C595903F;1334.
  ) 
 Here is how much of TeX's memory you used:
- 36278 strings out of 402987
- 800684 string characters out of 5448524
- 1460745 words of memory out of 5000000
- 64377 multiletter control sequences out of 15000+600000
- 639882 words of font info for 115 fonts, out of 8000000 for 9000
+ 36429 strings out of 402987
+ 804317 string characters out of 5448524
+ 1463019 words of memory out of 5000000
+ 64517 multiletter control sequences out of 15000+600000
+ 643042 words of font info for 133 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,15n,123p,431b,1284s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on presentacion_P01.xdv (22 pages, 516548 bytes).
+Output written on presentacion_P01.xdv (28 pages, 639320 bytes).

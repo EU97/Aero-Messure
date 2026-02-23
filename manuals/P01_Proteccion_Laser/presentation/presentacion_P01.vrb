@@ -1,30 +1,30 @@
 \frametitle{Automatización con Python}
 \begin{columns}
-    \begin{column}{0.55\textwidth}
-      \begin{block}{Contenido del Repositorio}
-        \texttt{Practicas/P01\_Proteccion\_Laser/}
-        \begin{itemize}
-          \item \texttt{src/P01\_Proteccion\_Laser.py}
-          \item \texttt{notebooks/P01\_Proteccion\_Laser.ipynb}
-          \item \texttt{data/epo\_lenses.csv}
-        \end{itemize}
-      \end{block}
-    \end{column}
-    \begin{column}{0.4\textwidth}
-      \begin{exampleblock}{Funciones}
-        \begin{itemize}
-          \item \texttt{area\_cm2\_from...()}
-          \item \texttt{h0\_exposure()}
-          \item \texttt{od\_required()}
-          \item \texttt{evaluate\_against\_lenses()}
-          \item \texttt{evaluate\_and\_plot()}
-        \end{itemize}
-      \end{exampleblock}
-    \end{column}
-  \end{columns}
+^^I^^I\begin{column}{0.55\textwidth}
+^^I^^I^^I\begin{block}{Contenido del Repositorio}
+^^I^^I^^I^^I\texttt{Practicas/P01\_Proteccion\_Laser/}
+^^I^^I^^I^^I\begin{itemize}
+^^I^^I^^I^^I^^I\item \texttt{src/P01\_Proteccion\_Laser.py}
+^^I^^I^^I^^I^^I\item \texttt{notebooks/P01\_Proteccion\_Laser.ipynb}
+^^I^^I^^I^^I^^I\item \texttt{data/epo\_lenses.csv}
+^^I^^I^^I^^I\end{itemize}
+^^I^^I^^I\end{block}
+^^I^^I\end{column}
+^^I^^I\begin{column}{0.4\textwidth}
+^^I^^I^^I\begin{exampleblock}{Funciones}
+^^I^^I^^I^^I\begin{itemize}
+^^I^^I^^I^^I^^I\item \texttt{area\_cm2\_from...()}
+^^I^^I^^I^^I^^I\item \texttt{h0\_exposure()}
+^^I^^I^^I^^I^^I\item \texttt{od\_required()}
+^^I^^I^^I^^I^^I\item \texttt{risk\_assessment()}
+^^I^^I^^I^^I^^I\item \texttt{evaluate\_and\_plot()}
+^^I^^I^^I^^I\end{itemize}
+^^I^^I^^I\end{exampleblock}
+^^I^^I\end{column}
+^^I\end{columns}
 
-  \vspace{0.3cm}
-  \begin{lstlisting}[language=Python]
+^^I\vspace{0.3cm}
+^^I\begin{lstlisting}[language=Python]
 A = area_cm2_from_diameter_mm(5.0)  # 0.1963 cm^2
 H0 = 0.2 / A                       # 1.02 J/cm^2
 print(od_required(H0, 5e-7))       # 6.31
