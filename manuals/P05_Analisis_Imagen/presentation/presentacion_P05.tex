@@ -265,20 +265,20 @@
 	\small
 	\begin{tabular}{lll}
 		\toprule
-		\textbf{Parámetro}            & \textbf{Unidad}
-		                              & \textbf{Efecto}                                \\
+		\textbf{Parámetro}       & \textbf{Unidad}
+		                         & \textbf{Efecto}                                 \\
 		\midrule
-		EHT (voltaje)                 & \si{\kilo\volt}
-		                              & $\uparrow$ $\to$ mayor penetración y resolución \\
-		WD (dist.\ trabajo)            & \si{\mm}
-		                              & $\downarrow$ $\to$ mejor resolución              \\
-		Mag (magnificación)            & $\times$
-		                              & Define campo de visión                           \\
-		Signal A (detector)            & SE / BSE
-		                              & SE: topografía; BSE: composición                \\
+		EHT (voltaje)            & \si{\kilo\volt}
+		                         & $\uparrow$ $\to$ mayor penetración y resolución \\
+		WD (dist.\ trabajo)      & \si{\mm}
+		                         & $\downarrow$ $\to$ mejor resolución             \\
+		Mag (magnificación)      & $\times$
+		                         & Define campo de visión                          \\
+		Signal A (detector)      & SE / BSE
+		                         & SE: topografía; BSE: composición                \\
 		\rowcolor{aeroyellow!20}
-		\textbf{Barra de escala}       & \si{\micro\m}
-		                              & \textbf{Fundamental para mediciones}             \\
+		\textbf{Barra de escala} & \si{\micro\m}
+		                         & \textbf{Fundamental para mediciones}            \\
 		\bottomrule
 	\end{tabular}
 
@@ -301,11 +301,11 @@
 				\begin{tikzpicture}[scale=0.55]
 					\draw[thick] (0,0) rectangle (2.8,2.2);
 					\foreach \x/\y/\r in {0.4/1.0/0.2, 1.0/0.6/0.25,
-						1.4/1.4/0.18, 2.0/0.9/0.3, 2.4/1.6/0.15,
-						0.7/1.7/0.12, 1.8/0.3/0.2} {
-						\draw[gray,fill=gray!20] (\x,\y)
-						ellipse ({\r} and {\r*0.7});
-					}
+							1.4/1.4/0.18, 2.0/0.9/0.3, 2.4/1.6/0.15,
+							0.7/1.7/0.12, 1.8/0.3/0.2} {
+							\draw[gray,fill=gray!20] (\x,\y)
+							ellipse ({\r} and {\r*0.7});
+						}
 				\end{tikzpicture}\\
 				\scriptsize \textbf{Hoyuelos} (dimples)\\
 				$G_\mathrm{dúctil} \gg G_\mathrm{frágil}$
@@ -332,10 +332,10 @@
 				\begin{tikzpicture}[scale=0.55]
 					\draw[thick] (0,0) rectangle (2.8,2.2);
 					\foreach \y in {0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0} {
-						\draw[gray,thin] (0.15,\y)
-						.. controls (0.8,{\y+0.1}) and (2.0,{\y-0.08})
-						.. (2.65,\y);
-					}
+							\draw[gray,thin] (0.15,\y)
+							.. controls (0.8,{\y+0.1}) and (2.0,{\y-0.08})
+							.. (2.65,\y);
+						}
 					\fill[aerored] (0.15,1.1) circle (0.06);
 					\draw[aerored,->] (0.15,1.1) -- (0.6,1.1);
 				\end{tikzpicture}\\
@@ -351,7 +351,7 @@
 		\node[draw=aerored,thick,rounded corners,fill=aerored!8,
 			text width=10cm,align=center,font=\small] {
 			Nuestras 5 micrografías muestran \textbf{superficies de
-			fractura por fatiga} con estrías, marcas de playa y
+				fractura por fatiga} con estrías, marcas de playa y
 			zonas de fractura final.
 		};
 	\end{tikzpicture}
@@ -417,39 +417,39 @@
 \begin{frame}{Pipeline de 6 Etapas}
 	\centering
 	\begin{tikzpicture}[node distance=0.6cm,>=Stealth,
-		block/.style={rectangle,draw=aerogreen,thick,fill=aerogreen!8,
-			text width=4.0cm,align=center,minimum height=0.6cm,
-			font=\scriptsize,rounded corners=2pt}]
+			block/.style={rectangle,draw=aerogreen,thick,fill=aerogreen!8,
+					text width=4.0cm,align=center,minimum height=0.6cm,
+					font=\scriptsize,rounded corners=2pt}]
 		\node[block] (load) {\textbf{1.} Carga en gris $[0,1]$};
 		\node[block,below=of load] (clahe)
-			{\textbf{2.} CLAHE (\texttt{clip}=0,03)};
+		{\textbf{2.} CLAHE (\texttt{clip}=0,03)};
 		\node[block,below=of clahe] (sobel)
-			{\textbf{3a.} Sobel (gradiente)};
+		{\textbf{3a.} Sobel (gradiente)};
 		\node[block,right=2cm of sobel] (canny)
-			{\textbf{3b.} Canny ($\sigma=2$)};
+		{\textbf{3b.} Canny ($\sigma=2$)};
 		\node[block,below=of sobel] (otsu)
-			{\textbf{4.} Umbralización Otsu};
+		{\textbf{4.} Umbralización Otsu};
 		\node[block,below=of otsu] (morph)
-			{\textbf{5.} Opening (disk=2)};
+		{\textbf{5.} Opening (disk=2)};
 		\node[block,below=of morph,draw=aerored,fill=aerored!8]
-			(label) {\textbf{6.} Etiquetado $\to$ $N$ regiones};
+		(label) {\textbf{6.} Etiquetado $\to$ $N$ regiones};
 		% Arrows
 		\foreach \a/\b in {load/clahe,clahe/sobel,sobel/otsu,
-			otsu/morph,morph/label} {
-			\draw[->,aerogreen,thick] (\a) -- (\b);
-		}
+				otsu/morph,morph/label} {
+				\draw[->,aerogreen,thick] (\a) -- (\b);
+			}
 		\draw[->,aerogreen,thick] (clahe.east) -| (canny.north);
 		% Side annotations
 		\node[right=0.5cm of load,font=\tiny,text width=3cm]
-			{float, normalizado};
+		{float, normalizado};
 		\node[right=0.5cm of clahe,font=\tiny,text width=3cm]
-			{Contraste local mejorado};
+		{Contraste local mejorado};
 		\node[right=0.5cm of otsu,font=\tiny,text width=3cm]
-			{Máscara binaria automática};
+		{Máscara binaria automática};
 		\node[right=0.5cm of morph,font=\tiny,text width=3cm]
-			{Ruido eliminado};
+		{Ruido eliminado};
 		\node[right=0.5cm of label,font=\tiny,text width=3cm,aerored]
-			{Descriptores de forma};
+		{Descriptores de forma};
 	\end{tikzpicture}
 \end{frame}
 
@@ -523,8 +523,8 @@
 			\begin{enumerate}\small
 				\item \textbf{Suavizado Gaussiano} ($\sigma = 2{,}0$)
 				      \begin{equation*}
-				      	G_\sigma = \frac{1}{2\pi\sigma^2}
-				      	e^{-\frac{x^2+y^2}{2\sigma^2}}
+					      G_\sigma = \frac{1}{2\pi\sigma^2}
+					      e^{-\frac{x^2+y^2}{2\sigma^2}}
 				      \end{equation*}
 				\item \textbf{Gradiente} $|\nabla I|$ y orientación
 				      $\theta$
@@ -637,12 +637,12 @@
 			\centering\small
 			\begin{tabular}{ll}
 				\toprule
-				\textbf{Descriptor} & \textbf{Significado}          \\
+				\textbf{Descriptor} & \textbf{Significado}    \\
 				\midrule
-				Área ($A_r$)        & Tamaño (px$^2$)               \\
-				Perímetro ($P_r$)   & Longitud borde (px)           \\
-				Excentricidad ($e$) & Alargamiento ($0$--$1$)       \\
-				Eje mayor           & Dimensión máxima (px)         \\
+				Área ($A_r$)        & Tamaño (px$^2$)         \\
+				Perímetro ($P_r$)   & Longitud borde (px)     \\
+				Excentricidad ($e$) & Alargamiento ($0$--$1$) \\
+				Eje mayor           & Dimensión máxima (px)   \\
 				\bottomrule
 			\end{tabular}
 		\end{column}
@@ -665,7 +665,7 @@
 				\fill[aeroyellow!60] (2.5,0.6) ellipse (0.6 and 0.25);
 				\node[font=\tiny\bfseries] at (2.5,0.6) {4};
 				\node[below,font=\scriptsize] at (2,-0.2)
-					{Ejemplo: 4 regiones etiquetadas};
+				{Ejemplo: 4 regiones etiquetadas};
 			\end{tikzpicture}
 		\end{column}
 	\end{columns}
@@ -678,15 +678,15 @@
 	\vspace{0.5em}
 	\begin{tabular}{l r l}
 		\toprule
-		\textbf{Imagen}     & $\boldsymbol{N}$ & \textbf{Observación}        \\
+		\textbf{Imagen} & $\boldsymbol{N}$ & \textbf{Observación} \\
 		\midrule
-		fatigue3            & 418               & Densidad media              \\
-		fatigue4            & 153               & Buen contraste              \\
+		fatigue3        & 418              & Densidad media       \\
+		fatigue4        & 153              & Buen contraste       \\
 		\rowcolor{aeroyellow!20}
-		fatigue5            & 2066              & Alta resolución             \\
+		fatigue5        & 2066             & Alta resolución      \\
 		\rowcolor{aerored!15}
-		fatigue6            & 2897              & Máxima complejidad          \\
-		fatigue7            & 549               & Textura fina                \\
+		fatigue6        & 2897             & Máxima complejidad   \\
+		fatigue7        & 549              & Textura fina         \\
 		\bottomrule
 	\end{tabular}
 
@@ -773,15 +773,15 @@
 				\item Clic en extremos $P_1$, $P_2$ de la barra
 				\item Calcular distancia en píxeles:
 				      \begin{equation*}
-				      	d_\mathrm{px}
-				      	= \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}
+					      d_\mathrm{px}
+					      = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}
 				      \end{equation*}
 				\item Ingresar distancia real
 				      $d_\mathrm{real}$ (\si{\micro\m})
 				\item Calcular escala:
 				      \begin{equation*}
-				      	\boxed{s = \frac{d_\mathrm{px}}{d_\mathrm{real}}
-				      	\;\left[\frac{\mathrm{px}}{\si{\micro\m}}\right]}
+					      \boxed{s = \frac{d_\mathrm{px}}{d_\mathrm{real}}
+						      \;\left[\frac{\mathrm{px}}{\si{\micro\m}}\right]}
 				      \end{equation*}
 			\end{enumerate}
 		\end{column}
@@ -849,25 +849,25 @@
 		\end{column}
 		\begin{column}{0.47\textwidth}
 			\begin{tikzpicture}[scale=0.7,>=Stealth,
-				box/.style={rectangle,draw=aerogreen,thick,
-					fill=aerogreen!8,text width=3.2cm,align=center,
-					minimum height=0.6cm,font=\tiny,
-					rounded corners=2pt}]
+					box/.style={rectangle,draw=aerogreen,thick,
+							fill=aerogreen!8,text width=3.2cm,align=center,
+							minimum height=0.6cm,font=\tiny,
+							rounded corners=2pt}]
 				\node[box] (sel) {Dropdown: seleccionar imagen};
 				\node[box,below=0.5cm of sel]
-					(cal) {Botón: Calibrar\\(2 clics + dist.)};
+				(cal) {Botón: Calibrar\\(2 clics + dist.)};
 				\node[box,below=0.5cm of cal]
-					(fix) {Botón: Fijar Escala};
+				(fix) {Botón: Fijar Escala};
 				\node[box,below=0.5cm of fix]
-					(meas) {Botón: Medir Distancia\\(2 clics)};
+				(meas) {Botón: Medir Distancia\\(2 clics)};
 				\node[box,below=0.5cm of meas,draw=aerored,fill=aerored!8]
-					(out) {Resultado: $d$ (\si{\micro\m})};
+				(out) {Resultado: $d$ (\si{\micro\m})};
 				\foreach \a/\b in {sel/cal,cal/fix,fix/meas,meas/out}
-					\draw[->,aerogreen,thick] (\a) -- (\b);
+				\draw[->,aerogreen,thick] (\a) -- (\b);
 				% Loop
 				\draw[aerored,thick,->] (out.east) -- ++(0.8,0)
-					|- (meas.east)
-					node[pos=0.25,right,font=\tiny,aerored] {repetir};
+				|- (meas.east)
+				node[pos=0.25,right,font=\tiny,aerored] {repetir};
 			\end{tikzpicture}
 		\end{column}
 	\end{columns}
@@ -884,28 +884,28 @@
 		\toprule
 		\textbf{Riesgo} & \textbf{P}                             & \textbf{S}
 		                & $\boldsymbol{R}$                       & \textbf{Nivel}
-		                & \textbf{Controles}                                           \\
+		                & \textbf{Controles}                                          \\
 		\midrule
 		\rowcolor{aeroyellow!15}
 		Alta tensión SEM
 		                & 2                                      & 4              & 8
 		                & \textcolor{aeroyellow}{\textbf{Medio}}
-		                & Interlock, formación                                         \\
+		                & Interlock, formación                                        \\
 		\rowcolor{aeroyellow!15}
 		Preparación metalo.
 		                & 2                                      & 3              & 6
 		                & \textcolor{aeroyellow}{\textbf{Medio}}
-		                & Gafas, guantes, SOPs                                         \\
+		                & Gafas, guantes, SOPs                                        \\
 		\rowcolor{aeroyellow!15}
 		Reactivos químicos
 		                & 2                                      & 3              & 6
 		                & \textcolor{aeroyellow}{\textbf{Medio}}
-		                & Campana, MSDS                                                \\
+		                & Campana, MSDS                                               \\
 		\rowcolor{aerogreen!15}
 		Ergonomía digital
 		                & 1                                      & 1              & 1
 		                & \textcolor{aerogreen}{\textbf{Bajo}}
-		                & Pausas, postura                                              \\
+		                & Pausas, postura                                             \\
 		\bottomrule
 	\end{tabular}
 
@@ -920,25 +920,25 @@
 	\centering
 	\begin{tikzpicture}[scale=0.65]
 		\foreach \x in {0,...,4} {
-			\foreach \y in {0,...,4} {
-				\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
-				\pgfmathparse{\risk < 5 ? "aerogreen!40" :
-					(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
-				\edef\fillcol{\pgfmathresult}
-				\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
-				\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
-				\node[font=\tiny] at (\x+0.5,\y+0.5)
-				{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+				\foreach \y in {0,...,4} {
+						\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+						\pgfmathparse{\risk < 5 ? "aerogreen!40" :
+							(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+						\edef\fillcol{\pgfmathresult}
+						\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+						\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+						\node[font=\tiny] at (\x+0.5,\y+0.5)
+						{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+					}
 			}
-		}
 		\foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
-			\node[font=\tiny,rotate=45,anchor=west]
-			at (\x+0.5,-0.1) {\l};
-		}
+				\node[font=\tiny,rotate=45,anchor=west]
+				at (\x+0.5,-0.1) {\l};
+			}
 		\foreach \y/\l in {0/Insignif.,1/Menor,2/Moder.,3/Mayor,
-			4/Catastrófico} {
-			\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
-		}
+				4/Catastrófico} {
+				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+			}
 		\node[font=\tiny\bfseries,rotate=90] at (-1.3,2.5)
 		{Severidad};
 		\node[font=\tiny\bfseries] at (2.5,-1) {Probabilidad};
@@ -993,14 +993,14 @@
 			\centering\scriptsize
 			\begin{tabular}{ll}
 				\toprule
-				\textbf{Par.}     & \textbf{Valor}        \\
+				\textbf{Par.}          & \textbf{Valor}            \\
 				\midrule
-				Imagen            & \texttt{fatigue3.png} \\
-				$N_\mathrm{reg}$  & 418                   \\
-				Mediciones        & $\geq$15 estrías      \\
-				Paris: $C$        & $6{,}9\!\times\!10^{-12}$ \\
-				Paris: $m$        & 3                     \\
-				$\Delta K_\mathrm{th}$ & $\SI{5}{\MPa\sqrt{\m}}$ \\
+				Imagen                 & \texttt{fatigue3.png}     \\
+				$N_\mathrm{reg}$       & 418                       \\
+				Mediciones             & $\geq$15 estrías          \\
+				Paris: $C$             & $6{,}9\!\times\!10^{-12}$ \\
+				Paris: $m$             & 3                         \\
+				$\Delta K_\mathrm{th}$ & $\SI{5}{\MPa\sqrt{\m}}$   \\
 				\bottomrule
 			\end{tabular}
 		\end{column}
@@ -1034,13 +1034,13 @@
 			\centering\scriptsize
 			\begin{tabular}{ll}
 				\toprule
-				\textbf{Par.}      & \textbf{Valor}                             \\
+				\textbf{Par.}    & \textbf{Valor}          \\
 				\midrule
-				Imágenes           & \texttt{fatigue4.png}                      \\
-				                   & \texttt{fatigue7.png}                      \\
-				$N_\mathrm{reg}$   & 153 / 549                                  \\
-				Mediciones         & $\geq$15 por imagen                        \\
-				Diagnóstico        & dúctil / frágil / mixto                    \\
+				Imágenes         & \texttt{fatigue4.png}   \\
+				                 & \texttt{fatigue7.png}   \\
+				$N_\mathrm{reg}$ & 153 / 549               \\
+				Mediciones       & $\geq$15 por imagen     \\
+				Diagnóstico      & dúctil / frágil / mixto \\
 				\bottomrule
 			\end{tabular}
 		\end{column}
@@ -1076,13 +1076,13 @@
 			\centering\scriptsize
 			\begin{tabular}{ll}
 				\toprule
-				\textbf{Par.}      & \textbf{Valor}                             \\
+				\textbf{Par.}    & \textbf{Valor}                              \\
 				\midrule
-				Imágenes           & \texttt{fatigue5.png}                      \\
-				                   & \texttt{fatigue4.png}                      \\
-				$N_\mathrm{reg}$   & 2066 / 153                                 \\
-				Tamaño             & \SI{2.3}{\mega\byte}\ / \SI{68}{\kilo\byte} \\
-				Objetivo           & Cuantificar efecto                         \\
+				Imágenes         & \texttt{fatigue5.png}                       \\
+				                 & \texttt{fatigue4.png}                       \\
+				$N_\mathrm{reg}$ & 2066 / 153                                  \\
+				Tamaño           & \SI{2.3}{\mega\byte}\ / \SI{68}{\kilo\byte} \\
+				Objetivo         & Cuantificar efecto                          \\
 				\bottomrule
 			\end{tabular}
 		\end{column}
@@ -1117,13 +1117,13 @@
 			\centering\scriptsize
 			\begin{tabular}{ll}
 				\toprule
-				\textbf{Par.}            & \textbf{Valor}           \\
+				\textbf{Par.}           & \textbf{Valor}                       \\
 				\midrule
-				Imagen                   & \texttt{fatigue6.png}    \\
-				$N_\mathrm{reg}$ (base)  & 2897                     \\
-				clip\_limit              & $\{0{,}01; 0{,}03; 0{,}05; 0{,}10\}$ \\
-				$\sigma_\mathrm{Canny}$  & $\{1; 2; 3; 5\}$        \\
-				disk                     & $\{1; 2; 3; 5\}$        \\
+				Imagen                  & \texttt{fatigue6.png}                \\
+				$N_\mathrm{reg}$ (base) & 2897                                 \\
+				clip\_limit             & $\{0{,}01; 0{,}03; 0{,}05; 0{,}10\}$ \\
+				$\sigma_\mathrm{Canny}$ & $\{1; 2; 3; 5\}$                     \\
+				disk                    & $\{1; 2; 3; 5\}$                     \\
 				\bottomrule
 			\end{tabular}
 		\end{column}
@@ -1170,24 +1170,24 @@
 			\begin{tabular}{ll}
 				\toprule
 				\textbf{Función}
-				& \textbf{Resultado}                            \\
+				 & \textbf{Resultado}          \\
 				\midrule
 				\texttt{cargar\_imagen\_gris}
-				& float $[0,1]$                                 \\
+				 & float $[0,1]$               \\
 				\texttt{procesar\_clahe}
-				& Imagen CLAHE                                  \\
+				 & Imagen CLAHE                \\
 				\texttt{procesar\_sobel}
-				& Mapa gradientes                               \\
+				 & Mapa gradientes             \\
 				\texttt{procesar\_canny}
-				& Bordes binarios                               \\
+				 & Bordes binarios             \\
 				\texttt{procesar\_otsu}
-				& Máscara binaria                               \\
+				 & Máscara binaria             \\
 				\texttt{procesar\_morfologia}
-				& Máscara limpia                                \\
+				 & Máscara limpia              \\
 				\texttt{procesar\_etiquetado}
-				& $N$ regiones + descriptores                   \\
+				 & $N$ regiones + descriptores \\
 				\texttt{run\_full\_analysis}
-				& Pipeline + 6 PNG                              \\
+				 & Pipeline + 6 PNG            \\
 				\bottomrule
 			\end{tabular}
 		\end{column}
