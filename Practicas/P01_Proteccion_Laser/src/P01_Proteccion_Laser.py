@@ -142,6 +142,111 @@ def evaluate_against_lenses(laser: dict, lenses_data):
     out.sort(key=lambda x: (not x['safe'], -(x['margin'] if x['margin'] is not None else -float('inf')), -x['vlt_pct']))
     return out
 
+# --- FUNCIONES DE EVALUACIÓN DE RIESGO ---
+
+RISK_PROB_LABELS = {1: 'MuyBajo', 2: 'Bajo', 3: 'Medio', 4: 'Alto', 5: 'MuyAlto'}
+RISK_SEV_LABELS  = {1: 'Insignificante', 2: 'Menor', 3: 'Moderado', 4: 'Mayor', 5: 'Catastrófico'}
+
+def risk_assessment(prob: int, severity: int) -> dict:
+    """Evalúa el riesgo según la matriz 5×5.
+    
+    Args:
+        prob: Probabilidad de exposición (1-5).
+        severity: Severidad del daño potencial (1-5).
+    
+    Returns:
+        dict con R (valor numérico), nivel (Bajo/Medio/Alto), color,
+        etiquetas de probabilidad y severidad.
+    """
+    if not (1 <= prob <= 5 and 1 <= severity <= 5):
+        raise ValueError('Probabilidad y severidad deben estar entre 1 y 5')
+    R = prob * severity
+    if R < 5:
+        nivel, color = 'Bajo', 'green'
+    elif R < 13:
+        nivel, color = 'Medio', 'gold'
+    else:
+        nivel, color = 'Alto', 'red'
+    return {
+        'prob': prob, 'prob_label': RISK_PROB_LABELS[prob],
+        'sev': severity, 'sev_label': RISK_SEV_LABELS[severity],
+        'R': R, 'nivel': nivel, 'color': color
+    }
+
+def risk_controls(nivel: str) -> str:
+    """Devuelve los controles recomendados según el nivel de riesgo."""
+    controles = {
+        'Bajo':  'Señalización, EPO recomendado.',
+        'Medio': 'EPO obligatorio, cortinas/barreras, SOPs, registro.',
+        'Alto':  'EPO obligatorio, interlock, enclave, señalización Clase 4, LSO.'
+    }
+    return controles.get(nivel, 'Desconocido')
+
+def plot_risk_matrix(scenarios: list, save_path: str = None):
+    """Dibuja la matriz de riesgos 5×5 con los escenarios marcados.
+    
+    Args:
+        scenarios: lista de dicts con keys 'name', 'prob', 'sev'.
+        save_path: ruta para guardar el gráfico (opcional).
+    """
+    if not HAS_MPL:
+        print('Matplotlib no disponible: se omite la matriz de riesgos.')
+        return
+    
+    fig, ax = plt.subplots(figsize=(8, 7))
+    
+    prob_labels = ['MuyBajo', 'Bajo', 'Medio', 'Alto', 'MuyAlto']
+    sev_labels  = ['Insignif.', 'Menor', 'Moderado', 'Mayor', 'Catastrófico']
+    
+    # Dibujar celdas coloreadas
+    for i in range(5):      # probabilidad (columna)
+        for j in range(5):  # severidad (fila)
+            R = (i + 1) * (j + 1)
+            if R < 5:
+                color = '#90EE90'   # verde claro
+            elif R < 13:
+                color = '#FFD700'   # amarillo
+            else:
+                color = '#FF6B6B'   # rojo claro
+            rect = plt.Rectangle((i, j), 1, 1, facecolor=color,
+                                  edgecolor='gray', linewidth=0.5)
+            ax.add_patch(rect)
+            ax.text(i + 0.5, j + 0.5, str(R), ha='center', va='center',
+                    fontsize=10, fontweight='bold')
+    
+    # Marcar escenarios
+    markers = ['o', 's', '^', 'D', 'v', 'p', '*']
+    colors_mk = ['navy', 'darkblue', 'darkorange', 'purple', 'teal', 'brown', 'darkgreen']
+    for idx, sc in enumerate(scenarios):
+        risk = risk_assessment(sc['prob'], sc['sev'])
+        x = sc['prob'] - 1 + 0.5
+        y = sc['sev'] - 1 + 0.5
+        mk = markers[idx % len(markers)]
+        cl = colors_mk[idx % len(colors_mk)]
+        ax.plot(x, y, mk, markersize=14, color=cl, markeredgecolor='white',
+                markeredgewidth=1.5, label=f"{sc['name']} (R={risk['R']}, {risk['nivel']})")
+    
+    ax.set_xlim(0, 5)
+    ax.set_ylim(0, 5)
+    ax.set_xticks([i + 0.5 for i in range(5)])
+    ax.set_xticklabels(prob_labels, fontsize=9)
+    ax.set_yticks([j + 0.5 for j in range(5)])
+    ax.set_yticklabels(sev_labels, fontsize=9)
+    ax.set_xlabel('Probabilidad', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Severidad', fontsize=12, fontweight='bold')
+    ax.set_title('Matriz de Riesgos 5x5 - Evaluacion de Escenarios Laser', fontsize=13)
+    ax.legend(loc='upper left', fontsize=8, framealpha=0.9)
+    ax.set_aspect('equal')
+    plt.tight_layout()
+    
+    if save_path:
+        try:
+            plt.savefig(save_path, dpi=150)
+            print(f"Matriz de riesgos guardada en: {save_path}")
+        except Exception as e:
+            print(f"Error al guardar: {e}")
+    plt.close(fig)
+
 # --- FUNCIÓN DE EVALUACIÓN Y GRÁFICO (de Celda 5) ---
 
 def evaluate_and_plot(laser, lenses_data, save_dir):
@@ -171,7 +276,7 @@ def evaluate_and_plot(laser, lenses_data, save_dir):
             plt.tight_layout()
             
             # Limpiar el nombre del láser para usarlo como nombre de archivo
-            clean_name = laser['name'].replace(' ', '_').replace('–', '_').replace('.', '_').replace('á','a').replace('ó','o')
+            clean_name = laser['name'].replace(' ', '_').replace('-', '_').replace('.', '_').replace('á','a').replace('ó','o')
             # Asegura que la ruta sea correcta
             save_path = os.path.join(save_dir, f"{clean_name}.png")
             
@@ -222,9 +327,21 @@ def main():
     
     # --- Definición de escenarios base (de Celda 5) ---
     LASERS = [
-        {'name':'Láser 1 – PIV','lambda_nm':532.0,'mode':'pulsed','a_mm':5.0,'E_J':0.2,'HMPE':5.0e-7},
-        {'name':'Láser 2 – LDA 514.5','lambda_nm':514.5,'mode':'CW','a_mm':1.2,'P_W':1.5,'HMPE':2.5e-3,'HMPE_long':1.0e-3},
-        {'name':'Láser 3 – Alineación','lambda_nm':635.0,'mode':'CW','a_mm':3.0,'P_W':4.5e-3,'HMPE':2.5e-3},
+        {'name':'Laser 1 - PIV','lambda_nm':532.0,'mode':'pulsed','a_mm':5.0,'E_J':0.2,'HMPE':5.0e-7,
+         'risk_prob':4, 'risk_sev':4},
+        {'name':'Laser 2 - LDA 514.5','lambda_nm':514.5,'mode':'CW','a_mm':1.2,'P_W':1.5,'HMPE':2.5e-3,'HMPE_long':1.0e-3,
+         'risk_prob':3, 'risk_sev':4},
+        {'name':'Laser 3 - Alineacion','lambda_nm':635.0,'mode':'CW','a_mm':3.0,'P_W':4.5e-3,'HMPE':2.5e-3,
+         'risk_prob':1, 'risk_sev':2},
+    ]
+    
+    # Escenarios de los equipos (sin soluciones de OD, solo riesgo para referencia)
+    TEAM_SCENARIOS_RISK = [
+        {'name': 'Eq1 - Nd:YAG 1064nm (Clase 4)',  'prob': 4, 'sev': 5},
+        {'name': 'Eq2 - CO2 10600nm (Clase 4)',     'prob': 4, 'sev': 4},
+        {'name': 'Eq3 - Diodo 808nm (Clase 3B)',    'prob': 3, 'sev': 3},
+        {'name': 'Eq4a - He-Ne 632.8nm (Clase 3R)', 'prob': 2, 'sev': 2},
+        {'name': 'Eq4b - LDA prolongada (Clase 4)', 'prob': 4, 'sev': 5},
     ]
     
     # --- Ejecución (de Celdas 2, 3 y 5) ---
@@ -253,11 +370,42 @@ def main():
     for L in LASERS:
         print(f"=== {L['name']} ===")
         evaluate_and_plot(L, lenses, IMAGE_DIR)
+        # Evaluación de riesgo del escenario base
+        if 'risk_prob' in L and 'risk_sev' in L:
+            risk = risk_assessment(L['risk_prob'], L['risk_sev'])
+            print(f"  Riesgo: P={risk['prob_label']}({risk['prob']}), "
+                  f"S={risk['sev_label']}({risk['sev']}), "
+                  f"R={risk['R']} -> {risk['nivel']}")
+            print(f"  Controles: {risk_controls(risk['nivel'])}\n")
         
-    print("--- Evaluación de escenarios base completada ---")
+    print("--- Evaluación de escenarios base completada ---\n")
+    
+    # --- Evaluación de riesgo para escenarios de equipos ---
+    print("=" * 50)
+    print("EVALUACIÓN DE RIESGO POR EQUIPOS")
+    print("=" * 50)
+    for sc in TEAM_SCENARIOS_RISK:
+        risk = risk_assessment(sc['prob'], sc['sev'])
+        print(f"\n{sc['name']}:")
+        print(f"  Probabilidad: {risk['prob_label']} ({risk['prob']})")
+        print(f"  Severidad:    {risk['sev_label']} ({risk['sev']})")
+        print(f"  Riesgo (R):   {risk['R']} -> {risk['nivel']}")
+        print(f"  Controles:    {risk_controls(risk['nivel'])}")
+    
+    # --- Dibujar matriz de riesgos combinada ---
+    all_risk_scenarios = [
+        {'name': 'L1 PIV',    'prob': 4, 'sev': 4},
+        {'name': 'L2 LDA',    'prob': 3, 'sev': 4},
+        {'name': 'L3 Alin.',  'prob': 1, 'sev': 2},
+    ] + TEAM_SCENARIOS_RISK
+    
+    risk_matrix_path = os.path.join(IMAGE_DIR, 'risk_matrix.png')
+    plot_risk_matrix(all_risk_scenarios, save_path=risk_matrix_path)
     
     # La funcionalidad de widgets (Celda 5 del notebook) se omite 
     # ya que requiere un entorno Jupyter interactivo.
+    
+    print("\n--- Análisis completo finalizado ---")
 
 # Este es el punto de entrada estándar para un script de Python
 if __name__ == "__main__":
