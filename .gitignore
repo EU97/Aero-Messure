@@ -16,3 +16,5 @@ Practicas/PDF
 !Practicas/P**/data/.gitkeep
 !Practicas/P**/data/README.md
 !Practicas/P08_Productos_Combustion/data/synthetic_example_combustion.csv
+Manual/**
+manuals/**
