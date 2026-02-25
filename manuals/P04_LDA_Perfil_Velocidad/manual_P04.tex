@@ -141,7 +141,7 @@
 
 La \textbf{Anemometría Láser Doppler} (LDA, también denominada LDV ---
 \emph{Laser Doppler Velocimetry}) es una técnica óptica \textbf{no
-intrusiva} para la medición puntual de velocidad en flujos de gas y
+	intrusiva} para la medición puntual de velocidad en flujos de gas y
 líquido~\cite{durst1981}.  A diferencia de la anemometría de hilo caliente
 (P03), la LDA no perturba el flujo, no requiere calibración ---~puesto que
 la relación velocidad--frecuencia es lineal y depende únicamente de la
@@ -183,16 +183,16 @@ cada ráfaga para determinar la velocidad instantánea.
 	\label{tab:comparativa}
 	\begin{tabular}{l c c c c}
 		\toprule
-		\textbf{Característica}   & \textbf{Pitot} & \textbf{HWA}
-		                          & \textbf{LDA}   & \textbf{PIV}          \\
+		\textbf{Característica} & \textbf{Pitot} & \textbf{HWA}
+		                        & \textbf{LDA}   & \textbf{PIV}                                       \\
 		\midrule
-		Intrusiva                 & Sí  & Sí  & No  & No                   \\
-		Calibración necesaria     & Sí  & Sí  & No  & Sí                   \\
-		Resolución temporal       & Baja & Muy alta & Alta & Media          \\
-		Resolución espacial       & cm   & mm  & $\sim\SI{100}{\micro\m}$
-		                          & mm                                     \\
-		Medición 2D/3D            & 1D   & 1--3D & 1--3D & 2D             \\
-		Coste y complejidad       & Bajo & Medio & Alto & Muy alto         \\
+		Intrusiva               & Sí             & Sí           & No                       & No       \\
+		Calibración necesaria   & Sí             & Sí           & No                       & Sí       \\
+		Resolución temporal     & Baja           & Muy alta     & Alta                     & Media    \\
+		Resolución espacial     & cm             & mm           & $\sim\SI{100}{\micro\m}$
+		                        & mm                                                                  \\
+		Medición 2D/3D          & 1D             & 1--3D        & 1--3D                    & 2D       \\
+		Coste y complejidad     & Bajo           & Medio        & Alto                     & Muy alto \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -238,7 +238,7 @@ Al finalizar esta práctica el estudiante será capaz de:
 
 Cuando una fuente de ondas se mueve con respecto a un observador, la
 frecuencia percibida difiere de la emitida.  En LDA la \emph{partícula
-trazadora} dispersa luz de dos haces que inciden con ángulos opuestos
+	trazadora} dispersa luz de dos haces que inciden con ángulos opuestos
 $\pm\theta/2$ respecto a la bisectriz.  La frecuencia Doppler diferencial:
 
 \begin{equation}
@@ -328,7 +328,7 @@ elipsoidal:
 \begin{align}
 	d_{mv} & = \frac{4\,f_L\,\lambda}{\pi\,d_b}
 	\quad\text{(diámetro del volumen)}
-	\label{eq:dmv}                                 \\
+	\label{eq:dmv}                              \\
 	l_{mv} & = \frac{d_{mv}}{\sin(\theta/2)}
 	\quad\text{(longitud del volumen)}
 	\label{eq:lmv}
@@ -350,19 +350,19 @@ El número de franjas $N_f$ en el volumen:
 	\label{tab:params_LDA}
 	\begin{tabular}{lll}
 		\toprule
-		\textbf{Parámetro}              & \textbf{Símbolo}
-		                                & \textbf{Valor}               \\
+		\textbf{Parámetro}            & \textbf{Símbolo}
+		                              & \textbf{Valor}    \\
 		\midrule
-		Longitud de onda (Ar-Ion)       & $\lambda$
-		                                & \SI{514,5}{\nm}              \\
-		Semi-ángulo de cruce            & $\theta/2$
-		                                & \SI{4,5}{\degree}            \\
-		Focal de la lente transmisora   & $f_L$
-		                                & \SI{250}{\mm}                \\
-		Diámetro del haz                & $d_b$
-		                                & \SI{1,2}{\mm}                \\
-		Desplazamiento Bragg            & $f_s$
-		                                & \SI{40}{\MHz}                \\
+		Longitud de onda (Ar-Ion)     & $\lambda$
+		                              & \SI{514,5}{\nm}   \\
+		Semi-ángulo de cruce          & $\theta/2$
+		                              & \SI{4,5}{\degree} \\
+		Focal de la lente transmisora & $f_L$
+		                              & \SI{250}{\mm}     \\
+		Diámetro del haz              & $d_b$
+		                              & \SI{1,2}{\mm}     \\
+		Desplazamiento Bragg          & $f_s$
+		                              & \SI{40}{\MHz}     \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -372,7 +372,7 @@ El número de franjas $N_f$ en el volumen:
 	\delta_f & = \frac{\lambda}{2\sin(\theta/2)}
 	= \frac{514{,}5\times10^{-9}}{2\sin(4{,}5°)}
 	= \frac{514{,}5\times10^{-9}}{2\times0{,}07846}
-	\notag                                                             \\
+	\notag                                              \\
 	         & = \frac{514{,}5\times10^{-9}}{0{,}15692}
 	\approx \SI{3,279}{\micro\metre}
 	\label{eq:delta_f_num}
@@ -383,11 +383,11 @@ El número de franjas $N_f$ en el volumen:
 	d_{mv} & = \frac{4\times 250\times10^{-3}\times 514{,}5\times10^{-9}}
 	{\pi\times 1{,}2\times10^{-3}}
 	\approx \SI{136,5}{\micro\metre}
-	\label{eq:dmv_num}                                                      \\
+	\label{eq:dmv_num}                                                    \\
 	l_{mv} & = \frac{136{,}5}{\sin(4{,}5°)}
 	= \frac{136{,}5}{0{,}0785}
 	\approx \SI{1,74}{\mm}
-	\label{eq:lmv_num}                                                      \\
+	\label{eq:lmv_num}                                                    \\
 	N_f    & = \frac{136{,}5}{3{,}279}
 	\approx 42 \text{ franjas}
 	\label{eq:Nf_num}
@@ -594,7 +594,7 @@ distribución rectangular, $u_{f_D} = \Delta f / \sqrt{3}
 	\approx \SI{5,77}{\kHz}$):
 \begin{equation}
 	u_U = \delta_f \cdot u_{f_D}
-	= 3{,}279\times10^{-6}\times 5{,}77\times10^{3}
+		= 3{,}279\times10^{-6}\times 5{,}77\times10^{3}
 	\approx \SI{0,019}{\m\per\s}
 	\label{eq:uU_num}
 \end{equation}
@@ -642,21 +642,21 @@ experimental diferente.
 	\label{tab:archivos}
 	\begin{tabular}{l l c c c}
 		\toprule
-		\textbf{Carpeta}    & \textbf{Prefijo}  & \textbf{Archivos}
-		                    & \textbf{Líneas/archivo}
-		                    & \textbf{Total muestras}                 \\
+		\textbf{Carpeta} & \textbf{Prefijo}        & \textbf{Archivos}
+		                 & \textbf{Líneas/archivo}
+		                 & \textbf{Total muestras}                     \\
 		\midrule
-		\texttt{FX01G00}    & \texttt{L01G00}   & 15
-		                    & 2\,000            & 30\,000             \\
-		\texttt{FX02G00}    & \texttt{F02G00a}  & 15
-		                    & 1\,138            & 17\,070             \\
-		\texttt{FX03G00}    & \texttt{F03G00}   & 15
-		                    & 2\,000            & 30\,000             \\
-		\texttt{FX04G00}    & \texttt{L04G00}   & 15
-		                    & 2\,000            & 30\,000             \\
+		\texttt{FX01G00} & \texttt{L01G00}         & 15
+		                 & 2\,000                  & 30\,000           \\
+		\texttt{FX02G00} & \texttt{F02G00a}        & 15
+		                 & 1\,138                  & 17\,070           \\
+		\texttt{FX03G00} & \texttt{F03G00}         & 15
+		                 & 2\,000                  & 30\,000           \\
+		\texttt{FX04G00} & \texttt{L04G00}         & 15
+		                 & 2\,000                  & 30\,000           \\
 		\midrule
 		\multicolumn{3}{l}{\textbf{Total}}
-		                    &                   & \textbf{107\,070}   \\
+		                 &                         & \textbf{107\,070} \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -676,19 +676,19 @@ línea de encabezado:
 	\label{tab:formato}
 	\begin{tabular}{c l l l}
 		\toprule
-		\textbf{Col.} & \textbf{Contenido}     & \textbf{Unidad}
-		              & \textbf{Ejemplo FX01}                      \\
+		\textbf{Col.} & \textbf{Contenido}       & \textbf{Unidad}
+		              & \textbf{Ejemplo FX01}                         \\
 		\midrule
-		1             & Índice de muestra       & --
-		              & 1, 2, 3, \ldots                            \\
-		2             & Tiempo de llegada       & ms
-		              & 18,770                                     \\
+		1             & Índice de muestra        & --
+		              & 1, 2, 3, \ldots                               \\
+		2             & Tiempo de llegada        & ms
+		              & 18,770                                        \\
 		3             & SNR / tiempo de tránsito & dB / \si{\micro\s}
-		              & 311,8                                      \\
-		4             & \textbf{Velocidad $U$}  & \si{\m\per\s}
-		              & 0,44                                       \\
-		5             & \textbf{Velocidad $V$}  & \si{\m\per\s}
-		              & $-0{,}00$                                  \\
+		              & 311,8                                         \\
+		4             & \textbf{Velocidad $U$}   & \si{\m\per\s}
+		              & 0,44                                          \\
+		5             & \textbf{Velocidad $V$}   & \si{\m\per\s}
+		              & $-0{,}00$                                     \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -708,15 +708,15 @@ sistema LDA (componente principal $U$ y componente transversal $V$).
 			S[table-format=2.1] S[table-format=1.5]}
 		\toprule
 		\textbf{Carpeta}
-		  & {$N$}    & {$\bar{U}$ (\si{\m\per\s})}
-		  & {$\sigma_U$ (\si{\m\per\s})}
-		  & {$I_u$ (\%)}
-		  & {$\bar{V}$ (\si{\m\per\s})}                    \\
+		        & {$N$}                        & {$\bar{U}$ (\si{\m\per\s})}
+		        & {$\sigma_U$ (\si{\m\per\s})}
+		        & {$I_u$ (\%)}
+		        & {$\bar{V}$ (\si{\m\per\s})}                                                          \\
 		\midrule
-		FX01G00 & 30000  & 0.5086  & 0.0731  & 14.4 & 0.01422 \\
-		FX02G00 & 29138  & 1.0133  & 0.1146  & 11.3 & 0.02078 \\
-		FX03G00 & 30000  & 1.9633  & 0.2191  & 11.2 & 0.07125 \\
-		FX04G00 & 30000  & 2.9255  & 0.3486  & 11.9 & 0.07639 \\
+		FX01G00 & 30000                        & 0.5086                      & 0.0731 & 14.4 & 0.01422 \\
+		FX02G00 & 29138                        & 1.0133                      & 0.1146 & 11.3 & 0.02078 \\
+		FX03G00 & 30000                        & 1.9633                      & 0.2191 & 11.2 & 0.07125 \\
+		FX04G00 & 30000                        & 2.9255                      & 0.3486 & 11.9 & 0.07639 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -781,7 +781,7 @@ intercuartílico:
 
 \begin{equation}
 	\bigl[Q_1 - 1{,}5\times\mathrm{IQR},\;
-	Q_3 + 1{,}5\times\mathrm{IQR}\bigr]
+		Q_3 + 1{,}5\times\mathrm{IQR}\bigr]
 	\label{eq:IQR}
 \end{equation}
 
@@ -827,14 +827,14 @@ la muestra.
 \label{subsec:stats}
 
 \begin{align}
-	\bar{U}(y_k)   & = \frac{1}{N_k}\sum_{i=1}^{N_k} U_i
-	\label{eq:Umean_y}                                       \\
-	\sigma_U(y_k)  & = \sqrt{\frac{1}{N_k-1}
-	\sum_{i=1}^{N_k}(U_i-\bar{U})^2}
-	\label{eq:sigma_y}                                        \\
-	I_u(y_k)       & = \frac{\sigma_U(y_k)}{\bar{U}(y_k)}
+	\bar{U}(y_k)     & = \frac{1}{N_k}\sum_{i=1}^{N_k} U_i
+	\label{eq:Umean_y}                                      \\
+	\sigma_U(y_k)    & = \sqrt{\frac{1}{N_k-1}
+		\sum_{i=1}^{N_k}(U_i-\bar{U})^2}
+	\label{eq:sigma_y}                                      \\
+	I_u(y_k)         & = \frac{\sigma_U(y_k)}{\bar{U}(y_k)}
 	\times100\%
-	\label{eq:Iu_y}                                           \\
+	\label{eq:Iu_y}                                         \\
 	\mathrm{SE}(y_k) & = \frac{\sigma_U(y_k)}{\sqrt{N_k}}
 	\quad\text{(error estándar)}
 	\label{eq:SE_y}
@@ -975,7 +975,7 @@ Se leen los 15 archivos \texttt{F03G00\_001.txt} a
 
 \begin{align}
 	N_\mathrm{total} & = 15 \times 2\,000 = 30\,000
-	\text{ muestras}                                  \\
+	\text{ muestras}                                         \\
 	U_\mathrm{raw}   & \in [0{,}64,\; 2{,}40]\;\si{\m\per\s}
 	\label{eq:ej_raw}
 \end{align}
@@ -983,12 +983,12 @@ Se leen los 15 archivos \texttt{F03G00\_001.txt} a
 \subsection{Paso 3: Filtrado IQR}
 
 \begin{align}
-	Q_1             & \approx \SI{1,82}{\m\per\s}, \quad
+	Q_1            & \approx \SI{1,82}{\m\per\s}, \quad
 	Q_3 \approx \SI{2,13}{\m\per\s}
-	\notag                                                  \\
-	\mathrm{IQR}    & = 2{,}13 - 1{,}82 = \SI{0,31}{\m\per\s}
-	\notag                                                  \\
-	\text{Límites}  & : [1{,}82 - 0{,}465,\; 2{,}13 + 0{,}465]
+	\notag                                                    \\
+	\mathrm{IQR}   & = 2{,}13 - 1{,}82 = \SI{0,31}{\m\per\s}
+	\notag                                                    \\
+	\text{Límites} & : [1{,}82 - 0{,}465,\; 2{,}13 + 0{,}465]
 	= [1{,}355,\; 2{,}595]\;\si{\m\per\s}
 	\label{eq:ej_iqr}
 \end{align}
@@ -1000,12 +1000,12 @@ Las muestras fuera de $[1{,}36,\; 2{,}60]$ se descartan.
 \begin{align}
 	\bar{U}_\mathrm{FX03} & \approx \SI{1,963}{\m\per\s}
 	\label{eq:ej_Umean}                                      \\
-	\sigma_{U}             & \approx \SI{0,219}{\m\per\s}
+	\sigma_{U}            & \approx \SI{0,219}{\m\per\s}
 	\label{eq:ej_sigma}                                      \\
-	I_u                    & = \frac{0{,}219}{1{,}963}
+	I_u                   & = \frac{0{,}219}{1{,}963}
 	\times100 = 11{,}2\%
 	\label{eq:ej_Iu}                                         \\
-	\mathrm{SE}            & = \frac{0{,}219}{\sqrt{30\,000}}
+	\mathrm{SE}           & = \frac{0{,}219}{\sqrt{30\,000}}
 	\approx \SI{0,001}{\m\per\s}
 	\label{eq:ej_SE}
 \end{align}
@@ -1124,12 +1124,12 @@ Cada equipo recibe un escenario experimental diferente.  Deben:
 	\centering
 	\begin{tabular}{ll}
 		\toprule
-		\textbf{Parámetro}   & \textbf{Valor}                     \\
+		\textbf{Parámetro}  & \textbf{Valor}                 \\
 		\midrule
-		Carpeta               & \texttt{FX01G00}                   \\
-		$\bar{U}$ esperado    & $\approx\SI{0,5}{\m\per\s}$       \\
-		Archivos              & 15 iteraciones $\times$ 2\,000     \\
-		Criterio de calidad   & $I_u < 10\%$                       \\
+		Carpeta             & \texttt{FX01G00}               \\
+		$\bar{U}$ esperado  & $\approx\SI{0,5}{\m\per\s}$    \\
+		Archivos            & 15 iteraciones $\times$ 2\,000 \\
+		Criterio de calidad & $I_u < 10\%$                   \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -1151,12 +1151,12 @@ Cada equipo recibe un escenario experimental diferente.  Deben:
 	\centering
 	\begin{tabular}{ll}
 		\toprule
-		\textbf{Parámetro}   & \textbf{Valor}                      \\
+		\textbf{Parámetro} & \textbf{Valor}                      \\
 		\midrule
-		Carpetas              & \texttt{FX01G00} y \texttt{FX04G00} \\
-		$\bar{U}$ FX01       & $\approx\SI{0,5}{\m\per\s}$         \\
-		$\bar{U}$ FX04       & $\approx\SI{2,9}{\m\per\s}$         \\
-		Análisis              & Perfiles superpuestos                \\
+		Carpetas           & \texttt{FX01G00} y \texttt{FX04G00} \\
+		$\bar{U}$ FX01     & $\approx\SI{0,5}{\m\per\s}$         \\
+		$\bar{U}$ FX04     & $\approx\SI{2,9}{\m\per\s}$         \\
+		Análisis           & Perfiles superpuestos               \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -1178,13 +1178,13 @@ Cada equipo recibe un escenario experimental diferente.  Deben:
 	\centering
 	\begin{tabular}{ll}
 		\toprule
-		\textbf{Parámetro}     & \textbf{Valor}                     \\
+		\textbf{Parámetro} & \textbf{Valor}              \\
 		\midrule
-		Carpeta                 & \texttt{FX02G00}                   \\
-		Particularidad          & 1\,138 muestras/archivo
-		                          (menos que el resto)               \\
-		$\bar{U}$ esperado      & $\approx\SI{1,0}{\m\per\s}$       \\
-		Análisis                & Convergencia estadística           \\
+		Carpeta            & \texttt{FX02G00}            \\
+		Particularidad     & 1\,138 muestras/archivo
+		(menos que el resto)                             \\
+		$\bar{U}$ esperado & $\approx\SI{1,0}{\m\per\s}$ \\
+		Análisis           & Convergencia estadística    \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -1206,12 +1206,12 @@ Cada equipo recibe un escenario experimental diferente.  Deben:
 	\centering
 	\begin{tabular}{ll}
 		\toprule
-		\textbf{Parámetro}     & \textbf{Valor}                      \\
+		\textbf{Parámetro} & \textbf{Valor}                      \\
 		\midrule
-		Carpetas                & \texttt{FX03G00} y \texttt{FX04G00} \\
-		Perfil                  & NACA~0012, $\alpha = 0°$            \\
-		$Re_c$                  & $1{,}5\times10^5$                   \\
-		Referencia              & $C_D \approx 0{,}012$ (literatura)  \\
+		Carpetas           & \texttt{FX03G00} y \texttt{FX04G00} \\
+		Perfil             & NACA~0012, $\alpha = 0°$            \\
+		$Re_c$             & $1{,}5\times10^5$                   \\
+		Referencia         & $C_D \approx 0{,}012$ (literatura)  \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -1240,46 +1240,46 @@ Cada equipo recibe un escenario experimental diferente.  Deben:
 		$R = P \times S$; Bajo ($<5$), Medio (5--12), Alto ($>12$).}
 	\label{tab:riesgos}
 	\begin{tabular}{>{\raggedright\arraybackslash}p{3.5cm} c c c l
-			>{\raggedright\arraybackslash}p{3.5cm}}
+		>{\raggedright\arraybackslash}p{3.5cm}}
 		\toprule
-		\textbf{Riesgo}       & $\boldsymbol{P}$  & $\boldsymbol{S}$
-		                      & $\boldsymbol{R}$
-		                      & \textbf{Nivel}     & \textbf{Control}   \\
+		\textbf{Riesgo} & $\boldsymbol{P}$                     & $\boldsymbol{S}$
+		                & $\boldsymbol{R}$
+		                & \textbf{Nivel}                       & \textbf{Control}      \\
 		\midrule
 		\rowcolor{aerored!15}
 		Exposición ocular al láser
-		                      & 3 & 5 & 15
-		                      & \textcolor{aerored}{\textbf{Alto}}
-		                      & Gafas protectoras OD~$\geq3$;
-		                        protocolos P01                         \\
+		                & 3                                    & 5                & 15
+		                & \textcolor{aerored}{\textbf{Alto}}
+		                & Gafas protectoras OD~$\geq3$;
+		protocolos P01                                                                 \\
 		\rowcolor{aerored!15}
 		Reflexiones especulares
-		                      & 3 & 4 & 12
-		                      & \textcolor{aerored}{\textbf{Alto}}
-		                      & Eliminar objetos reflectantes;
-		                        carcasa cerrada                        \\
+		                & 3                                    & 4                & 12
+		                & \textcolor{aerored}{\textbf{Alto}}
+		                & Eliminar objetos reflectantes;
+		carcasa cerrada                                                                \\
 		\rowcolor{yellow!25}
 		Fallo de alineación óptica
-		                      & 3 & 3 & 9
-		                      & \textcolor{orange}{\textbf{Medio}}
-		                      & Calibración previa;
-		                        recalibrar cada sesión                 \\
+		                & 3                                    & 3                & 9
+		                & \textcolor{orange}{\textbf{Medio}}
+		                & Calibración previa;
+		recalibrar cada sesión                                                         \\
 		\rowcolor{yellow!25}
 		Inhalación de seeding
-		                      & 2 & 3 & 6
-		                      & \textcolor{orange}{\textbf{Medio}}
-		                      & Ventilación; mascarilla                \\
+		                & 2                                    & 3                & 6
+		                & \textcolor{orange}{\textbf{Medio}}
+		                & Ventilación; mascarilla                                      \\
 		\rowcolor{aerogreen!15}
 		Descarga eléctrica (fuente láser)
-		                      & 1 & 4 & 4
-		                      & \textcolor{aerogreen}{\textbf{Bajo}}
-		                      & Puesta a tierra;
-		                        mantenimiento certificado              \\
+		                & 1                                    & 4                & 4
+		                & \textcolor{aerogreen}{\textbf{Bajo}}
+		                & Puesta a tierra;
+		mantenimiento certificado                                                      \\
 		\rowcolor{aerogreen!15}
 		Daño en ventana óptica
-		                      & 2 & 2 & 4
-		                      & \textcolor{aerogreen}{\textbf{Bajo}}
-		                      & Limpieza con paños ópticos             \\
+		                & 2                                    & 2                & 4
+		                & \textcolor{aerogreen}{\textbf{Bajo}}
+		                & Limpieza con paños ópticos                                   \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -1308,7 +1308,7 @@ Cada equipo recibe un escenario experimental diferente.  Deben:
 				at (\x+0.5,-0.1) {\l};
 			}
 		\foreach \y/\l in
-		{0/Insignif.,1/Menor,2/Moderado,3/Mayor,4/Catastrófico} {
+			{0/Insignif.,1/Menor,2/Moderado,3/Mayor,4/Catastrófico} {
 				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
 			}
 		\node[font=\small\bfseries,rotate=90] at (-1.5,2.5)
@@ -1382,13 +1382,13 @@ El script principal es
 	\label{tab:funciones}
 	\begin{tabular}{l l}
 		\toprule
-		\textbf{Función}                 & \textbf{Resultado}            \\
+		\textbf{Función}                   & \textbf{Resultado}      \\
 		\midrule
-		\texttt{remove\_outliers\_iqr}   & Array filtrado, máscara       \\
-		\texttt{process\_position\_folder}& Dict con $\bar{U}$,
-		                                   $\sigma_U$, $I_u$, $N$       \\
-		Bloque principal                 & Perfiles, histogramas,
-		                                   box-plots, Reynolds stress    \\
+		\texttt{remove\_outliers\_iqr}     & Array filtrado, máscara \\
+		\texttt{process\_position\_folder} & Dict con $\bar{U}$,
+		$\sigma_U$, $I_u$, $N$                                       \\
+		Bloque principal                   & Perfiles, histogramas,
+		box-plots, Reynolds stress                                   \\
 		\bottomrule
 	\end{tabular}
 \end{table}

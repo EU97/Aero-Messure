@@ -1,283 +1,1565 @@
 % =============================================================================
 % Presentación Beamer P04 – LDA / Perfil de Velocidades
 % Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode presentacion_P04.tex
 % =============================================================================
 \documentclass[aspectratio=169,12pt]{beamer}
 \usetheme{Madrid}
 \usecolortheme{seahorse}
 \usefonttheme{professionalfonts}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+
+% ---- Encoding & Language ----
+\usepackage{fontspec}
+\usepackage{csquotes}
 \usepackage[spanish]{babel}
+
+% ---- Math & Units ----
 \usepackage{amsmath,amssymb}
 \usepackage{siunitx}
 \sisetup{output-decimal-marker={,}}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
-\usepackage{booktabs}
-\usepackage{listings}
-\lstset{basicstyle=\ttfamily\tiny,keywordstyle=\color{blue!80}\bfseries,
-  commentstyle=\color{green!50!black},backgroundcolor=\color{gray!10},
-  frame=single,breaklines=true}
 
+% ---- TikZ (babel first!) ----
+\usepackage{tikz}
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
+                decorations.markings,decorations.pathmorphing,patterns}
+
+% ---- Tables & Graphics ----
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+
+% ---- Code Listings ----
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{blue!80}\bfseries,
+  commentstyle=\color{green!50!black},
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  breaklines=true
+}
+
+% ---- Custom Colors ----
 \definecolor{aeroblue}{RGB}{0,51,102}
 \definecolor{aerored}{RGB}{153,0,0}
 \definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aeroyellow}{RGB}{204,153,0}
 \definecolor{aerolaser}{RGB}{0,180,0}
+\definecolor{aerogreendark}{RGB}{0,80,40}
+\definecolor{aerogreenlight}{RGB}{0,140,70}
 
-\setbeamercolor{frametitle}{bg=aeroblue,fg=white}
-\setbeamercolor{title}{bg=aeroblue,fg=white}
-\setbeamercolor{structure}{fg=aeroblue}
+% ---- Beamer Color Theme (GREEN) ----
+\setbeamercolor{frametitle}{bg=aerogreen,fg=white}
+\setbeamercolor{title}{bg=aerogreen,fg=white}
+\setbeamercolor{structure}{fg=aerogreen}
+\setbeamercolor{palette primary}{bg=aerogreen,fg=white}
+\setbeamercolor{palette secondary}{bg=aerogreenlight,fg=white}
+\setbeamercolor{palette tertiary}{bg=aerogreendark,fg=white}
+\setbeamercolor{block title}{bg=aerogreen,fg=white}
+\setbeamercolor{block body}{bg=aerogreen!8}
+\setbeamercolor{block title alerted}{bg=aerored,fg=white}
+\setbeamercolor{block body alerted}{bg=aerored!8}
+\setbeamercolor{block title example}{bg=aeroblue,fg=white}
+\setbeamercolor{block body example}{bg=aeroblue!8}
+\setbeamercolor{item}{fg=aerogreen}
+\setbeamercolor{subitem}{fg=aerogreenlight}
 
-\title[P04 -- LDA]{P04: Anemometría Láser Doppler -- Perfil de Velocidades}
+% ---- Image path ----
+\graphicspath{{../../../Practicas/P04_LDA_Perfil_Velocidad/data/images/}}
+
+% ---- Title ----
+\title[P04 -- LDA]{P04: Anemometría Láser Doppler\\Perfil de Velocidades}
 \subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
 \author{Laboratorio de Técnicas de Medida}
 \institute{Departamento de Ingeniería Aeroespacial}
 \date{\today}
 
+% =============================================================================
 \begin{document}
+% =============================================================================
 
-\begin{frame}\titlepage\end{frame}
-\begin{frame}{Contenido}\tableofcontents\end{frame}
+\begin{frame}
+	\titlepage
+\end{frame}
 
-\section{Principio LDA}
+\begin{frame}{Contenido}
+	\tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Introducción}
+% =============================================================================
+
+\begin{frame}{¿Qué es la Anemometría Láser Doppler (LDA)?}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}\small
+				\item Técnica \textbf{óptica no intrusiva} para
+				      medir velocidad puntual en fluidos
+				\item Basada en el \textbf{efecto Doppler} de luz
+				      dispersada por partículas trazadoras
+				\item Dos haces láser coherentes $\to$ patrón
+				      de franjas $\to$ $f_D \propto U$
+				\item También denominada \textbf{LDV}
+				      (\emph{Laser Doppler Velocimetry})
+			\end{itemize}
+			\vspace{0.3em}
+			\begin{alertblock}{Ventaja clave}
+				\textbf{Auto-calibrante}: $U = f_D \cdot \delta_f$\\
+				depende solo de la geometría óptica
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.75,>=Stealth]
+				% Two laser beams
+				\draw[aerolaser,ultra thick] (0,1.5) -- (3.0,0);
+				\draw[aerolaser,ultra thick] (0,-1.5) -- (3.0,0);
+				% Measurement volume
+				\fill[aerolaser!25] (3.0,0) ellipse (0.25 and 0.12);
+				\draw[aerolaser,thick] (3.0,0) ellipse (0.25 and 0.12);
+				% Fringes
+				\foreach \dx in {-0.18,-0.09,0.0,0.09,0.18} {
+						\draw[aerolaser!50,very thin]
+						(3+\dx,-0.12) -- (3+\dx,0.12);
+					}
+				% Particle
+				\fill[gray!80] (3.0,0) circle (0.06);
+				% Flow arrow
+				\draw[->,blue!60,thick] (2.2,-0.3) -- (3.8,-0.3)
+				node[right,font=\tiny] {$U$};
+				% Scattered light
+				\draw[gray,dashed,->] (3.0,0.12) .. controls (3.5,1.0)
+				.. (4.5,1.0) node[right,font=\tiny] {$f_D$};
+				% Beam labels
+				\node[aerolaser,above,font=\tiny] at (1.2,0.9)
+				{Haz 1};
+				\node[aerolaser,below,font=\tiny] at (1.2,-0.9)
+				{Haz 2};
+				% Fringe spacing
+				\draw[<->,aerolaser,thin] (2.78,-0.30) -- (3.22,-0.30)
+				node[midway,below,font=\tiny] {$\delta_f$};
+				% Laser box
+				\draw[fill=aerogreen!20,draw=aerogreen]
+				(-1,-0.15) rectangle (0,0.15);
+				\node[font=\tiny] at (-0.5,0) {Láser};
+				\draw[->,aerolaser] (0,0.07) -- (0.3,1.1);
+				\draw[->,aerolaser] (0,-0.07) -- (0.3,-1.1);
+				% PMT
+				\draw[fill=gray!30,draw=black] (4.5,0.7) rectangle (5.3,1.3);
+				\node[font=\tiny] at (4.9,1.0) {PMT};
+				% BSA
+				\draw[fill=aerogreen!20,draw=aerogreen]
+				(5.5,0.7) rectangle (6.4,1.3);
+				\node[font=\tiny,aerogreen] at (5.95,1.0) {BSA};
+				\draw[->] (5.3,1.0) -- (5.5,1.0);
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Aplicaciones y Ventajas vs.\ HWA}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{enumerate}\small
+				\item Perfiles de velocidad en túneles de viento
+				\item Estelas de perfiles aerodinámicos ($C_D$)
+				\item Aerodinámica interna de motores
+				\item Flujo en rotores de helicóptero
+				\item Validación de CFD
+			\end{enumerate}
+			\vspace{0.3em}
+			\begin{exampleblock}{Ventajas vs.\ HWA (P03)}
+				\begin{itemize}\small
+					\item \textbf{No intrusiva} (sin sonda)
+					\item Mide \textbf{flujos inversos} (Bragg)
+					\item \textbf{No requiere calibración}
+					\item Opera en alta temperatura
+				\end{itemize}
+			\end{exampleblock}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{alertblock}{Limitaciones}
+				\begin{itemize}\small
+					\item Necesita acceso óptico (ventanas)
+					\item Requiere partículas trazadoras
+					      (\emph{seeding})
+					\item El fluido debe ser transparente
+					\item Coste y complejidad elevados
+					\item Medida puntual (no campo completo)
+				\end{itemize}
+			\end{alertblock}
+			\vspace{0.3em}
+			\centering\scriptsize
+			\begin{tabular}{lcc}
+				\toprule
+				           & \textbf{HWA} & \textbf{LDA} \\
+				\midrule
+				Intrusiva  & Sí           & No           \\
+				Calibr.    & Sí           & No           \\
+				Res.\ temp & Muy alta     & Alta         \\
+				Coste      & Medio        & Alto         \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Objetivos de Aprendizaje}
+	\begin{enumerate}
+		\item Comprender el efecto Doppler aplicado a la dispersión de
+		      luz por partículas trazadoras
+		\item Describir el modelo de franjas y calcular $\delta_f$
+		      del volumen de medida
+		\item Relacionar $f_D$ con $U$: $U = f_D \cdot \delta_f$
+		\item Calcular $d_{mv}$, $l_{mv}$ y $N_f$ a partir
+		      de los parámetros ópticos
+		\item Explicar la función de la celda de Bragg ($f_s$)
+		\item Procesar datos LDA del laboratorio (\texttt{files/P4/})
+		      para obtener $U(y)$
+		\item Aplicar filtrado IQR y calcular $\bar{U}$, $\sigma_U$,
+		      $I_u$ por posición
+		\item Propagar incertidumbre $f_D \to U$ por método GUM
+		\item Realizar evaluación de riesgos con la matriz $5\times5$
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Fundamentos Teóricos}
+% =============================================================================
+
 \begin{frame}{Efecto Doppler y Modelo de Franjas}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Frecuencia Doppler:}
-      \begin{equation*}
-        f_D = \frac{2\sin(\theta/2)}{\lambda}\,U
-      \end{equation*}
-      \textbf{Separación de franjas:}
-      \begin{equation*}
-        \delta_f = \frac{\lambda}{2\sin(\theta/2)}
-      \end{equation*}
-      \begin{block}{Velocidad}
-        \begin{equation*}
-          \boxed{U = f_D \cdot \delta_f}
-        \end{equation*}
-      \end{block}
-      \textbf{Ventajas vs HWA:}
-      \begin{itemize}\small
-        \item No intrusiva (sin sonda en el flujo)
-        \item Mide flujos inversos (celda de Bragg)
-        \item No requiere calibración
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.8,>=Stealth]
-        \draw[aerolaser,ultra thick] (0,1.2) -- (3.0,0);
-        \draw[aerolaser,ultra thick] (0,-1.2) -- (3.0,0);
-        \fill[aerolaser!30] (3.0,0) ellipse (0.2 and 0.1);
-        \foreach \dx in {-0.15,-0.07,0.0,0.07,0.15} {
-          \draw[aerolaser!50,very thin] (3+\dx,-0.1) -- (3+\dx,0.1);
-        }
-        \fill[gray!80] (3.0,0) circle (0.07);
-        \draw[->,blue!60,thick] (2.3,-0.3) -- (3.7,-0.3) node[right,font=\tiny] {$U$};
-        \draw[gray,dashed,->] (3.0,0.1) .. controls (3.5,1.0) .. (4.5,1.0)
-              node[right,font=\tiny] {$f_D$};
-        \node[aerolaser,above,font=\tiny] at (1.2,0.8) {Haz 1};
-        \node[aerolaser,below,font=\tiny] at (1.2,-0.8) {Haz 2};
-        \draw[<->,aerolaser,thin] (2.78,-0.3) -- (3.22,-0.3)
-              node[midway,below,font=\tiny] {$\delta_f$};
-        \draw[fill=aeroblue!20,draw=aeroblue] (-1,-0.15) rectangle (0,0.15);
-        \node[font=\tiny] at (-0.5,0) {Láser};
-        \draw[->,aerolaser] (0,0.07) -- (0.3,0.9);
-        \draw[->,aerolaser] (0,-0.07) -- (0.3,-0.9);
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Frecuencia Doppler:}
+			\begin{equation*}
+				f_D = \frac{2\sin(\theta/2)}{\lambda}\,U
+			\end{equation*}
+
+			\textbf{Separación de franjas:}
+			\begin{equation*}
+				\boxed{\delta_f = \frac{\lambda}{2\sin(\theta/2)}}
+			\end{equation*}
+
+			\textbf{Velocidad de la partícula:}
+			\begin{equation*}
+				\boxed{U = f_D \cdot \delta_f}
+			\end{equation*}
+
+			\vspace{0.3em}
+			La relación es \textbf{lineal}: no se necesita
+			calibración, solo conocer $\lambda$ y $\theta$.
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.8,>=Stealth]
+				% Two beams
+				\draw[aerolaser,ultra thick] (-2.5,1.5) -- (0,0);
+				\draw[aerolaser,ultra thick] (-2.5,-1.5) -- (0,0);
+				% Volume ellipse
+				\fill[aerolaser!15] (0,0) ellipse (0.5 and 0.22);
+				\draw[aerolaser,thick,dashed] (0,0) ellipse (0.5 and 0.22);
+				% Fringes
+				\foreach \dx in {-0.4,-0.3,-0.2,-0.1,0.0,0.1,0.2,0.3,0.4} {
+						\draw[aerolaser!40,thin] (\dx,-0.22) -- (\dx,0.22);
+					}
+				% Fringe spacing
+				\draw[<->,aerored,thick] (-0.1,-0.32) -- (0.1,-0.32)
+				node[midway,below,font=\tiny] {$\delta_f$};
+				% d_mv
+				\draw[<->,aerogreen,thick] (-0.5,-0.5) -- (0.5,-0.5)
+				node[midway,below,font=\tiny] {$d_{mv}$};
+				% Particle
+				\fill[blue!80] (0,0) circle (0.06);
+				\draw[->,blue!60,thick] (-0.7,0) -- (0.7,0)
+				node[right,font=\tiny] {$U_\perp$};
+				% Angle
+				\draw[gray,thin] (-2.5,0) -- (0,0);
+				\draw[gray,thin] (-1.5,0) arc (0:31:1.0);
+				\node[gray,font=\tiny] at (-1.2,0.22) {$\theta/2$};
+				% Scattered light
+				\draw[gray!60,dashed,thick,->] (0,0.22)
+				.. controls (0.5,1.2) .. (1.8,1.2)
+				node[right,font=\tiny] {Luz dispersada};
+				% Labels
+				\node[aerolaser,above,font=\tiny] at (-1.5,1.0) {Haz 1};
+				\node[aerolaser,below,font=\tiny] at (-1.5,-1.0) {Haz 2};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\section{Cálculo Numérico}
-\begin{frame}{Parámetros del sistema LDA}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \textbf{Sistema Ar-Ion del laboratorio:}
-      \begin{itemize}
-        \item $\lambda = \SI{514.5}{\nm}$
-        \item $\theta/2 = \SI{4.5}{\degree}$
-        \item $f_L = \SI{250}{\mm}$, $d_b = \SI{1.2}{\mm}$
-      \end{itemize}
-      \vspace{0.5em}
-      \textbf{Separación de franjas:}
-      \begin{align*}
-        \delta_f &= \frac{514.5\times10^{-9}}{2\sin(4.5°)}\\
-                 &= \SI{3.279}{\micro\metre}
-      \end{align*}
-      \textbf{$U$ para $f_D = \SI{1.53}{\MHz}$:}
-      \begin{equation*}
-        U = 1.53\!\times\!10^6 \times 3.279\!\times\!10^{-6}
-          \approx \SI{5.0}{\m\per\s}
-      \end{equation*}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \textbf{Volumen de medida:}
-      \begin{align*}
-        d_{mv} &= \frac{4 f_L \lambda}{\pi d_b}\\
-               &\approx \SI{136.5}{\micro\m}\\
-        l_{mv} &= \frac{d_{mv}}{\sin(\theta/2)} \approx \SI{1.74}{\mm}\\
-        N_f    &= d_{mv}/\delta_f \approx 42\text{ franjas}
-      \end{align*}
-      \begin{alertblock}{}
-        \centering
-        $u_U \approx \SI{0.033}{\m\per\s}$\\($\approx 0.16\%$ a \SI{20}{\m\per\s})
-      \end{alertblock}
-    \end{column}
-  \end{columns}
+\begin{frame}{Volumen de Medida y Número de Franjas}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Haces gaussianos enfocados:}
+			\begin{align*}
+				d_{mv} & = \frac{4\,f_L\,\lambda}{\pi\,d_b}
+				\quad\text{(diámetro)}                      \\
+				l_{mv} & = \frac{d_{mv}}{\sin(\theta/2)}
+				\quad\text{(longitud)}                      \\
+				N_f    & = \frac{d_{mv}}{\delta_f}
+				\quad\text{(Nº franjas)}
+			\end{align*}
+
+			\vspace{0.3em}
+			\begin{block}{Parámetros del laboratorio}
+				\begin{itemize}\scriptsize
+					\item $\lambda = \SI{514,5}{\nm}$ (Ar-Ion)
+					\item $\theta/2 = \SI{4,5}{\degree}$
+					\item $f_L = \SI{250}{\mm}$
+					\item $d_b = \SI{1,2}{\mm}$
+					\item $f_s = \SI{40}{\MHz}$ (Bragg)
+				\end{itemize}
+			\end{block}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\textbf{Cálculos numéricos:}
+			\begin{align*}
+				\delta_f & = \frac{514{,}5\!\times\!10^{-9}}{2\sin(4{,}5°)}      \\
+				         & = \SI{3,279}{\micro\metre}                            \\[0.5em]
+				d_{mv}   & = \frac{4 \times 250 \times 514{,}5\!\times\!10^{-9}}
+				{\pi\times 1{,}2\!\times\!10^{-3}}                               \\
+				         & \approx \SI{136,5}{\micro\metre}                      \\[0.5em]
+				l_{mv}   & = \frac{136{,}5}{\sin(4{,}5°)}
+				\approx \SI{1,74}{\mm}                                           \\[0.5em]
+				N_f      & = 136{,}5 / 3{,}279 \approx 42
+			\end{align*}
+
+			\begin{alertblock}{}
+				\centering
+				$u_U \approx \SI{0,019}{\m\per\s}$\\
+				($\approx 0{,}95\%$ a \SI{2}{\m\per\s})
+			\end{alertblock}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\section{Datos del Laboratorio}
-\begin{frame}{Archivos \texttt{files/P4/}}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      4 carpetas (FX01G00--FX04G00) = 4 posiciones $y$\\
-      $\sim$15 ficheros $\times$ 2000 mediciones cada uno.
+\begin{frame}{Celda de Bragg -- Desplazamiento de Frecuencia}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Problema:} sin Bragg, $f_D > 0$ tanto si
+			$U > 0$ como si $U < 0$ (ambigüedad).
 
-      \vspace{0.3em}
-      \textbf{Resultados estadísticos:}
-      \begin{table}
-        \centering\tiny
-        \begin{tabular}{lSSS}
-          \toprule
-          Carpeta & {$\bar{U}$ (m/s)} & {$\sigma_U$} & {$I_u$ (\%)} \\
-          \midrule
-          FX01G00 & 18.3 & 1.83 & 10.0 \\
-          FX02G00 & 22.1 & 1.77 &  8.0 \\
-          FX03G00 & 25.8 & 1.55 &  6.0 \\
-          FX04G00 & 24.6 & 1.72 &  7.0 \\
-          \bottomrule
-        \end{tabular}
-      \end{table}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.9,>=Stealth]
-        \draw[->] (0,-0.3) -- (0,3.8) node[above,font=\tiny] {$y$ (mm)};
-        \draw[->] (-0.2,0) -- (3.8,0) node[right,font=\tiny] {$\bar{U}$ (m/s)};
-        \fill[gray!50] (-0.2,-0.3) rectangle (0,3.8);
-        \foreach \y/\u/\s in {0.5/1.83/0.37, 1.5/2.21/0.35,
-                               2.5/2.58/0.31, 3.5/2.46/0.34} {
-          \fill[aerored] (\u,\y) circle (0.1);
-          \draw[aerored,thick] (\u-\s,\y) -- (\u+\s,\y);
-        }
-        \draw[aeroblue,thick] plot[domain=0:3.8,samples=20]
-              ({2.0+0.6*(\x/3.8)^0.143}, \x);
-        \node[aeroblue,font=\tiny,rotate=85] at (2.5,2.0) {$U/U_e=(y/\delta)^{1/7}$};
-        \foreach \y/\l in {0.5/25,1.5/75,2.5/150,3.5/225} {
-          \node[left,font=\tiny] at (0,\y) {\l};
-        }
-        \foreach \u/\l in {1.0/10,2.0/20,3.0/30} {
-          \node[below,font=\tiny] at (\u,0) {\l};
-        }
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+			\vspace{0.5em}
+			\textbf{Solución:} desplazar uno de los haces
+			$f_s = \SI{40}{\MHz}$:
+			\begin{equation*}
+				\boxed{f_\mathrm{obs} = f_s + f_D}
+			\end{equation*}
+
+			\begin{itemize}\small
+				\item $U > 0 \Rightarrow f_\mathrm{obs} > f_s$
+				\item $U < 0 \Rightarrow f_\mathrm{obs} < f_s$
+				\item Permite medir \textbf{recirculación}
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.65,>=Stealth]
+				% Frequency axis
+				\draw[->] (0,0) -- (6.5,0)
+				node[right,font=\tiny] {$f$};
+				\draw[->] (0,0) -- (0,4)
+				node[above,font=\tiny] {Amplitud};
+				% f_s
+				\draw[aerogreen,very thick] (3,0) -- (3,3.5);
+				\node[aerogreen,below,font=\tiny] at (3,0) {$f_s$};
+				% f_D positive
+				\draw[aerogreen,very thick] (4.5,0) -- (4.5,2.5);
+				\node[aerogreen,below,font=\tiny] at (4.5,0)
+				{$f_s\!+\!f_D$};
+				\draw[<->,aerogreen,thick] (3,3.7) -- (4.5,3.7)
+				node[midway,above,font=\tiny] {$f_D > 0$};
+				% f_D negative
+				\draw[aerored,very thick] (1.5,0) -- (1.5,2.0);
+				\node[aerored,below,font=\tiny] at (1.5,0)
+				{$f_s\!-\!|f_D|$};
+				\draw[<->,aerored,thick] (1.5,2.5) -- (3,2.5)
+				node[midway,above,font=\tiny] {$f_D < 0$};
+			\end{tikzpicture}
+
+			\vspace{0.3em}
+			\begin{exampleblock}{Modulador acusto-óptico}
+				\scriptsize
+				Cristal piezoeléctrico genera onda acústica
+				que difracta un haz, desplazándolo $f_s$.
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\section{Caso: Estela NACA 0012}
+\begin{frame}{Señal de Ráfaga (\emph{Burst}) y Seeding}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Señal \emph{burst}:}\\
+			Cada partícula genera una ráfaga sinusoidal
+			modulada por la envolvente gaussiana del haz.
+
+			\vspace{0.3em}
+			\begin{tikzpicture}[xscale=1.2,yscale=0.7]
+				\draw[->] (0,-1.2) -- (5,0) node[right,font=\tiny] {$t$};
+				\draw[->] (0,-1.2) -- (0,1.6)
+				node[above,font=\tiny] {PMT};
+				% Envelope
+				\draw[aerored,thick,dashed]
+				plot[domain=0.5:4.5,samples=50]
+				(\x,{1.1*exp(-0.4*(\x-2.5)^2)});
+				\draw[aerored,thick,dashed]
+				plot[domain=0.5:4.5,samples=50]
+				(\x,{-1.1*exp(-0.4*(\x-2.5)^2)});
+				% Burst signal
+				\draw[aerogreen,thick]
+				plot[domain=0.5:4.5,samples=150]
+				(\x,{1.1*exp(-0.4*(\x-2.5)^2)*sin(deg(10*\x))});
+				% Period
+				\draw[<->,aerogreen,thick] (2.15,-0.9) -- (2.47,-0.9)
+				node[midway,below,font=\tiny] {$1/f_D$};
+			\end{tikzpicture}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\textbf{Partículas trazadoras:}
+			\begin{itemize}\small
+				\item $d_p \approx \SI{1}{\micro\m}$
+				      (aceite nebulizado)
+				\item $\rho_p \approx \SI{900}{\kg\per\m\cubed}$
+				\item Tiempo de respuesta:
+				      \begin{equation*}
+					      \tau_p = \frac{\rho_p\,d_p^2}{18\,\mu}
+					      \approx \SI{2,8}{\micro\s}
+				      \end{equation*}
+				\item Sigue turbulencia hasta
+				      ${\sim}\SI{50}{\kHz}$
+			\end{itemize}
+
+			\vspace{0.3em}
+			\begin{alertblock}{Criterio}
+				$>\!1000$ ráfagas/s por punto\\
+				BSA extrae $f_D$ por FFT
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Configuración Óptica del Sistema LDA}
+	\centering
+	\begin{tikzpicture}[>=Stealth,scale=0.78]
+		% Laser source
+		\draw[fill=aerogreen!20,draw=aerogreen,very thick]
+		(-1,-0.35) rectangle (1,0.35);
+		\node[font=\tiny\bfseries,align=center] at (0,0)
+		{Ar-Ion\\\SI{514,5}{\nm}};
+		% Beam splitter
+		\draw[fill=gray!30,draw=black,thick]
+		(1.8,-0.35) rectangle (2.0,0.35);
+		\node[below,font=\tiny] at (1.9,-0.45) {Divisor};
+		\draw[aerolaser,very thick,->] (1,0) -- (1.8,0);
+		% Bragg cell
+		\draw[fill=yellow!20,draw=black,thick]
+		(2.6,-0.35) rectangle (3.0,0.35);
+		\node[below,font=\tiny] at (2.8,-0.45) {Bragg};
+		\draw[aerolaser,very thick] (2.0,0.08) -- (2.6,0.08);
+		\draw[aerolaser,very thick] (2.0,-0.08) -- (2.6,-0.08);
+		% Two beams diverging
+		\draw[aerolaser,very thick] (3.0,0.08) -- (4.3,0.8);
+		\draw[aerolaser,very thick] (3.0,-0.08) -- (4.3,-0.8);
+		% Focusing lens
+		\draw[fill=cyan!20,draw=black,thick]
+		(4.3,-1.0) -- (4.5,0) -- (4.3,1.0) -- (4.1,1.0)
+		-- (4.3,0) -- (4.1,-1.0) -- cycle;
+		\node[below,font=\tiny] at (4.3,-1.1) {$f_L$};
+		% Measurement volume
+		\fill[aerogreen!30] (5.8,0) ellipse (0.12 and 0.06);
+		\draw[aerogreen,thick] (5.8,0) ellipse (0.12 and 0.06);
+		% Fringes
+		\foreach \dx in {-0.08,-0.04,0.0,0.04,0.08} {
+				\draw[aerolaser!50,very thin]
+				(5.8+\dx,-0.06) -- (5.8+\dx,0.06);
+			}
+		% Particle
+		\draw[->,blue!60,thick] (5.2,-0.3) -- (6.4,-0.3)
+		node[right,font=\tiny] {Partícula};
+		% Scattered light
+		\draw[gray,dashed,->] (5.8,0.06)
+		.. controls (6.3,0.8) .. (7.5,0.8);
+		% Receiving optics
+		\draw[fill=cyan!20,draw=black,thick]
+		(7.5,0.5) -- (7.7,0.8) -- (7.5,1.1) -- (7.3,1.1)
+		-- (7.5,0.8) -- (7.3,0.5) -- cycle;
+		\node[above,font=\tiny] at (7.5,1.2) {Lente rec.};
+		% PMT
+		\draw[fill=gray!30,draw=black]
+		(8.0,0.5) rectangle (8.8,1.1);
+		\node[font=\tiny] at (8.4,0.8) {PMT};
+		\draw[->,gray!50] (7.5,0.8) -- (8.0,0.8);
+		% BSA
+		\draw[fill=aerogreen!20,draw=aerogreen]
+		(9.1,0.5) rectangle (10.1,1.1);
+		\node[font=\tiny,aerogreen] at (9.6,0.8) {BSA};
+		\draw[->] (8.8,0.8) -- (9.1,0.8);
+		% Output
+		\draw[->,aerogreen,thick] (10.1,0.8) -- (11.0,0.8)
+		node[right,font=\tiny] {$U = f_D\,\delta_f$};
+		% Labels
+		\node[above,font=\tiny,aerolaser] at (3.8,0.6) {Haz 1};
+		\node[below,font=\tiny,aerolaser] at (3.8,-0.6) {Haz 2};
+		\node[below,font=\tiny,aerolaser] at (5.8,-0.12) {Vol.\ med.};
+		% Angle
+		\draw[gray,thin] (4.3,0) -- (5.8,0);
+		\draw[gray,thin] (5.3,0) arc (0:28:0.5);
+		\node[gray,font=\tiny] at (5.4,0.13) {$\theta/2$};
+	\end{tikzpicture}
+
+	\vspace{0.5em}
+	\begin{tikzpicture}
+		\node[draw=aerogreen,thick,rounded corners,fill=aerogreen!8,
+			text width=12cm,align=center,font=\scriptsize] {
+			\textbf{Cadena:} Láser Ar-Ion $\to$ Divisor $\to$
+			Bragg ($f_s = \SI{40}{\MHz}$) $\to$ Lente ($f_L = \SI{250}{\mm}$)
+			$\to$ Volumen de medida ($\delta_f = \SI{3,28}{\micro\m}$)
+			$\to$ PMT $\to$ BSA $\to$ $f_D$ $\to$ $U$
+		};
+	\end{tikzpicture}
+\end{frame}
+
+% =============================================================================
+\section{Datos Experimentales}
+% =============================================================================
+
+\begin{frame}{Estructura de Datos -- \texttt{files/P4/}}
+	\begin{columns}
+		\begin{column}{0.45\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{lccr}
+				\toprule
+				\textbf{Carpeta} & \textbf{Arch.}
+				                 & \textbf{Lín./arch.}
+				                 & \textbf{Total}                                   \\
+				\midrule
+				FX01G00          & 15                  & 2\,000 & 30\,000           \\
+				FX02G00          & 15                  & 1\,138 & 17\,070           \\
+				FX03G00          & 15                  & 2\,000 & 30\,000           \\
+				FX04G00          & 15                  & 2\,000 & 30\,000           \\
+				\midrule
+				\textbf{Total}   &                     &        & \textbf{107\,070} \\
+				\bottomrule
+			\end{tabular}
+
+			\vspace{0.3em}
+			\textit{\tiny FX02G00: 1\,138 muestras/archivo\\
+				(anomalía de adquisición)}
+		\end{column}
+		\begin{column}{0.52\textwidth}
+			\begin{block}{Formato de datos (5 columnas)}
+				\scriptsize
+				\begin{tabular}{cl}
+					\toprule
+					\textbf{Col.} & \textbf{Contenido}           \\
+					\midrule
+					1             & Índice de muestra            \\
+					2             & Tiempo de llegada (ms)       \\
+					3             & SNR / tiem.\ tránsito        \\
+					4             & \textbf{Velocidad $U$} (m/s) \\
+					5             & \textbf{Velocidad $V$} (m/s) \\
+					\bottomrule
+				\end{tabular}
+			\end{block}
+			\vspace{0.2em}
+			\begin{exampleblock}{Lectura automática}
+				\scriptsize
+				\texttt{pd.read\_csv(file, sep=r'\textbackslash s+')}\\
+				$U$ = Col.~4 (principal), $V$ = Col.~5 (transversal)
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Estadísticos Verificados por Carpeta}
+	\centering\small
+	\begin{tabular}{l S[table-format=5.0]
+			S[table-format=1.4] S[table-format=1.4]
+			S[table-format=2.2] S[table-format=1.5]}
+		\toprule
+		\textbf{Carpeta}
+		        & {$N$}              & {$\bar{U}$ (m/s)}
+		        & {$\sigma_U$ (m/s)}
+		        & {$I_u$ (\%)}
+		        & {$\bar{V}$ (m/s)}                                                 \\
+		\midrule
+		FX01G00 & 30000              & 0.5086            & 0.0731 & 14.37 & 0.01422 \\
+		FX02G00 & 29138              & 1.0133            & 0.1146 & 11.31 & 0.02078 \\
+		FX03G00 & 30000              & 1.9633            & 0.2191 & 11.16 & 0.07125 \\
+		FX04G00 & 30000              & 2.9255            & 0.3486 & 11.92 & 0.07639 \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.5em}
+	\begin{tikzpicture}
+		\node[draw=aerogreen,thick,rounded corners,fill=aerogreen!8,
+			text width=11cm,align=center,font=\scriptsize] {
+			$\bar{U}$ crece de $\sim$\SI{0,5}{\m\per\s} a
+			$\sim$\SI{2,9}{\m\per\s} $|$
+			$I_u \approx 11$--$14\%$ (flujo moderadamente turbulento) $|$
+			$\bar{V}/\bar{U} < 3\%$ (flujo unidimensional)
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Parámetros del Sistema LDA}
+	\centering
+	\begin{tabular}{llr}
+		\toprule
+		\textbf{Parámetro}            & \textbf{Valor}
+		                              & \textbf{Unidad}        \\
+		\midrule
+		Tipo láser                    & Ar-Ion            & -- \\
+		Longitud de onda $\lambda$    & 514,5
+		                              & \si{\nm}               \\
+		Semi-ángulo $\theta/2$        & 4,5
+		                              & \si{\degree}           \\
+		Focal lente transmisora $f_L$ & 250
+		                              & \si{\mm}               \\
+		Diámetro del haz $d_b$        & 1,2
+		                              & \si{\mm}               \\
+		Desplazamiento Bragg $f_s$    & 40
+		                              & \si{\MHz}              \\
+		Separación de franjas         & 3,279
+		                              & \si{\micro\metre}      \\
+		Diámetro vol.\ medida         & 136,5
+		                              & \si{\micro\metre}      \\
+		Longitud vol.\ medida         & 1,74
+		                              & \si{\mm}               \\
+		Nº de franjas $N_f$           & 42
+		                              & --                     \\
+		Carpetas de datos             & 4 (FX01--FX04)
+		                              & --                     \\
+		Muestras por archivo          & 2\,000 (típico)
+		                              & --                     \\
+		\bottomrule
+	\end{tabular}
+\end{frame}
+
+% =============================================================================
+\section{Procesamiento de Datos}
+% =============================================================================
+
+\begin{frame}{Cadena de Procesamiento (5 Pasos)}
+	\centering
+	\begin{tikzpicture}[node distance=1.0cm,>=Stealth,
+			block/.style={rectangle,draw=aerogreen,thick,
+					fill=aerogreen!8,text width=4.5cm,align=center,
+					minimum height=0.75cm,font=\scriptsize,
+					rounded corners=3pt}]
+		\node[block] (read) {\textbf{Paso 1:}
+			Leer todos los \texttt{.txt}\\
+			de la carpeta (15 archivos)};
+		\node[block,below=of read] (concat) {\textbf{Paso 2:}
+			Concatenar $U$ y $V$\\
+			de las 15 iteraciones};
+		\node[block,below=of concat] (iqr) {\textbf{Paso 3:}
+			Filtrado IQR ($k = 1{,}5$)\\
+			Eliminar outliers};
+		\node[block,below=of iqr] (stats) {\textbf{Paso 4:}
+			Calcular $\bar{U}$, $\sigma_U$,\\
+			$I_u$, $\bar{V}$, SE};
+		\node[block,below=of stats,draw=aerored,fill=aerored!8]
+		(profile) {\textbf{Paso 5:}
+			Construir perfil $U(y)$\\
+			con barras de error};
+		% Arrows
+		\foreach \a/\b in {read/concat,concat/iqr,iqr/stats,
+				stats/profile} {
+				\draw[->,aerogreen,thick] (\a) -- (\b);
+			}
+		% Loop
+		\draw[aerored,thick,->] (stats.east) -- ++(1.2,0)
+		|- (read.east)
+		node[pos=0.25,right,font=\tiny,aerored] {$\times 4$ carpetas};
+		% Counts
+		\node[right=0.3cm,font=\tiny,gray] at (read.west)
+		{$\sim$2\,000 lín./arch.};
+		\node[right=0.3cm,font=\tiny,gray] at (concat.west)
+		{$N \sim 30\,000$};
+		\node[right=0.3cm,font=\tiny,gray] at (iqr.west)
+		{3--6\% eliminados};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Filtrado IQR de Outliers}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Rango intercuartílico:}
+			\begin{equation*}
+				\mathrm{IQR} = Q_3 - Q_1
+			\end{equation*}
+
+			\textbf{Límites de aceptación:}
+			\begin{equation*}
+				\bigl[Q_1 - 1{,}5\,\mathrm{IQR},\;
+					Q_3 + 1{,}5\,\mathrm{IQR}\bigr]
+			\end{equation*}
+
+			\vspace{0.3em}
+			\begin{exampleblock}{Resultados del filtrado}
+				\scriptsize
+				\begin{tabular}{lr}
+					\toprule
+					\textbf{Carpeta} & \textbf{Outliers (\%)} \\
+					\midrule
+					FX01G00          & 3,2\%                  \\
+					FX02G00          & 3,3\%                  \\
+					FX03G00          & 5,7\%                  \\
+					FX04G00          & 5,7\%                  \\
+					\bottomrule
+				\end{tabular}
+			\end{exampleblock}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.6,>=Stealth]
+				% Box plot conceptual
+				\draw[aerogreen,thick] (0,0) rectangle (3.5,2);
+				\draw[aerogreen,very thick] (0,1.2) -- (3.5,1.2);
+				\draw[aerogreen,thick] (1.75,0) -- (1.75,-0.8);
+				\draw[aerogreen,thick] (1.75,2) -- (1.75,3.0);
+				\draw[aerogreen,thick] (0.8,-0.8) -- (2.7,-0.8);
+				\draw[aerogreen,thick] (0.8,3.0) -- (2.7,3.0);
+				% Outlier threshold
+				\draw[aerored,thick,dashed]
+				(-0.3,-2.0) -- (3.8,-2.0);
+				\draw[aerored,thick,dashed]
+				(-0.3,4.2) -- (3.8,4.2);
+				% Labels
+				\node[left,font=\tiny] at (0,0) {$Q_1$};
+				\node[left,font=\tiny] at (0,1.2) {Med};
+				\node[left,font=\tiny] at (0,2) {$Q_3$};
+				\node[left,font=\tiny,aerored] at (-0.3,-2.0)
+				{$Q_1\!-\!1{,}5\,\mathrm{IQR}$};
+				\node[left,font=\tiny,aerored] at (-0.3,4.2)
+				{$Q_3\!+\!1{,}5\,\mathrm{IQR}$};
+				% Outlier points
+				\fill[aerored] (1.75,-2.5) circle (0.1);
+				\fill[aerored] (1.2,4.8) circle (0.1);
+				\fill[aerored] (2.5,5.0) circle (0.1);
+				\node[aerored,right,font=\tiny] at (2.7,4.9) {Outliers};
+				% IQR brace
+				\draw[<->,thick] (3.8,0) -- (3.8,2)
+				node[midway,right,font=\tiny] {IQR};
+			\end{tikzpicture}
+
+			\vspace{0.3em}
+			\begin{alertblock}{Ventaja IQR}
+				Más \textbf{robusto} que $\pm2\sigma$:\\
+				insensible a los propios outliers
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Estadísticos por Posición}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Velocidad media:}
+			\begin{equation*}
+				\bar{U}(y_k) = \frac{1}{N_k}\sum_{i=1}^{N_k} U_i
+			\end{equation*}
+
+			\textbf{Desviación estándar:}
+			\begin{equation*}
+				\sigma_U(y_k) = \sqrt{\frac{1}{N_k\!-\!1}
+					\sum_{i=1}^{N_k}(U_i - \bar{U})^2}
+			\end{equation*}
+
+			\textbf{Intensidad de turbulencia:}
+			\begin{equation*}
+				\boxed{I_u = \frac{\sigma_U}{\bar{U}} \times 100\%}
+			\end{equation*}
+
+			\textbf{Error estándar:}
+			\begin{equation*}
+				\mathrm{SE} = \frac{\sigma_U}{\sqrt{N_k}}
+			\end{equation*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.6]
+				\draw[->] (0,0) -- (5.5,0)
+				node[right,font=\tiny] {$t$};
+				\draw[->] (0,0) -- (0,4)
+				node[above,font=\tiny] {$U(t)$};
+				% Mean line
+				\draw[aerogreen,thick,dashed] (0,2) -- (5.2,2);
+				\node[aerogreen,left,font=\tiny] at (0,2) {$\bar{U}$};
+				% Signal
+				\draw[gray,thick]
+				(0.1,2.0) sin (0.4,2.6) cos (0.7,2.0) sin (1.0,1.4)
+				cos (1.3,2.0) sin (1.6,2.8) cos (1.9,2.0)
+				sin (2.2,1.3) cos (2.5,2.0) sin (2.8,2.5)
+				cos (3.1,2.0) sin (3.4,1.5) cos (3.7,2.0)
+				sin (4.0,2.7) cos (4.3,2.0) sin (4.6,1.6)
+				cos (4.9,2.0);
+				% RMS
+				\draw[<->,aerored,thick] (5.0,2.0) -- (5.0,2.7);
+				\node[aerored,right,font=\tiny] at (5.0,2.35) {$\sigma_U$};
+			\end{tikzpicture}
+
+			\vspace{0.3em}
+			\centering\scriptsize
+			\begin{tabular}{lr}
+				\toprule
+				\textbf{Carpeta} & \textbf{$I_u$ (\%)} \\
+				\midrule
+				FX01G00          & 11,68               \\
+				FX02G00          & 8,94                \\
+				FX03G00          & 8,08                \\
+				FX04G00          & 8,35                \\
+				\bottomrule
+			\end{tabular}
+
+			\begin{alertblock}{}
+				\centering\scriptsize
+				$I_u \approx 8$--$12\%$: turbulento moderado
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Resultados Experimentales}
+% =============================================================================
+
+\begin{frame}{Perfil de Velocidades $U(y)$}
+	\centering
+	\includegraphics[width=0.82\textwidth]{perfil_de_velocidades_anemometra_lser_doppler_lda.png}
+
+	\vspace{0.3em}
+	\scriptsize
+	Perfil medido con LDA: $U$ crece con $y$ de
+	\SI{0,52}{\m\per\s} (FX01) a \SI{2,98}{\m\per\s} (FX04)\\
+	Barras de error = error estándar (SE $\sim\SI{0,001}{\m\per\s}$)
+\end{frame}
+
+\begin{frame}{Ajuste de Perfil Polinómico}
+	\centering
+	\includegraphics[width=0.82\textwidth]{perfil_ajuste_polinomico.png}
+
+	\vspace{0.3em}
+	\scriptsize
+	Ajuste polinómico (grado~2):
+	$U(y) = 2{,}97\!\times\!10^{-4}\,y^2 + 1{,}81\!\times\!10^{-2}\,y
+		+ 0{,}283$ [m/s, mm]
+\end{frame}
+
+\begin{frame}{Intensidad de Turbulencia $I_u(y)$}
+	\centering
+	\includegraphics[width=0.82\textwidth]{perfil_intensidad_turbulencia_lda.png}
+
+	\vspace{0.3em}
+	\scriptsize
+	$I_u$ mayor cerca de la pared (FX01: 11,7\%) y más uniforme
+	en la zona central ($\sim$~8\%)
+\end{frame}
+
+\begin{frame}{Histogramas de Velocidad por Posición}
+	\centering
+	\includegraphics[width=0.82\textwidth]{histogramas_velocidad_U_limpia.png}
+
+	\vspace{0.3em}
+	\scriptsize
+	Distribuciones aproximadamente gaussianas tras filtrado IQR.
+	Nota la escala creciente en $U$ de FX01 a FX04.
+\end{frame}
+
+\begin{frame}{Box Plot -- Distribución de $U$ por Posición}
+	\centering
+	\includegraphics[width=0.75\textwidth]{boxplot_velocidades_U.png}
+
+	\vspace{0.3em}
+	\scriptsize
+	Dispersión creciente con la velocidad media:
+	$\sigma_U$ escala con $\bar{U}$ ($I_u$ aproximadamente constante)
+\end{frame}
+
+\begin{frame}{Coeficiente de Variación (CV) por Posición}
+	\centering
+	\includegraphics[width=0.75\textwidth]{CV_por_posicion.png}
+
+	\vspace{0.3em}
+	\scriptsize
+	FX01 ligeramente por encima de CV~$=10\%$ (calidad regular);
+	FX02--FX04 buena calidad (CV~$< 10\%$)
+\end{frame}
+
+\begin{frame}{Esfuerzo de Reynolds $\tau_\mathrm{turb}(y)$}
+	\begin{columns}
+		\begin{column}{0.55\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{perfil_esfuerzo_reynolds.png}
+		\end{column}
+		\begin{column}{0.42\textwidth}
+			\textbf{Esfuerzo turbulento:}
+			\begin{equation*}
+				\tau_\mathrm{turb} = -\rho\,\overline{u'\,v'}
+			\end{equation*}
+
+			\begin{exampleblock}{Resultados}
+				\scriptsize
+				\begin{tabular}{lr}
+					\toprule
+					     & {$\tau$ (Pa)}   \\
+					\midrule
+					FX01 & $-\num{1,2e-4}$ \\
+					FX02 & $-\num{5,7e-4}$ \\
+					FX03 & $-\num{3,2e-4}$ \\
+					FX04 & $-\num{6,9e-3}$ \\
+					\bottomrule
+				\end{tabular}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\scriptsize
+			$R_{uv}$ bajo ($0{,}02$--$0{,}18$): correlación
+			débil entre $u'$ y $v'$
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Datos Brutos -- Archivo Individual}
+	\centering
+	\includegraphics[width=0.82\textwidth]{box_plot_de_velocidades_cols_4_y_5.png}
+
+	\vspace{0.3em}
+	\scriptsize
+	Análisis de archivo \texttt{L01G00\_001.txt} (2000 muestras):
+	$\bar{U} = \SI{0,377}{\m\per\s}$, $\bar{V} \approx 0$
+\end{frame}
+
+% =============================================================================
+\section{Incertidumbre}
+% =============================================================================
+
+\begin{frame}{Propagación GUM -- Velocidad LDA}
+	\textbf{Incertidumbre combinada:}
+	\begin{equation*}
+		u_U^2 = \delta_f^2\,u_{f_D}^2 + f_D^2\,u_{\delta_f}^2
+	\end{equation*}
+
+	\vspace{0.3em}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Contribución dominante:} $u_{f_D}$
+
+			\vspace{0.3em}
+			BSA resolución $\Delta f = \SI{10}{\kHz}$\\
+			(tipo~B, rectangular):
+			\begin{equation*}
+				u_{f_D} = \frac{\Delta f}{\sqrt{3}}
+				\approx \SI{5,77}{\kHz}
+			\end{equation*}
+
+			\begin{equation*}
+				u_U = \delta_f \cdot u_{f_D}
+				\approx \SI{0,019}{\m\per\s}
+			\end{equation*}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\textbf{Incertidumbre tipo~A:}
+			\begin{equation*}
+				u_{\bar{U}} = \frac{\sigma_U}{\sqrt{N}}
+				\approx \SI{0,001}{\m\per\s}
+			\end{equation*}
+			($\sigma_U \approx 0{,}2$, $N \approx 30\,000$)
+
+			\vspace{0.3em}
+			\begin{block}{Incertidumbre expandida}
+				\begin{align*}
+					u_{c,U}        & \approx \SI{0,02}{\m\per\s} \\
+					U_\mathrm{exp} & = 2\,u_{c,U}
+					\approx \SI{0,04}{\m\per\s}                  \\
+					u_U / U        & \approx 0{,}95\% \text{ a }
+					\SI{2}{\m\per\s}
+				\end{align*}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Caso de Estudio: Estela NACA~0012}
+% =============================================================================
+
 \begin{frame}{Coeficiente de Arrastre por Estela}
-  \begin{block}{Método de Jones}
-    \begin{equation*}
-      C_D = \frac{2}{c}\int_{-\infty}^{+\infty}
-            \frac{U_1}{U_\infty}\!\left(1 - \frac{U_1}{U_\infty}\right)dy
-      \approx 0.012
-    \end{equation*}
-    NACA 0012, $Re_c=1.5\times10^5$, $\alpha=0°$ (consistente con literatura)
-  \end{block}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item $c = \SI{150}{\mm}$, medida a $x/c=1.0$
-        \item Barrido $y \in [-50,50]\,\si{\mm}$, $\Delta y = \SI{5}{\mm}$
-        \item Mínimo $U_1/U_\infty \approx 0.72$ en la línea central
-        \item Integración trapezoidal con datos LDA
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{tikzpicture}[scale=0.85,>=Stealth]
-        \draw[->] (0,-2.5) -- (0,2.5) node[above,font=\tiny] {$y$};
-        \draw[->] (-0.3,0) -- (4.0,0) node[right,font=\tiny] {$U/U_\infty$};
-        \draw[aeroblue,very thick] plot[domain=-2.3:2.3,samples=40]
-              ({3.0 - 1.0*exp(-(\x)^2/0.7)}, \x);
-        \draw[gray,dashed] (3.0,-2.5) -- (3.0,2.5);
-        \fill[aeroblue!15] plot[domain=-2.3:2.3,samples=40]
-              ({3.0-1.0*exp(-(\x)^2/0.7)},\x) -- (3.0,2.3) -- (3.0,-2.3) -- cycle;
-        \node[aeroblue,font=\tiny] at (2.5,0) {Déficit};
-        \foreach \y in {-2,-1.5,-1,-0.5,0,0.5,1,1.5,2} {
-          \fill[aerored] ({3.0-exp(-\y*\y/0.7)},\y) circle (0.07);
-        }
-        \node[gray,right,font=\tiny] at (3.0,2.3) {$U_\infty$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+	\begin{block}{Método de Jones}
+		\begin{equation*}
+			C_D = \frac{2}{c}\int_{-\infty}^{+\infty}
+			\frac{U_1}{U_\infty}\!\left(1
+			- \frac{U_1}{U_\infty}\right)dy
+			\approx 0{,}012
+		\end{equation*}
+		NACA~0012, $Re_c = 1{,}5\times10^5$, $\alpha = 0°$
+		(consistente con literatura)
+	\end{block}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}\small
+				\item $c = \SI{150}{\mm}$, medida a $x/c = 1{,}0$
+				\item Barrido $y \in [-50,50]\;\si{\mm}$,
+				      $\Delta y = \SI{10}{\mm}$
+				\item Mínimo $U_1/U_\infty \approx 0{,}72$
+				      en la línea central
+				\item Integración trapezoidal con datos LDA
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.75,>=Stealth]
+				\draw[->] (0,-2.5) -- (0,2.5)
+				node[above,font=\tiny] {$y$};
+				\draw[->] (-0.3,0) -- (4.0,0)
+				node[right,font=\tiny] {$U/U_\infty$};
+				% Wake profile
+				\draw[aerogreen,very thick]
+				plot[domain=-2.3:2.3,samples=40]
+				({3.0 - 1.0*exp(-(\x)^2/0.7)}, \x);
+				% Free stream
+				\draw[gray,dashed] (3.0,-2.5) -- (3.0,2.5);
+				% Deficit area
+				\fill[aerogreen!15]
+				plot[domain=-2.3:2.3,samples=40]
+				({3.0-1.0*exp(-(\x)^2/0.7)},\x)
+				-- (3.0,2.3) -- (3.0,-2.3) -- cycle;
+				\node[aerogreen,font=\tiny] at (2.5,0) {Déficit};
+				% Data points
+				\foreach \y in {-2,-1.5,-1,-0.5,0,0.5,1,1.5,2} {
+						\fill[aerored]
+						({3.0-exp(-\y*\y/0.7)},\y) circle (0.07);
+					}
+				\node[gray,right,font=\tiny] at (3.0,2.3) {$U_\infty$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\section{Notebook}
-\begin{frame}[fragile]{P04\_LDA\_Perfil\_Velocidad.ipynb}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-      \texttt{\small Practicas/P04\_LDA\_Perfil\_Velocidad/\\notebooks/P04\_LDA\_Perfil\_Velocidad.ipynb}
-      \vspace{0.3em}
-      \begin{itemize}\small
-        \item Lectura de \texttt{files/P4/}
-        \item Filtrado IQR de outliers
-        \item $\bar{U}$, $\sigma_U$, $I_u$ por posición
-        \item Perfil $U(y)$ con barras de error
-        \item Ajuste $1/7$-potencia ($R^2>0.95$)
-        \item Exportación CSV
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.47\textwidth}
-      \begin{lstlisting}[language=Python]
+% =============================================================================
+\section{Evaluación de Riesgos}
+% =============================================================================
+
+\begin{frame}{Riesgos de la Práctica LDA}
+	\centering\small
+	\begin{tabular}{>{\raggedright\arraybackslash}p{2.6cm}
+		c c c c l}
+		\toprule
+		\textbf{Riesgo} & \textbf{P}                             & \textbf{S}
+		                & $\boldsymbol{R}$                       & \textbf{Nivel}
+		                & \textbf{Controles}                                           \\
+		\midrule
+		\rowcolor{aerored!15}
+		Exposición ocular al láser
+		                & 3                                      & 5              & 15
+		                & \textcolor{aerored}{\textbf{Alto}}
+		                & Gafas OD${\geq}3$                                            \\
+		\rowcolor{aerored!15}
+		Reflexiones especulares
+		                & 3                                      & 4              & 12
+		                & \textcolor{aerored}{\textbf{Alto}}
+		                & Carcasa cerrada                                              \\
+		\rowcolor{aeroyellow!15}
+		Fallo alineación óptica
+		                & 3                                      & 3              & 9
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Recalibrar sesión                                            \\
+		\rowcolor{aeroyellow!15}
+		Inhalación seeding
+		                & 2                                      & 3              & 6
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Ventilación                                                  \\
+		\rowcolor{aerogreen!15}
+		Descarga eléctrica
+		                & 1                                      & 4              & 4
+		                & \textcolor{aerogreen}{\textbf{Bajo}}
+		                & Puesta a tierra                                              \\
+		\rowcolor{aerogreen!15}
+		Daño ventana óptica
+		                & 2                                      & 2              & 4
+		                & \textcolor{aerogreen}{\textbf{Bajo}}
+		                & Paños ópticos                                                \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.3em}
+	\begin{block}{$R = \text{Probabilidad} \times \text{Severidad}$}
+		Bajo ($<5$) \quad | \quad Medio (5--12)
+		\quad | \quad Alto ($>12$)
+	\end{block}
+\end{frame}
+
+\begin{frame}{Matriz de Riesgos $5\times5$}
+	\centering
+	\begin{tikzpicture}[scale=0.6]
+		\foreach \x in {0,...,4} {
+				\foreach \y in {0,...,4} {
+						\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+						\pgfmathparse{\risk < 5 ? "aerogreen!40" :
+							(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+						\edef\fillcol{\pgfmathresult}
+						\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+						\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+						\node[font=\tiny]
+						at (\x+0.5,\y+0.5)
+						{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+					}
+			}
+		\foreach \x/\l in
+			{0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+				\node[font=\tiny,rotate=45,anchor=west]
+				at (\x+0.5,-0.1) {\l};
+			}
+		\foreach \y/\l in
+			{0/Insignif.,1/Menor,2/Moder.,3/Mayor,4/Catastrófico} {
+				\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+			}
+		\node[font=\tiny\bfseries,rotate=90] at (-1.3,2.5)
+		{Severidad};
+		\node[font=\tiny\bfseries] at (2.5,-1) {Probabilidad};
+		% Risk markers
+		\fill[blue,opacity=0.8] (2.5,4.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (2.5,4.5) {1};
+		\fill[blue!70,opacity=0.8] (2.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (2.5,3.5) {2};
+		\fill[orange,opacity=0.8] (2.5,2.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (2.5,2.5) {3};
+		\fill[yellow!70,opacity=0.8] (1.5,2.5) circle (0.2);
+		\node[font=\tiny\bfseries] at (1.5,2.5) {4};
+		\fill[aerogreen!70,opacity=0.8] (0.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (0.5,3.5) {5};
+		\fill[aerogreen!70,opacity=0.8] (1.5,1.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (1.5,1.5) {6};
+	\end{tikzpicture}
+
+	\vspace{0.3cm}
+	\begin{tikzpicture}[scale=0.65,every node/.style={font=\small}]
+		\fill[aerogreen!80] (0,0) -- (5,0) -- (4.2,0.8)
+		-- (0.8,0.8) -- cycle;
+		\fill[aerogreen!60] (0.8,0.8) -- (4.2,0.8) -- (3.4,1.6)
+		-- (1.6,1.6) -- cycle;
+		\fill[aeroyellow!80] (1.6,1.6) -- (3.4,1.6) -- (2.8,2.4)
+		-- (2.2,2.4) -- cycle;
+		\fill[aerored!60] (2.2,2.4) -- (2.8,2.4) -- (2.5,3.0) -- cycle;
+		\node[white,font=\tiny\bfseries] at (2.5,0.4)
+		{Eliminación / Sustitución};
+		\node[white,font=\tiny\bfseries] at (2.5,1.2) {Ingeniería};
+		\node[font=\tiny\bfseries] at (2.5,2.0) {Admin.};
+		\node[white,font=\tiny\bfseries] at (2.5,2.6) {EPP};
+		\draw[->,gray,very thick] (5.3,2.8) -- (5.3,-0.1);
+		\node[gray,font=\tiny,rotate=90] at (5.6,1.3) {Más efectivo};
+	\end{tikzpicture}
+\end{frame}
+
+% =============================================================================
+\section{Casos de Estudio por Equipos}
+% =============================================================================
+
+\begin{frame}{Trabajo por Equipos: 4 Escenarios}
+	\begin{block}{Instrucciones}
+		Cada equipo recibe un escenario diferente.\ Deben:
+		\begin{enumerate}
+			\item Procesar los datos de la(s) carpeta(s) indicadas
+			\item Calcular estadísticos: $\bar{U}$, $\sigma_U$,
+			      $I_u$ por posición
+			\item Construir el perfil $U(y)$ o comparar condiciones
+			\item Evaluar riesgo: $P$ (1--5), $S$ (1--5),
+			      $R = P\!\times\!S$, ubicar en la matriz
+			\item Resolver los problemas adicionales del escenario
+			\item Verificar resultados con el script Python
+		\end{enumerate}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Equipo~1: Perfil de Velocidad Baja (FX01G00)}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}  & \textbf{Valor}           \\
+				\midrule
+				Carpeta        & FX01G00                  \\
+				$\bar{U}$ esp. & $\sim\SI{0,5}{\m\per\s}$ \\
+				Archivos       & 15 $\times$ 2\,000       \\
+				Criterio       & $I_u < 10\%$             \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Baja velocidad,\\
+				señal débil,\\
+				ruido del BSA.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[A.1] $\bar{U}$, $\sigma_U$, $I_u$
+					      antes/después IQR
+					\item[A.2] $f_D = \bar{U}/\delta_f$
+					\item[A.3] $u_U$ y $u_U/\bar{U}$
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.45,>=Stealth]
+				\draw[fill=aerogreen!10,draw=aerogreen,thick]
+				(0,0) rectangle (2.2,1.2);
+				\draw[aerolaser,ultra thick] (0.5,0.6) -- (1.7,0.6);
+				\foreach \y in {0.3,0.6,0.9} {
+						\draw[->,blue!50,thick] (-0.3,\y) -- (0.2,\y);
+					}
+				\node[font=\tiny] at (1.1,1.0) {LDA};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~2: Comparación FX01 vs.\ FX04}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}  & \textbf{Valor}           \\
+				\midrule
+				Carpetas       & FX01G00 y FX04G00        \\
+				$\bar{U}$ FX01 & $\sim\SI{0,5}{\m\per\s}$ \\
+				$\bar{U}$ FX04 & $\sim\SI{2,9}{\m\per\s}$ \\
+				Análisis       & Perfiles superpuestos    \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Dos condiciones de\\
+				velocidad extremas,\\
+				rango del BSA.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[B.1] Histogramas $U$\\
+					      ¿Gaussianos?
+					\item[B.2] $U/\bar{U}$\\
+					      ¿Colapsan?
+					\item[B.3] $-\rho\overline{u'v'}$\\
+					      ¿Escala con $\bar{U}^2$?
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~3: Calidad de Señal (FX02G00)}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}  & \textbf{Valor}           \\
+				\midrule
+				Carpeta        & FX02G00                  \\
+				Particularidad & 1\,138 muest./arch.      \\
+				$\bar{U}$ esp. & $\sim\SI{1,0}{\m\per\s}$ \\
+				Análisis       & Convergencia estat.      \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Menor $N$ de muestras,\\
+				posible bajo seeding,\\
+				sesgo estadístico.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[C.1] ¿Por qué menos\\
+					      muestras?
+					\item[C.2] $\bar{U}$ acumulado\\
+					      ¿Converge a $\pm1\%$?
+					\item[C.3] $\sigma_U$ con/sin\\
+					      filtrado IQR
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~4: Estela NACA~0012 (FX03 + FX04)}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.} & \textbf{Valor}         \\
+				\midrule
+				Carpetas      & FX03G00 y FX04G00      \\
+				Perfil        & NACA~0012, $\alpha=0°$ \\
+				$Re_c$        & $1{,}5\times10^5$      \\
+				Referencia    & $C_D \approx 0{,}012$  \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Sonda cerca del perfil,\\
+				reflexiones del borde\\
+				de salida, seeding\\
+				no uniforme. $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[D.1] Perfil $U/U_\infty$
+					\item[D.2] $C_D$ por integración
+					      trapezoidal
+					\item[D.3] $\theta$ y comparar
+					      con $C_D \cdot c / 2$
+				\end{enumerate}
+			\end{exampleblock}
+			\vspace{0.2em}
+			\begin{tikzpicture}[scale=0.45,>=Stealth]
+				% NACA schematic
+				\draw[thick,fill=gray!30]
+				(0,0.08) .. controls (0.5,0.15) and (1.5,0.12)
+				.. (2.2,0.02)
+				-- (2.2,-0.02)
+				.. controls (1.5,-0.12) and (0.5,-0.15)
+				.. (0,-0.08) -- cycle;
+				% Wake
+				\draw[aerogreen,thick,dashed] (2.2,0.5) -- (3.0,0.5);
+				\draw[aerogreen,thick,dashed] (2.2,-0.5) -- (3.0,-0.5);
+				\node[font=\tiny] at (2.8,0) {Estela};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Herramientas de Software}
+% =============================================================================
+
+\begin{frame}[fragile]{Script \texttt{P04\_LDA\_Perfil\_Velocidad.py}}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Ruta}
+				\scriptsize
+				\texttt{Practicas/P04\_LDA\_Perfil\_Velocidad/}\\
+				\texttt{\ \ src/P04\_LDA\_Perfil\_Velocidad.py}
+			\end{block}
+			\vspace{0.2em}
+			\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Función}
+				 & \textbf{Resultado}                      \\
+				\midrule
+				\texttt{remove\_outliers\_iqr}
+				 & Array filtrado + máscara                \\
+				\texttt{process\_position\_folder}
+				 & Dict: $\bar{U}$, $\sigma_U$, $I_u$, $N$ \\
+				Bloque principal
+				 & Perfiles, histogramas,                  \\
+				 & box-plots, Reynolds                     \\
+				\bottomrule
+			\end{tabular}
+			\vspace{0.3em}
+
+			\textbf{Salidas:}
+			\begin{itemize}\scriptsize
+				\item \texttt{data/images/*.png} y \texttt{*.svg}
+				\item 8 gráficas generadas
+				\item Tabla resumen en consola
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{lstlisting}[language=Python]
 import numpy as np
+import pandas as pd
 from pathlib import Path
+from scipy import stats
 
-def read_lda(folder):
-    data = []
-    for f in sorted(folder.glob("*.txt")):
-        d = np.loadtxt(f)
-        data.append(d[:,1])  # U
-    return np.concatenate(data)
-
-def filter_iqr(U, k=1.5):
-    Q1, Q3 = np.percentile(U, [25,75])
+def remove_outliers_iqr(data, k=1.5):
+    Q1 = np.percentile(data, 25)
+    Q3 = np.percentile(data, 75)
     IQR = Q3 - Q1
-    mask = (U >= Q1-k*IQR) & (U <= Q3+k*IQR)
-    return U[mask]
+    mask = (data >= Q1 - k*IQR)
+         & (data <= Q3 + k*IQR)
+    return data[mask], mask
 
-root = Path("files/P4")
-for folder in sorted(root.iterdir()):
-    U = filter_iqr(read_lda(folder))
-    print(f"{folder.name}: "
-          f"U={U.mean():.2f} m/s, "
-          f"Iu={U.std()/U.mean()*100:.1f}%")
-      \end{lstlisting}
-    \end{column}
-  \end{columns}
+def process_position_folder(folder):
+    all_U = []
+    for f in folder.glob('*.txt'):
+        df = pd.read_csv(f, sep=r'\s+',
+            header=None,
+            names=['idx','t','SNR','U','V'])
+        all_U.extend(df['U'].values)
+    U = np.array(all_U)
+    U_clean, _ = remove_outliers_iqr(U)
+    return {
+        'U_mean': np.mean(U_clean),
+        'U_std': np.std(U_clean),
+        'I_u': np.std(U_clean)
+             / np.mean(U_clean) * 100,
+        'N': len(U_clean)
+    }
+			\end{lstlisting}
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\section{Resumen}
+\begin{frame}{Flujo de Ejecución del Script}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{\texttt{P04\_LDA\_Perfil\_Velocidad.py}}\\[0.3em]
+			\scriptsize
+			\begin{enumerate}
+				\item Descubrimiento de \texttt{files/P4/}
+				      (4 carpetas)
+				\item Lectura de 60 archivos \texttt{.txt}
+				\item Concatenación $U$ y $V$ por posición
+				\item Filtrado IQR ($k = 1{,}5$)
+				\item Estadísticos: $\bar{U}$, $\sigma_U$,
+				      $I_u$, SE
+				\item Perfil $U(y)$ con barras de error
+				\item Histogramas por posición
+				\item Box-plots y coef.\ de variación
+				\item Ajuste polinómico (grado~2)
+				\item Esfuerzos de Reynolds
+				\item Gráficas PNG + SVG
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{exampleblock}{Ejecución}
+				\texttt{cd Practicas/.../src}\\
+				\texttt{python P04\_LDA\_...py}
+			\end{exampleblock}
+			\vspace{0.3em}
+			\begin{block}{Gráficas generadas}
+				\scriptsize
+				\begin{itemize}
+					\item \texttt{perfil\_de\_velocidades\_*.png}
+					\item \texttt{perfil\_intensidad\_*.png}
+					\item \texttt{histogramas\_velocidad\_*.png}
+					\item \texttt{boxplot\_velocidades\_*.png}
+					\item \texttt{CV\_por\_posicion.png}
+					\item \texttt{perfil\_ajuste\_*.png}
+					\item \texttt{perfil\_esfuerzo\_*.png}
+					\item \texttt{box\_plot\_de\_velocidades\_*.png}
+				\end{itemize}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Cuestionario y Formato}
+% =============================================================================
+
+\begin{frame}{Preguntas de Discusión}
+	\begin{enumerate}\small
+		\item ¿Cuál es la magnitud medida directamente por el sistema
+		      LDA? ¿Cómo se diferencia de la HWA?
+		\item Deducir $\delta_f$ a partir de los parámetros ópticos.
+		      ¿Qué ocurre si se reduce $\theta/2$?
+		\item ¿Por qué la LDA no necesita calibración?
+		\item Función de la celda de Bragg: ¿qué pasaría sin ella
+		      en un flujo con recirculación?
+		\item ¿Cómo afecta la densidad de seeding a la tasa de
+		      adquisición?
+		\item ¿Por qué el IQR ($k = 1{,}5$) es más robusto que
+		      $\pm2\sigma$?
+		\item Interpretar los valores de $I_u$: ¿laminar, transición
+		      o turbulento?
+		\item Si se usara un Pitot en vez de LDA, ¿cómo afectaría
+		      la resolución cerca de la pared?
+		\item Dos aplicaciones aeronáuticas donde LDA sea superior
+		      al hilo caliente y justificar por qué
+		\item ¿Qué información adicional proporciona
+		      $-\rho\overline{u'v'}$?
+		\item Criterio de Stokes ($\mathrm{Stk} \ll 1$) para
+		      trazadores
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Formato del Informe (AIAA)}
+	\begin{enumerate}
+		\item \textbf{Resumen:} máx.\ 200 palabras
+		\item \textbf{Introducción}
+		\item \textbf{Fundamento Teórico:} efecto Doppler, modelo
+		      de franjas, Bragg
+		\item \textbf{Metodología:} procesamiento + herramientas
+		\item \textbf{Resultados:} tabla de estadísticos por carpeta,
+		      perfil $U(y)$, histogramas, caso del equipo,
+		      evaluación de riesgo
+		\item \textbf{Discusión:} cuestionario + análisis de
+		      incertidumbre
+		\item \textbf{Conclusiones:} 4--6 puntos
+		\item \textbf{Referencias} (IEEE)
+		\item \textbf{Apéndice~A:} gráficas Python
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Conclusiones}
+% =============================================================================
+
 \begin{frame}{Conclusiones}
-  \begin{enumerate}
-    \item LDA es \textbf{no intrusiva} -- ideal para flujos sensibles a sondas.
-    \item $\delta_f = \SI{3.28}{\micro\m}$, $u_U < 0.2\%$ -- excelente precisión.
-    \item El perfil $U(y)$ sigue la ley $1/7$-potencia ($R^2\approx0.95$).
-    \item $C_D \approx 0.012$ para NACA~0012 por integración de estela.
-    \item El notebook automatiza lectura, filtrado IQR, estadísticos y gráficas.
-  \end{enumerate}
-  \vspace{0.5em}
-  \begin{block}{Recursos}
-    Manual: \texttt{manuals/P04\_LDA\_Perfil\_Velocidad/manual\_P04.tex}\\
-    Notebook: \texttt{Practicas/P04\_LDA\_Perfil\_Velocidad/notebooks/P04\_LDA\_Perfil\_Velocidad.ipynb}
-  \end{block}
+	\begin{enumerate}
+		\item El sistema LDA Ar-Ion ($\lambda = \SI{514,5}{\nm}$) con
+		      $\delta_f = \SI{3,28}{\micro\m}$ mide velocidades con
+		      incertidumbre relativa $< 1\%$
+		\item El volumen de medida
+		      ($d_{mv} \approx \SI{137}{\micro\m}$,
+		      $l_{mv} \approx \SI{1,74}{\mm}$) proporciona resolución
+		      espacial adecuada para perfiles de capa límite
+		\item El filtrado IQR ($k = 1{,}5$) elimina 3--6\% de
+		      outliers por posición, mejorando la calidad estadística
+		\item Las 4 condiciones muestran $\bar{U}$ de
+		      \SIrange{0,5}{3,0}{\m\per\s} con $I_u \approx 8$--$12\%$
+		      (flujo moderadamente turbulento)
+		\item La componente transversal $\bar{V} < 3\%\,\bar{U}$
+		      confirma flujo predominantemente unidimensional
+		\item La integración del déficit de estela permite estimar
+		      $C_D \approx 0{,}012$ para NACA~0012
+		\item El script Python automatiza lectura, filtrado,
+		      estadísticos, perfiles y gráficas
+	\end{enumerate}
+
+	\vspace{0.3em}
+	\centering
+	\begin{tikzpicture}
+		\node[draw=aerogreen,thick,rounded corners,fill=aerogreen!10,
+			text width=10cm,align=center,font=\small] {
+			\textit{<<\,La LDA es la técnica de referencia para medición
+				no intrusiva de velocidad en flujos
+				aerodinámicos\,>>}};
+	\end{tikzpicture}
 \end{frame}
 
-\begin{frame}{Referencias}
-  \begin{itemize}
-    \item Durst, Melling \& Whitelaw (1981). \textit{Principles and Practice of LDA}, Academic Press
-    \item Adrian \& Westerweel (2011). \textit{Particle Image Velocimetry}, Cambridge
-    \item Anderson (2017). \textit{Fundamentals of Aerodynamics}, McGraw-Hill
-  \end{itemize}
+\begin{frame}{}
+	\centering
+	\vspace{2cm}
+	{\Huge\color{aerogreen}\bfseries ¿Preguntas?}\\[1cm]
+	{\large P04 -- Anemometría Láser Doppler (LDA)}\\[0.5cm]
+	{\small Técnicas de Medida -- Ingeniería Aeronáutica}
 \end{frame}
 
 \end{document}

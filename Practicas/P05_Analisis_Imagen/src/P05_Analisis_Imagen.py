@@ -21,6 +21,8 @@ El script se enfoca en la parte automatizada del análisis.
 """
 
 # --- Importación de Librerías ---
+import matplotlib
+matplotlib.use('Agg')  # Backend no-interactivo para ejecución por script
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -111,13 +113,13 @@ def procesar_morfologia(img_bin, op_type='opening', disk_size=3):
     """Aplica operaciones morfológicas (opening, closing, erosion, dilation)."""
     selem = morphology.disk(disk_size)
     if op_type == 'opening':
-        return morphology.binary_opening(img_bin, selem)
+        return morphology.opening(img_bin, selem)
     elif op_type == 'closing':
-        return morphology.binary_closing(img_bin, selem)
+        return morphology.closing(img_bin, selem)
     elif op_type == 'erosion':
-        return morphology.binary_erosion(img_bin, selem)
+        return morphology.erosion(img_bin, selem)
     elif op_type == 'dilation':
-        return morphology.binary_dilation(img_bin, selem)
+        return morphology.dilation(img_bin, selem)
     return img_bin
 
 def procesar_etiquetado(img_bin):
@@ -131,66 +133,68 @@ def procesar_etiquetado(img_bin):
     # print(props) # Descomentar para ver la tabla de propiedades
     return label_image, props
 
+def _save_individual(img_data, cmap, title, filename):
+    """Guarda una imagen individual de un paso de procesamiento."""
+    fig_ind, ax_ind = plt.subplots(figsize=(6, 5))
+    ax_ind.imshow(img_data, cmap=cmap)
+    ax_ind.set_title(title)
+    ax_ind.axis('off')
+    fig_ind.tight_layout()
+    full_path = RESULTS_DIR / filename
+    fig_ind.savefig(full_path, bbox_inches='tight', dpi=150)
+    plt.close(fig_ind)
+    print(f"  > Figura guardada en: {full_path.name}")
+
+
 def run_full_analysis(img_gray, base_filename):
-    """Ejecuta todos los análisis y los muestra/guarda."""
-    
-    # Esta función ya no necesita 'out_analysis_plots'
-    # Los 'print' irán directamente a la consola.
+    """Ejecuta todos los análisis y guarda los resultados."""
     
     print(f"--- Iniciando análisis para: {base_filename} ---")
     
-    # Crear una figura para todos los análisis
-    fig_analysis, axs = plt.subplots(3, 2, figsize=(10, 12))
-    axs = axs.ravel() # Aplanar el array de ejes
-    
-    # a) Histograma (sobre la imagen float original)
-    mostrar_histograma(axs[0], img_gray, 'Histograma Original')
-    
     # b) CLAHE (creado como float)
     img_clahe = procesar_clahe(img_gray)
-    axs[1].imshow(img_clahe, cmap='gray')
-    axs[1].set_title('Ecualización (CLAHE)')
-    axs[1].axis('off')
-    save_fig(f"{base_filename}_01_clahe.png")
+    _save_individual(img_clahe, 'gray', 'Ecualización (CLAHE)',
+                     f"{base_filename}_01_clahe.png")
 
     # Convertir la imagen CLAHE a uint8 [0, 255]
-    # Esta versión se usará para las funciones (sobel, canny, otsu)
     img_clahe_u8 = img_as_ubyte(img_clahe)
 
     # c) Sobel (usando la versión uint8)
     img_sobel = procesar_sobel(img_clahe_u8)
-    axs[2].imshow(img_sobel, cmap='gray')
-    axs[2].set_title('Filtro Sobel (sobre CLAHE)')
-    axs[2].axis('off')
-    save_fig(f"{base_filename}_02_sobel.png")
+    _save_individual(img_sobel, 'gray', 'Filtro Sobel (sobre CLAHE)',
+                     f"{base_filename}_02_sobel.png")
 
     # d) Canny (usando la versión uint8)
     img_canny = procesar_canny(img_clahe_u8, sigma=2.0)
-    axs[3].imshow(img_canny, cmap='binary')
-    axs[3].set_title('Bordes Canny (sigma=2)')
-    axs[3].axis('off')
-    save_fig(f"{base_filename}_03_canny.png")
+    _save_individual(img_canny, 'binary', 'Bordes Canny (sigma=2)',
+                     f"{base_filename}_03_canny.png")
 
     # e) Otsu (usando la versión uint8)
     img_otsu = procesar_otsu(img_clahe_u8)
-    axs[4].imshow(img_otsu, cmap='gray')
-    axs[4].set_title('Umbralización Otsu (sobre CLAHE)')
-    axs[4].axis('off')
-    save_fig(f"{base_filename}_04_otsu.png")
+    _save_individual(img_otsu, 'gray', 'Umbralización Otsu (sobre CLAHE)',
+                     f"{base_filename}_04_otsu.png")
 
     # f) Morfología (Opening, sobre la imagen de Otsu que ya es booleana)
     img_opened = procesar_morfologia(img_otsu, op_type='opening', disk_size=2)
-    axs[5].imshow(img_opened, cmap='gray')
-    axs[5].set_title('Morfología (Opening, disk=2)')
-    axs[5].axis('off')
-    save_fig(f"{base_filename}_05_opening.png")
+    _save_individual(img_opened, 'gray', 'Morfología (Opening, disk=2)',
+                     f"{base_filename}_05_opening.png")
+
+    # --- Figura compuesta (resumen de todos los pasos) ---
+    fig_analysis, axs = plt.subplots(3, 2, figsize=(10, 12))
+    axs = axs.ravel()
     
-    plt.tight_layout()
+    mostrar_histograma(axs[0], img_gray, 'Histograma Original')
+    axs[1].imshow(img_clahe, cmap='gray'); axs[1].set_title('CLAHE'); axs[1].axis('off')
+    axs[2].imshow(img_sobel, cmap='gray'); axs[2].set_title('Sobel'); axs[2].axis('off')
+    axs[3].imshow(img_canny, cmap='binary'); axs[3].set_title('Canny'); axs[3].axis('off')
+    axs[4].imshow(img_otsu, cmap='gray'); axs[4].set_title('Otsu'); axs[4].axis('off')
+    axs[5].imshow(img_opened, cmap='gray'); axs[5].set_title('Opening'); axs[5].axis('off')
     
-    # plt.show() es bloqueante en un script.
-    # Mostrará la figura y pausará el script hasta que la cierres.
-    print("Mostrando gráfico de análisis... Cierra la ventana para continuar.")
-    plt.show()
+    fig_analysis.tight_layout()
+    composite_path = RESULTS_DIR / f"{base_filename}_00_resumen.png"
+    fig_analysis.savefig(composite_path, bbox_inches='tight', dpi=150)
+    plt.close(fig_analysis)
+    print(f"  > Resumen guardado en: {composite_path.name}")
     
     # g) Etiquetado (se imprime en la consola)
     procesar_etiquetado(img_opened)
