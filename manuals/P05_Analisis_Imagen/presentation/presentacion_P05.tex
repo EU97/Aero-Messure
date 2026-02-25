@@ -1,0 +1,1341 @@
+% =============================================================================
+% Presentación Beamer P05 – Análisis de Imagen Digital y Fractografía SEM
+% Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode presentacion_P05.tex
+% =============================================================================
+\documentclass[aspectratio=169,12pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+\usefonttheme{professionalfonts}
+
+% ---- Encoding & Language ----
+\usepackage{fontspec}
+\usepackage{csquotes}
+\usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+% ---- Math & Physics ----
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}}
+
+% ---- Graphics ----
+\usepackage{graphicx}
+\graphicspath{{../../../Practicas/P05_Analisis_Imagen/data/images/}
+              {../../../files/p5/}}
+
+% ---- TikZ ----
+\usepackage{tikz}
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,
+                decorations.markings,decorations.pathmorphing,patterns}
+
+% ---- Tables ----
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{array}
+
+% ---- Code ----
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\tiny,
+  keywordstyle=\color{blue!80}\bfseries,
+  commentstyle=\color{green!50!black},
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  breaklines=true
+}
+
+% ---- Custom Colors ----
+\definecolor{aeroblue}{RGB}{0,51,102}
+\definecolor{aerored}{RGB}{153,0,0}
+\definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aeroyellow}{RGB}{204,153,0}
+\definecolor{aerogreendark}{RGB}{0,80,40}
+\definecolor{aerogreenlight}{RGB}{0,140,70}
+
+% ---- GREEN THEME ----
+\setbeamercolor{frametitle}{bg=aerogreen,fg=white}
+\setbeamercolor{title}{bg=aerogreen,fg=white}
+\setbeamercolor{structure}{fg=aerogreen}
+\setbeamercolor{palette primary}{bg=aerogreen,fg=white}
+\setbeamercolor{palette secondary}{bg=aerogreenlight,fg=white}
+\setbeamercolor{palette tertiary}{bg=aerogreendark,fg=white}
+\setbeamercolor{palette quaternary}{bg=aerogreendark,fg=white}
+\setbeamercolor{section in toc}{fg=aerogreen}
+\setbeamercolor{subsection in toc}{fg=aerogreendark}
+\setbeamercolor{block title}{bg=aerogreen,fg=white}
+\setbeamercolor{block body}{bg=aerogreen!10,fg=black}
+\setbeamercolor{block title alerted}{bg=aerored,fg=white}
+\setbeamercolor{block body alerted}{bg=aerored!10,fg=black}
+\setbeamercolor{block title example}{bg=aerogreenlight,fg=white}
+\setbeamercolor{block body example}{bg=aerogreenlight!10,fg=black}
+\setbeamercolor{item}{fg=aerogreen}
+\setbeamercolor{itemize item}{fg=aerogreen}
+\setbeamercolor{enumerate item}{fg=aerogreen}
+
+% ---- Title Info ----
+\title[P05 -- Análisis de Imagen]{P05: Análisis de Imagen Digital\\y Fractografía SEM}
+\subtitle{Técnicas de Medida -- Ingeniería Aeronáutica}
+\author{Laboratorio de Técnicas de Medida}
+\date{}
+
+% =============================================================================
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+\begin{frame}{Índice}
+	\tableofcontents
+\end{frame}
+
+% =============================================================================
+\section{Introducción}
+% =============================================================================
+
+\begin{frame}{¿Qué es la Fractografía SEM?}
+	\begin{columns}
+		\begin{column}{0.55\textwidth}
+			\begin{itemize}\small
+				\item Estudio de superficies de fractura con
+				      \textbf{Microscopía Electrónica de Barrido}
+				\item Resolución $\sim\!\SI{1}{\nano\m}$,
+				      gran profundidad de campo
+				\item Identifica el \textbf{modo de falla}:
+				      dúctil (hoyuelos), frágil (clivaje),
+				      fatiga (estrías)
+				\item Complemento: \textbf{procesamiento digital}
+				      para cuantificación automatizada
+			\end{itemize}
+			\vspace{0.1em}
+			\begin{alertblock}{Objetivo}
+				\scriptsize Pipeline de 6 etapas sobre micrografías SEM
+				+ mediciones dimensionales
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.42\textwidth}
+			\begin{tikzpicture}[scale=0.55,>=Stealth]
+				% SEM column
+				\draw[fill=gray!20,draw=aeroblue,thick]
+				(-0.6,3.2) rectangle (0.6,4.2);
+				\node[aeroblue,font=\tiny\bfseries] at (0,3.7) {Cañón $e^-$};
+				% Lens
+				\draw[aeroblue,thick] (-0.8,2.6) arc (180:360:0.8 and 0.12);
+				\draw[aeroblue,thick] (-0.8,2.6) arc (180:0:0.8 and 0.12);
+				% Beam
+				\draw[blue!50,line width=1.5pt] (0,3.2) -- (0,0.3);
+				% Sample
+				\draw[fill=orange!15,draw=black,thick]
+				(-1.2,0) -- (1.2,0) -- (0.9,-0.4) -- (-0.9,-0.4) -- cycle;
+				\node[font=\tiny] at (0,-0.7) {Fractura};
+				% Detector
+				\draw[fill=aerogreen!20,draw=aerogreen,thick]
+				(1.6,1.0) circle (0.3);
+				\node[aerogreen,font=\tiny] at (1.6,0.5) {SE};
+				\draw[->,dashed,gray] (0.2,0.2) -- (1.3,0.8);
+				% Arrow to processing
+				\draw[aeroblue,ultra thick,->] (2.3,1.0) -- (3.5,1.0);
+				\node[above,font=\tiny,aeroblue] at (2.9,1.1) {Imagen};
+				% Pipeline
+				\draw[fill=aeroblue!10,draw=aeroblue,thick,rounded corners=2pt]
+				(3.5,0.3) rectangle (5.0,1.7);
+				\node[aeroblue,font=\tiny\bfseries,align=center] at (4.25,1.0)
+				{CLAHE\\Sobel\\Canny\\Otsu};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Aplicaciones en Ingeniería Aeronáutica}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{enumerate}\small
+				\item Diagnóstico de causa raíz de fallas en servicio
+				\item Control de calidad de aleaciones aeronáuticas
+				\item Verificación de tratamientos superficiales
+				\item Estimación de vida a fatiga ($da/dN$ por estrías)
+				\item Validación de modelos de mecánica de fractura
+			\end{enumerate}
+			\vspace{0.3em}
+			\begin{exampleblock}{Dato clave}
+				La \textbf{fatiga} causa $>60\%$ de las fallas
+				estructurales en aeronáutica
+			\end{exampleblock}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{alertblock}{¿Por qué automatizar?}
+				\begin{itemize}\small
+					\item Medición manual es lenta y subjetiva
+					\item Pipeline automatizado: reproducible,
+					      trazable, cuantitativo
+					\item Estadísticas sobre miles de regiones
+					\item Comparación objetiva entre muestras
+				\end{itemize}
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Objetivos de Aprendizaje}
+	\begin{enumerate}
+		\item Comprender el principio del SEM y los parámetros de
+		      adquisición (EHT, WD, detector, escala)
+		\item Aplicar la ecualización adaptativa CLAHE para mejorar
+		      el contraste local
+		\item Calcular bordes con los operadores Sobel y Canny
+		\item Segmentar con la umbralización óptima de Otsu
+		\item Refinar máscaras con operaciones morfológicas (opening)
+		\item Etiquetar regiones y extraer descriptores de forma
+		\item Calibrar la escala espacial (\si{px}/\si{\micro\m})
+		      y medir dimensiones
+		\item Diagnosticar modos de fractura a partir de evidencia
+		      cuantitativa
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Fundamentos Teóricos}
+% =============================================================================
+
+\begin{frame}{Microscopía Electrónica de Barrido (SEM)}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{tikzpicture}[scale=0.6,>=Stealth]
+				% Column
+				\draw[fill=gray!15,draw=black,thick] (-0.7,4.5) rectangle (0.7,5.5);
+				\node[font=\scriptsize] at (0,5.0) {Cañón $e^-$};
+				% Condenser
+				\draw[thick,aeroblue] (-1.0,3.8) arc (180:360:1.0 and 0.15);
+				\draw[thick,aeroblue] (-1.0,3.8) arc (180:0:1.0 and 0.15);
+				\node[right,font=\tiny,aeroblue] at (1.1,3.8) {Condensadora};
+				% Scan coils
+				\draw[fill=aeroyellow!30,draw=black]
+				(-0.4,3.0) rectangle (-0.15,3.4);
+				\draw[fill=aeroyellow!30,draw=black]
+				(0.15,3.0) rectangle (0.4,3.4);
+				\node[font=\tiny] at (0,2.7) {Bobinas};
+				% Objective
+				\draw[thick,aeroblue] (-0.8,2.2) arc (180:360:0.8 and 0.12);
+				\draw[thick,aeroblue] (-0.8,2.2) arc (180:0:0.8 and 0.12);
+				\node[right,font=\tiny,aeroblue] at (0.9,2.2) {Objetivo};
+				% Beam
+				\draw[blue!60,line width=1.5pt] (0,4.5) -- (0,0.3);
+				% Sample
+				\draw[fill=orange!15,draw=black,thick]
+				(-1.5,0) -- (1.5,0) -- (1.2,-0.5) -- (-1.2,-0.5) -- cycle;
+				\node[font=\scriptsize] at (0,-0.8) {Muestra};
+				% SE detector
+				\draw[fill=aerogreen!20,draw=aerogreen,thick]
+				(2.2,1.2) ellipse (0.35 and 0.25);
+				\node[aerogreen,font=\tiny] at (2.2,0.7) {Detector SE};
+				\draw[->,dashed,aerogreen] (0.3,0.2) -- (1.9,1.0);
+			\end{tikzpicture}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{block}{Señales del SEM}
+				\begin{itemize}\small
+					\item \textbf{SE} (secundarios):
+					      topografía superficial
+					\item \textbf{BSE} (retrodispersados):
+					      contraste composicional
+					\item \textbf{Rayos~X}: análisis elemental
+					      (EDS/EDX)
+				\end{itemize}
+			\end{block}
+			\vspace{0.3em}
+			\begin{exampleblock}{Ventajas vs.\ óptico}
+				\begin{itemize}\scriptsize
+					\item Resolución: $\sim\!\SI{1}{\nano\m}$
+					      (vs.\ $\sim\!\SI{200}{\nano\m}$)
+					\item Profundidad de campo $\gg$
+					\item Imagen 3D de superficies rugosas
+				\end{itemize}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Parámetros de Adquisición SEM}
+	\centering
+	\small
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Parámetro}            & \textbf{Unidad}
+		                              & \textbf{Efecto}                                \\
+		\midrule
+		EHT (voltaje)                 & \si{\kilo\volt}
+		                              & $\uparrow$ $\to$ mayor penetración y resolución \\
+		WD (dist.\ trabajo)            & \si{\mm}
+		                              & $\downarrow$ $\to$ mejor resolución              \\
+		Mag (magnificación)            & $\times$
+		                              & Define campo de visión                           \\
+		Signal A (detector)            & SE / BSE
+		                              & SE: topografía; BSE: composición                \\
+		\rowcolor{aeroyellow!20}
+		\textbf{Barra de escala}       & \si{\micro\m}
+		                              & \textbf{Fundamental para mediciones}             \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.5cm}
+	\begin{tikzpicture}
+		\node[draw=aerogreen,thick,rounded corners,fill=aerogreen!10,
+			text width=10cm,align=center,font=\small] {
+			La barra de escala define la relación
+			\textbf{píxeles $\leftrightarrow$ \si{\micro\m}}.\\
+			Sin ella, no hay medición cuantitativa posible.
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Mecanismos de Fractura}
+	\begin{columns}
+		\begin{column}{0.32\textwidth}
+			\begin{block}{\centering Dúctil}
+				\centering
+				\begin{tikzpicture}[scale=0.55]
+					\draw[thick] (0,0) rectangle (2.8,2.2);
+					\foreach \x/\y/\r in {0.4/1.0/0.2, 1.0/0.6/0.25,
+						1.4/1.4/0.18, 2.0/0.9/0.3, 2.4/1.6/0.15,
+						0.7/1.7/0.12, 1.8/0.3/0.2} {
+						\draw[gray,fill=gray!20] (\x,\y)
+						ellipse ({\r} and {\r*0.7});
+					}
+				\end{tikzpicture}\\
+				\scriptsize \textbf{Hoyuelos} (dimples)\\
+				$G_\mathrm{dúctil} \gg G_\mathrm{frágil}$
+			\end{block}
+		\end{column}
+		\begin{column}{0.32\textwidth}
+			\begin{block}{\centering Frágil}
+				\centering
+				\begin{tikzpicture}[scale=0.55]
+					\draw[thick] (0,0) rectangle (2.8,2.2);
+					\draw[gray] (0.2,0.1) -- (1.0,1.6) -- (1.4,0.4) -- cycle;
+					\draw[gray] (1.0,1.6) -- (2.0,1.8) -- (1.4,0.4) -- cycle;
+					\draw[gray] (1.4,0.4) -- (2.0,1.8) -- (2.6,0.6) -- cycle;
+					\draw[aerored,thin,->] (0.7,0.8) -- (1.1,1.0);
+					\draw[aerored,thin,->] (1.5,1.0) -- (1.9,1.3);
+				\end{tikzpicture}\\
+				\scriptsize \textbf{Clivaje} + marcas de río\\
+				Planos cristalográficos
+			\end{block}
+		\end{column}
+		\begin{column}{0.32\textwidth}
+			\begin{block}{\centering Fatiga}
+				\centering
+				\begin{tikzpicture}[scale=0.55]
+					\draw[thick] (0,0) rectangle (2.8,2.2);
+					\foreach \y in {0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0} {
+						\draw[gray,thin] (0.15,\y)
+						.. controls (0.8,{\y+0.1}) and (2.0,{\y-0.08})
+						.. (2.65,\y);
+					}
+					\fill[aerored] (0.15,1.1) circle (0.06);
+					\draw[aerored,->] (0.15,1.1) -- (0.6,1.1);
+				\end{tikzpicture}\\
+				\scriptsize \textbf{Estrías} de fatiga\\
+				$da/dN = C(\Delta K)^m$
+			\end{block}
+		\end{column}
+	\end{columns}
+
+	\vspace{0.4cm}
+	\centering
+	\begin{tikzpicture}
+		\node[draw=aerored,thick,rounded corners,fill=aerored!8,
+			text width=10cm,align=center,font=\small] {
+			Nuestras 5 micrografías muestran \textbf{superficies de
+			fractura por fatiga} con estrías, marcas de playa y
+			zonas de fractura final.
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Ley de Paris -- Propagación de Grietas por Fatiga}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Tasa de crecimiento:}
+			\begin{equation*}
+				\boxed{\frac{da}{dN} = C\,(\Delta K)^m}
+			\end{equation*}
+
+			\begin{itemize}\small
+				\item $a$: longitud de grieta
+				\item $N$: número de ciclos
+				\item $\Delta K$: rango del factor de intensidad
+				\item $C$, $m$: constantes del material
+			\end{itemize}
+
+			\vspace{0.3em}
+			\begin{alertblock}{Conexión con estrías}
+				Cada estría $\approx$ 1 ciclo de carga\\
+				Espaciado entre estrías $\approx da/dN$
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.65]
+				\draw[->] (0,0) -- (5.5,0)
+				node[right,font=\tiny] {$\log(\Delta K)$};
+				\draw[->] (0,0) -- (0,4.5)
+				node[above,font=\tiny] {$\log(da/dN)$};
+				% Three regions
+				\fill[aeroblue!10] (0,0) rectangle (1.5,4.5);
+				\fill[aerogreen!10] (1.5,0) rectangle (3.8,4.5);
+				\fill[aerored!8] (3.8,0) rectangle (5.5,4.5);
+				\node[aeroblue,font=\tiny,rotate=90] at (0.75,2.2)
+				{Región I};
+				\node[aerogreen,font=\tiny,rotate=90] at (2.65,2.2)
+				{Región II (Paris)};
+				\node[aerored,font=\tiny,rotate=90] at (4.65,2.2)
+				{Región III};
+				% Curve
+				\draw[aerored,very thick]
+				(0.8,0.3) .. controls (1.2,0.6) .. (1.5,1.0)
+				-- (3.8,3.2)
+				.. controls (4.2,3.8) .. (4.8,4.3);
+				% Slope label
+				\node[aerogreen,font=\small\bfseries] at (3.0,1.8)
+				{pend.\ $= m$};
+				% Threshold
+				\draw[aerogreen,dashed] (1.5,0) -- (1.5,4.5);
+				\node[below,font=\tiny] at (1.5,0) {$\Delta K_\mathrm{th}$};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Pipeline de Procesamiento}
+% =============================================================================
+
+\begin{frame}{Pipeline de 6 Etapas}
+	\centering
+	\begin{tikzpicture}[node distance=0.6cm,>=Stealth,
+		block/.style={rectangle,draw=aerogreen,thick,fill=aerogreen!8,
+			text width=4.0cm,align=center,minimum height=0.6cm,
+			font=\scriptsize,rounded corners=2pt}]
+		\node[block] (load) {\textbf{1.} Carga en gris $[0,1]$};
+		\node[block,below=of load] (clahe)
+			{\textbf{2.} CLAHE (\texttt{clip}=0,03)};
+		\node[block,below=of clahe] (sobel)
+			{\textbf{3a.} Sobel (gradiente)};
+		\node[block,right=2cm of sobel] (canny)
+			{\textbf{3b.} Canny ($\sigma=2$)};
+		\node[block,below=of sobel] (otsu)
+			{\textbf{4.} Umbralización Otsu};
+		\node[block,below=of otsu] (morph)
+			{\textbf{5.} Opening (disk=2)};
+		\node[block,below=of morph,draw=aerored,fill=aerored!8]
+			(label) {\textbf{6.} Etiquetado $\to$ $N$ regiones};
+		% Arrows
+		\foreach \a/\b in {load/clahe,clahe/sobel,sobel/otsu,
+			otsu/morph,morph/label} {
+			\draw[->,aerogreen,thick] (\a) -- (\b);
+		}
+		\draw[->,aerogreen,thick] (clahe.east) -| (canny.north);
+		% Side annotations
+		\node[right=0.5cm of load,font=\tiny,text width=3cm]
+			{float, normalizado};
+		\node[right=0.5cm of clahe,font=\tiny,text width=3cm]
+			{Contraste local mejorado};
+		\node[right=0.5cm of otsu,font=\tiny,text width=3cm]
+			{Máscara binaria automática};
+		\node[right=0.5cm of morph,font=\tiny,text width=3cm]
+			{Ruido eliminado};
+		\node[right=0.5cm of label,font=\tiny,text width=3cm,aerored]
+			{Descriptores de forma};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Etapa 2: CLAHE -- Ecualización Adaptativa}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Problema:} iluminación desigual en SEM
+
+			\vspace{0.3em}
+			\textbf{Solución CLAHE:}
+			\begin{equation*}
+				I_\mathrm{CLAHE}(x,y)
+				= T_\mathrm{tile}[I(x,y)]
+			\end{equation*}
+
+			\begin{itemize}\small
+				\item Divide imagen en \emph{tiles}
+				\item Ecualiza cada tile localmente
+				\item \texttt{clip\_limit}: limita la amplificación
+				      del contraste (evita ruido)
+				\item Interpolación bilineal entre tiles
+			\end{itemize}
+
+			\vspace{0.3em}
+			\begin{block}{Parámetro}
+				\texttt{clip\_limit = 0,03} (normalizado)
+			\end{block}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\includegraphics[width=\textwidth]{fatigue3_01_clahe.png}
+			\centering
+			\scriptsize Resultado CLAHE sobre \texttt{fatigue3.png}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Etapa 3a: Operador de Sobel}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Kernels de gradiente:}
+			\begin{equation*}
+				G_x = \begin{bmatrix}
+					-1 & 0 & +1 \\ -2 & 0 & +2 \\ -1 & 0 & +1
+				\end{bmatrix} \ast I
+			\end{equation*}
+			\begin{equation*}
+				G_y = \begin{bmatrix}
+					+1 & +2 & +1 \\ 0 & 0 & 0 \\ -1 & -2 & -1
+				\end{bmatrix} \ast I
+			\end{equation*}
+
+			\textbf{Magnitud del gradiente:}
+			\begin{equation*}
+				\boxed{|\nabla I| = \sqrt{G_x^2 + G_y^2}}
+			\end{equation*}
+
+			$\to$ Valores altos = bordes
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\includegraphics[width=\textwidth]{fatigue3_02_sobel.png}
+			\centering
+			\scriptsize Filtro Sobel sobre \texttt{fatigue3.png}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Etapa 3b: Detector de Bordes de Canny}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{4 pasos del algoritmo:}
+			\begin{enumerate}\small
+				\item \textbf{Suavizado Gaussiano} ($\sigma = 2{,}0$)
+				      \begin{equation*}
+				      	G_\sigma = \frac{1}{2\pi\sigma^2}
+				      	e^{-\frac{x^2+y^2}{2\sigma^2}}
+				      \end{equation*}
+				\item \textbf{Gradiente} $|\nabla I|$ y orientación
+				      $\theta$
+				\item \textbf{Supresión no máxima}:\\
+				      solo máximos locales en dirección de $\theta$
+				\item \textbf{Histéresis}:\\
+				      $T_\mathrm{high}$ confirma, $T_\mathrm{low}$
+				      extiende
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\includegraphics[width=0.92\textwidth]{fatigue3_03_canny.png}
+			\centering
+			\scriptsize Bordes Canny ($\sigma=2$) sobre
+			\texttt{fatigue3.png}
+
+			\vspace{0.2em}
+			\begin{exampleblock}{Ventaja}
+				\scriptsize Bordes de 1~px, óptimos para
+				medir contornos de estrías
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Etapa 4: Umbralización de Otsu}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Minimiza varianza intra-clase}\\
+			(equivalente a maximizar inter-clase):
+
+			\begin{equation*}
+				\sigma_B^2(t) = \omega_0\,\omega_1\,
+				(\mu_0 - \mu_1)^2
+			\end{equation*}
+
+			\begin{equation*}
+				\boxed{t^* = \arg\max_{t}\;\sigma_B^2(t)}
+			\end{equation*}
+
+			\begin{itemize}\small
+				\item $\omega_0$, $\omega_1$: probabilidades de clase
+				\item $\mu_0$, $\mu_1$: medias de clase
+				\item Resultado: máscara binaria automática
+				\item No requiere parámetros del usuario
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\includegraphics[width=0.92\textwidth]{fatigue3_04_otsu.png}
+			\centering
+			\scriptsize Umbralización Otsu sobre
+			\texttt{fatigue3.png}
+
+			\vspace{0.2em}
+			\begin{alertblock}{Limitación}
+				\scriptsize Requiere histograma bimodal.
+				Se aplica tras CLAHE.
+			\end{alertblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Etapa 5: Morfología -- Opening}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Erosión + Dilatación:}
+			\begin{equation*}
+				\boxed{I \circ SE = (I \ominus SE) \oplus SE}
+			\end{equation*}
+
+			\vspace{-0.3em}
+			\begin{itemize}\small
+				\item \textbf{Erosión:}
+				      $(I \ominus SE) = \min_{SE}\,I$
+				\item \textbf{Dilatación:}
+				      $(I \oplus SE) = \max_{SE}\,I$
+				\item Opening elimina objetos $<$ SE
+				      (disco radio~2, $\pi(2)^2 \approx 12{,}6$~px$^2$)
+			\end{itemize}
+
+			\vspace{0.2em}
+			\begin{block}{Propiedad}
+				$I \circ SE \subseteq I$ (nunca agrega píxeles)
+			\end{block}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\includegraphics[width=0.92\textwidth]{fatigue3_05_opening.png}
+			\centering
+			\scriptsize Opening (disk=2) sobre
+			\texttt{fatigue3.png}
+
+			\vspace{0.2em}
+			\begin{exampleblock}{Resultado}
+				\scriptsize Ruido eliminado, regiones
+				preservadas. Listo para etiquetado.
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Etapa 6: Etiquetado -- Descriptores de Región}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Componentes conexos:} cada grupo de píxeles
+			``1'' conectados $\to$ etiqueta única
+			$\ell \in \{1, \ldots, N\}$
+
+			\vspace{0.5em}
+			\textbf{Descriptores por región:}
+			\centering\small
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Descriptor} & \textbf{Significado}          \\
+				\midrule
+				Área ($A_r$)        & Tamaño (px$^2$)               \\
+				Perímetro ($P_r$)   & Longitud borde (px)           \\
+				Excentricidad ($e$) & Alargamiento ($0$--$1$)       \\
+				Eje mayor           & Dimensión máxima (px)         \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{block}{Uso}
+				Clasificar regiones como estrías (alta $e$)
+				vs.\ hoyuelos (baja $e$)
+			\end{block}
+
+			\vspace{0.3em}
+			\begin{tikzpicture}[scale=0.55]
+				\draw[thick] (0,0) rectangle (4,3);
+				% Labelled regions
+				\fill[aerogreen!40] (0.3,0.5) ellipse (0.5 and 0.3);
+				\node[font=\tiny\bfseries,white] at (0.3,0.5) {1};
+				\fill[aeroblue!40] (1.5,1.8) ellipse (0.8 and 0.2);
+				\node[font=\tiny\bfseries,white] at (1.5,1.8) {2};
+				\fill[aerored!40] (3.0,2.2) ellipse (0.4 and 0.5);
+				\node[font=\tiny\bfseries,white] at (3.0,2.2) {3};
+				\fill[aeroyellow!60] (2.5,0.6) ellipse (0.6 and 0.25);
+				\node[font=\tiny\bfseries] at (2.5,0.6) {4};
+				\node[below,font=\scriptsize] at (2,-0.2)
+					{Ejemplo: 4 regiones etiquetadas};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Etapa 6: Resultados del Etiquetado}
+	\centering
+	\textbf{Regiones detectadas por imagen:}
+
+	\vspace{0.5em}
+	\begin{tabular}{l r l}
+		\toprule
+		\textbf{Imagen}     & $\boldsymbol{N}$ & \textbf{Observación}        \\
+		\midrule
+		fatigue3            & 418               & Densidad media              \\
+		fatigue4            & 153               & Buen contraste              \\
+		\rowcolor{aeroyellow!20}
+		fatigue5            & 2066              & Alta resolución             \\
+		\rowcolor{aerored!15}
+		fatigue6            & 2897              & Máxima complejidad          \\
+		fatigue7            & 549               & Textura fina                \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.6em}
+	\begin{columns}
+		\begin{column}{0.48\textwidth}
+			\begin{alertblock}{Observación}
+				$N$ depende fuertemente de la
+				resolución/magnificación de la imagen.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.48\textwidth}
+			\begin{exampleblock}{Consistencia}
+				El pipeline es determinista: mismos
+				parámetros $\to$ mismos $N$.
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Resultados: \texttt{fatigue3.png}}
+% =============================================================================
+
+\begin{frame}{Resultado Completo: \texttt{fatigue3.png}}
+	\centering
+	\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{fatigue3_00_resumen.png}
+
+	\vspace{0.1cm}
+	\scriptsize Figura compuesta: Histograma $\to$ CLAHE $\to$ Sobel $\to$
+	Canny $\to$ Otsu $\to$ Opening. \textbf{418 regiones} detectadas.
+\end{frame}
+
+\begin{frame}{Interpretación del Pipeline -- \texttt{fatigue3.png}}
+	\begin{columns}
+		\begin{column}{0.48\textwidth}
+			\begin{enumerate}\scriptsize
+				\item \textbf{Histograma:} concentrado en tonos
+				      medio-bajos $\to$ bajo contraste
+				\item \textbf{CLAHE:} mejora detalles finos
+				      (estrías, bordes) sin saturar
+				\item \textbf{Sobel:} revela textura;
+				      alto gradiente = transiciones
+				\item \textbf{Canny:} contornos nítidos (1~px)
+				\item \textbf{Otsu:} segmentación automática
+				      (claras vs.\ oscuras)
+				\item \textbf{Opening:} limpieza $\to$
+				      \textbf{418 regiones}
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Diagnóstico preliminar}
+				\scriptsize
+				\begin{itemize}
+					\item Estrías de fatiga visibles (líneas
+					      paralelas)
+					\item Dirección de propagación identificable
+					\item Zona de fractura final (rasgos irregulares)
+				\end{itemize}
+			\end{block}
+
+			\vspace{0.2em}
+			\begin{exampleblock}{Mediciones necesarias}
+				\scriptsize
+				\begin{itemize}
+					\item Espaciado de estrías $\to$ $da/dN$
+					\item Tamaño de regiones $\to$ distribución
+					\item Excentricidad $\to$ clasificación
+				\end{itemize}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Calibración y Medición}
+% =============================================================================
+
+\begin{frame}{Calibración de Escala}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Procedimiento:}
+			\begin{enumerate}\small
+				\item Clic en extremos $P_1$, $P_2$ de la barra
+				\item Calcular distancia en píxeles:
+				      \begin{equation*}
+				      	d_\mathrm{px}
+				      	= \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}
+				      \end{equation*}
+				\item Ingresar distancia real
+				      $d_\mathrm{real}$ (\si{\micro\m})
+				\item Calcular escala:
+				      \begin{equation*}
+				      	\boxed{s = \frac{d_\mathrm{px}}{d_\mathrm{real}}
+				      	\;\left[\frac{\mathrm{px}}{\si{\micro\m}}\right]}
+				      \end{equation*}
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\textbf{Error de calibración:}
+			\begin{equation*}
+				\varepsilon_s = \frac{2n}{d_\mathrm{px}} \times 100\%
+			\end{equation*}
+
+			\begin{exampleblock}{Ejemplo}
+				\scriptsize
+				Si la barra mide 200~px y cometemos
+				$\pm$5~px de error:
+				\[
+					\varepsilon_s = \frac{2 \times 5}{200}
+					\times 100\% = 5\%
+				\]
+				$\to$ todas las mediciones heredan este 5\%
+			\end{exampleblock}
+
+			\vspace{0.3em}
+			\begin{tikzpicture}[scale=0.6]
+				\draw[thick] (0,0) -- (4,0);
+				\fill[aerored] (0,0) circle (0.08);
+				\fill[aerored] (4,0) circle (0.08);
+				\node[above,font=\tiny] at (0,0.1) {$P_1$};
+				\node[above,font=\tiny] at (4,0.1) {$P_2$};
+				\draw[<->,aerogreen,thick] (0,-0.3) -- (4,-0.3);
+				\node[below,font=\scriptsize,aerogreen] at (2,-0.3)
+				{$d_\mathrm{px}$};
+				\node[below,font=\tiny] at (2,-0.7)
+				{Barra de escala SEM};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Herramienta de Medición Interactiva}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{Notebook:} \texttt{CalculadoraDistancia}
+
+			\vspace{0.3em}
+			\begin{enumerate}\small
+				\item Paso~A: Seleccionar imagen (dropdown)
+				\item Paso~B: Calibrar escala
+				      \begin{itemize}\scriptsize
+					      \item Clic en extremos de la barra
+					      \item Ingresar distancia real (\si{\micro\m})
+					      \item Fijar escala
+				      \end{itemize}
+				\item Paso~C: Medir distancias
+				      \begin{itemize}\scriptsize
+					      \item Clic en dos puntos
+					      \item Resultado en \si{\micro\m}
+					      \item Repetir para 15+ mediciones
+				      \end{itemize}
+			\end{enumerate}
+
+			\vspace{0.3em}
+			\begin{block}{Salida}
+				Cada medición reporta:\\
+				$d_\mathrm{px}$ y $d_\mathrm{real}$ (\si{\micro\m})
+			\end{block}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{tikzpicture}[scale=0.7,>=Stealth,
+				box/.style={rectangle,draw=aerogreen,thick,
+					fill=aerogreen!8,text width=3.2cm,align=center,
+					minimum height=0.6cm,font=\tiny,
+					rounded corners=2pt}]
+				\node[box] (sel) {Dropdown: seleccionar imagen};
+				\node[box,below=0.5cm of sel]
+					(cal) {Botón: Calibrar\\(2 clics + dist.)};
+				\node[box,below=0.5cm of cal]
+					(fix) {Botón: Fijar Escala};
+				\node[box,below=0.5cm of fix]
+					(meas) {Botón: Medir Distancia\\(2 clics)};
+				\node[box,below=0.5cm of meas,draw=aerored,fill=aerored!8]
+					(out) {Resultado: $d$ (\si{\micro\m})};
+				\foreach \a/\b in {sel/cal,cal/fix,fix/meas,meas/out}
+					\draw[->,aerogreen,thick] (\a) -- (\b);
+				% Loop
+				\draw[aerored,thick,->] (out.east) -- ++(0.8,0)
+					|- (meas.east)
+					node[pos=0.25,right,font=\tiny,aerored] {repetir};
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Evaluación de Riesgos}
+% =============================================================================
+
+\begin{frame}{Riesgos de la Práctica}
+	\centering\small
+	\begin{tabular}{>{\raggedright\arraybackslash}p{3.2cm}
+		c c c c l}
+		\toprule
+		\textbf{Riesgo} & \textbf{P}                             & \textbf{S}
+		                & $\boldsymbol{R}$                       & \textbf{Nivel}
+		                & \textbf{Controles}                                           \\
+		\midrule
+		\rowcolor{aeroyellow!15}
+		Alta tensión SEM
+		                & 2                                      & 4              & 8
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Interlock, formación                                         \\
+		\rowcolor{aeroyellow!15}
+		Preparación metalo.
+		                & 2                                      & 3              & 6
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Gafas, guantes, SOPs                                         \\
+		\rowcolor{aeroyellow!15}
+		Reactivos químicos
+		                & 2                                      & 3              & 6
+		                & \textcolor{aeroyellow}{\textbf{Medio}}
+		                & Campana, MSDS                                                \\
+		\rowcolor{aerogreen!15}
+		Ergonomía digital
+		                & 1                                      & 1              & 1
+		                & \textcolor{aerogreen}{\textbf{Bajo}}
+		                & Pausas, postura                                              \\
+		\bottomrule
+	\end{tabular}
+
+	\vspace{0.4em}
+	\begin{block}{$R = \text{Probabilidad} \times \text{Severidad}$}
+		Bajo ($<5$) \quad | \quad Medio (5--12)
+		\quad | \quad Alto ($>12$)
+	\end{block}
+\end{frame}
+
+\begin{frame}{Matriz de Riesgos $5\times5$}
+	\centering
+	\begin{tikzpicture}[scale=0.65]
+		\foreach \x in {0,...,4} {
+			\foreach \y in {0,...,4} {
+				\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+				\pgfmathparse{\risk < 5 ? "aerogreen!40" :
+					(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+				\edef\fillcol{\pgfmathresult}
+				\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+				\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+				\node[font=\tiny] at (\x+0.5,\y+0.5)
+				{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+			}
+		}
+		\foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+			\node[font=\tiny,rotate=45,anchor=west]
+			at (\x+0.5,-0.1) {\l};
+		}
+		\foreach \y/\l in {0/Insignif.,1/Menor,2/Moder.,3/Mayor,
+			4/Catastrófico} {
+			\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+		}
+		\node[font=\tiny\bfseries,rotate=90] at (-1.3,2.5)
+		{Severidad};
+		\node[font=\tiny\bfseries] at (2.5,-1) {Probabilidad};
+		% Markers
+		\fill[aerored,opacity=0.8] (1.5,3.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (1.5,3.5) {SEM};
+		\fill[blue!70,opacity=0.8] (1.5,2.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (1.5,2.5) {Prep.};
+		\fill[orange,opacity=0.8] (1.5,2.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (1.5,2.5) {Reac.};
+		\fill[aerogreen!70,opacity=0.8] (0.5,0.5) circle (0.2);
+		\node[white,font=\tiny\bfseries] at (0.5,0.5) {PC};
+	\end{tikzpicture}
+
+	\vspace{0.3cm}
+	\begin{tikzpicture}[scale=0.7,every node/.style={font=\small}]
+		\fill[aerogreendark] (0,0) -- (5,0) -- (4.2,0.8) -- (0.8,0.8) -- cycle;
+		\fill[aerogreen] (0.8,0.8) -- (4.2,0.8) -- (3.4,1.6) -- (1.6,1.6) -- cycle;
+		\fill[aeroyellow!80] (1.6,1.6) -- (3.4,1.6) -- (2.8,2.4) -- (2.2,2.4) -- cycle;
+		\fill[aerored!60] (2.2,2.4) -- (2.8,2.4) -- (2.5,3.0) -- cycle;
+		\node[white,font=\tiny\bfseries] at (2.5,0.4) {Eliminación / Sustitución};
+		\node[white,font=\tiny\bfseries] at (2.5,1.2) {Ingeniería};
+		\node[font=\tiny\bfseries] at (2.5,2.0) {Admin.};
+		\node[white,font=\tiny\bfseries] at (2.5,2.6) {EPP};
+		\draw[->,gray,very thick] (5.3,2.8) -- (5.3,-0.1);
+		\node[gray,font=\tiny,rotate=90] at (5.6,1.3) {Más efectivo};
+	\end{tikzpicture}
+\end{frame}
+
+% =============================================================================
+\section{Casos de Estudio por Equipos}
+% =============================================================================
+
+\begin{frame}{Trabajo por Equipos: 4 Escenarios}
+	\begin{block}{Instrucciones}
+		Cada equipo recibe una imagen (o par de imágenes) diferente. Deben:
+		\begin{enumerate}
+			\item Ejecutar el pipeline completo sobre la(s) imagen(es) asignada(s)
+			\item Calibrar la escala con la barra del SEM (notebook)
+			\item Medir al menos 15 características dimensionales
+			\item Diagnosticar el modo de fractura predominante
+			\item Evaluar el riesgo: $P$ (1--5), $S$ (1--5),
+			      $R = P \times S$, ubicar en la matriz
+			\item Resolver 3 problemas adicionales
+		\end{enumerate}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Equipo~1: Análisis Dimensional de Estrías}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}     & \textbf{Valor}        \\
+				\midrule
+				Imagen            & \texttt{fatigue3.png} \\
+				$N_\mathrm{reg}$  & 418                   \\
+				Mediciones        & $\geq$15 estrías      \\
+				Paris: $C$        & $6{,}9\!\times\!10^{-12}$ \\
+				Paris: $m$        & 3                     \\
+				$\Delta K_\mathrm{th}$ & $\SI{5}{\MPa\sqrt{\m}}$ \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Operación SEM (EHT),\\
+				preparación metalográfica.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P1.1] Error 5px en barra\\
+					      200px $\to \varepsilon$?
+					\item[P1.2] CLAHE clip 0,01\\
+					      vs.\ 0,05
+					\item[P1.3] Criterio $e$ para\\
+					      estrías vs.\ hoyuelos
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~2: Comparación de Modos de Fractura}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}      & \textbf{Valor}                             \\
+				\midrule
+				Imágenes           & \texttt{fatigue4.png}                      \\
+				                   & \texttt{fatigue7.png}                      \\
+				$N_\mathrm{reg}$   & 153 / 549                                  \\
+				Mediciones         & $\geq$15 por imagen                        \\
+				Diagnóstico        & dúctil / frágil / mixto                    \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Dos zonas del mismo\\
+				componente.\\
+				Comparar descriptores\\
+				de forma.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P2.1] Hoyuelos equiax.\\
+					      vs.\ alargados
+					\item[P2.2] Canny $\sigma$=1\\
+					      vs.\ $\sigma$=3
+					\item[P2.3] Detectar fractura\\
+					      intergranular
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~3: Efecto de Resolución / Magnificación}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}      & \textbf{Valor}                             \\
+				\midrule
+				Imágenes           & \texttt{fatigue5.png}                      \\
+				                   & \texttt{fatigue4.png}                      \\
+				$N_\mathrm{reg}$   & 2066 / 153                                 \\
+				Tamaño             & \SI{2.3}{\mega\byte}\ / \SI{68}{\kilo\byte} \\
+				Objetivo           & Cuantificar efecto                         \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Alta vs.\ baja resolución.\\
+				¿Son comparables las\\
+				mediciones absolutas?\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P3.1] Menor caract.\\
+					      medible (3px mín.)
+					\item[P3.2] Resize 25\% y\\
+					      reprocesar
+					\item[P3.3] Protocolo para\\
+					      estadísticas repr.
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Equipo~4: Optimización de Parámetros}
+	\begin{columns}
+		\begin{column}{0.38\textwidth}
+			\centering\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Par.}            & \textbf{Valor}           \\
+				\midrule
+				Imagen                   & \texttt{fatigue6.png}    \\
+				$N_\mathrm{reg}$ (base)  & 2897                     \\
+				clip\_limit              & $\{0{,}01; 0{,}03; 0{,}05; 0{,}10\}$ \\
+				$\sigma_\mathrm{Canny}$  & $\{1; 2; 3; 5\}$        \\
+				disk                     & $\{1; 2; 3; 5\}$        \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.28\textwidth}
+			\begin{alertblock}{\scriptsize Riesgo}
+				\scriptsize
+				Imagen más compleja.\\
+				Optimizar pipeline\\
+				para maximizar calidad\\
+				de segmentación.\\
+				Evaluar $P$, $S$, $R$.
+			\end{alertblock}
+		\end{column}
+		\begin{column}{0.3\textwidth}
+			\begin{exampleblock}{\scriptsize Problemas}
+				\scriptsize
+				\begin{enumerate}
+					\item[P4.1] disk que elimine\\
+					      todas las regiones
+					\item[P4.2] Opening + Closing\\
+					      ¿efecto?
+					\item[P4.3] Otsu vs.\ umbral\\
+					      fijo $t=128$
+				\end{enumerate}
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+% =============================================================================
+\section{Herramientas de Software}
+% =============================================================================
+
+\begin{frame}[fragile]{Script \texttt{P05\_Analisis\_Imagen.py}}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{block}{Ruta}
+				\scriptsize
+				\texttt{Practicas/P05\_Analisis\_Imagen/}\\
+				\texttt{\ \ src/P05\_Analisis\_Imagen.py}
+			\end{block}
+			\vspace{0.2em}
+			\scriptsize
+			\begin{tabular}{ll}
+				\toprule
+				\textbf{Función}
+				& \textbf{Resultado}                            \\
+				\midrule
+				\texttt{cargar\_imagen\_gris}
+				& float $[0,1]$                                 \\
+				\texttt{procesar\_clahe}
+				& Imagen CLAHE                                  \\
+				\texttt{procesar\_sobel}
+				& Mapa gradientes                               \\
+				\texttt{procesar\_canny}
+				& Bordes binarios                               \\
+				\texttt{procesar\_otsu}
+				& Máscara binaria                               \\
+				\texttt{procesar\_morfologia}
+				& Máscara limpia                                \\
+				\texttt{procesar\_etiquetado}
+				& $N$ regiones + descriptores                   \\
+				\texttt{run\_full\_analysis}
+				& Pipeline + 6 PNG                              \\
+				\bottomrule
+			\end{tabular}
+		\end{column}
+		\begin{column}{0.47\textwidth}
+			\begin{lstlisting}[language=Python]
+# Ejecucion desde la raiz:
+python Practicas\P05_Analisis_Imagen\
+       src\P05_Analisis_Imagen.py
+
+# Salida: 30 archivos PNG
+# (6 por imagen x 5 imagenes)
+# en data/images/
+
+# Patron de nombres:
+#   fatigue3_00_resumen.png
+#   fatigue3_01_clahe.png
+#   fatigue3_02_sobel.png
+#   fatigue3_03_canny.png
+#   fatigue3_04_otsu.png
+#   fatigue3_05_opening.png
+			\end{lstlisting}
+
+			\vspace{0.2em}
+			\begin{exampleblock}{Notebook}
+				\scriptsize
+				Misma lógica + calibración interactiva\\
+				+ medición con clics en la imagen
+			\end{exampleblock}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo de Uso del Pipeline}
+	\begin{lstlisting}[language=Python]
+# Importar funciones del pipeline
+from P05_Analisis_Imagen import *
+
+# 1. Cargar imagen en escala de gris
+img = cargar_imagen_gris('files/p5/fatigue3.png')
+
+# 2. Mejorar contraste
+img_clahe = procesar_clahe(img, clip_limit=0.03)
+img_u8 = img_as_ubyte(img_clahe)
+
+# 3. Detectar bordes
+img_sobel = procesar_sobel(img_u8)
+img_canny = procesar_canny(img_u8, sigma=2.0)
+
+# 4. Segmentar
+img_otsu = procesar_otsu(img_u8)
+
+# 5. Limpiar morfologicamente
+img_clean = procesar_morfologia(img_otsu, 'opening', 2)
+
+# 6. Etiquetar y contar regiones
+label_img, props = procesar_etiquetado(img_clean)
+# >> Numero de objetos encontrados: 418
+	\end{lstlisting}
+\end{frame}
+
+% =============================================================================
+\section{Cuestionario y Formato}
+% =============================================================================
+
+\begin{frame}{Preguntas de Discusión}
+	\begin{enumerate}\small
+		\item ¿Por qué la calibración de escala es el paso más crítico
+		      para mediciones cuantitativas?
+		\item Diferencia entre Sobel y Canny.\ ¿Cuándo usar cada uno?
+		\item Escriba $\sigma_B^2(t)$ de Otsu y explique por qué
+		      maximizarla es equivalente a minimizar la varianza
+		      intra-clase.
+		\item ¿Por qué el SEM requiere muestra conductora?
+		      ¿Qué artefactos aparecen si no lo es?
+		\item Demuestre que $I \circ SE \subseteq I$
+		      (opening nunca agrega píxeles).
+		\item ¿Qué infiere de hoyuelos pequeños y equiaxiales vs.\
+		      grandes y alargados?
+		\item ¿Por qué es importante analizar a múltiples
+		      magnificaciones?
+		\item Efecto del EHT en el contraste: ¿alto o bajo EHT para
+		      fractografía superficial?
+		\item Si no hay estrías claras pero se sospecha fatiga,
+		      ¿qué buscar?
+		\item Proponga un método cuantitativo para clasificar
+		      ``dúctil'' vs.\ ``frágil'' con descriptores de región.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Formato del Informe (AIAA)}
+	\begin{enumerate}
+		\item \textbf{Resumen:} objetivo, pipeline, resultados
+		\item \textbf{Introducción:} importancia fractografía SEM
+		\item \textbf{Fundamento Teórico:} SEM, fractura, algoritmos
+		\item \textbf{Metodología:} pipeline, parámetros, calibración
+		\item \textbf{Resultados:} 6 etapas del pipeline + tabla de
+		      regiones + mediciones + evaluación de riesgo
+		\item \textbf{Discusión:} diagnóstico + cuestionario + efecto
+		      de parámetros
+		\item \textbf{Conclusiones:} 4--6 puntos
+		\item \textbf{Referencias} (IEEE)
+		\item \textbf{Apéndice~A:} imágenes del script/notebook
+	\end{enumerate}
+\end{frame}
+
+% =============================================================================
+\section{Conclusiones}
+% =============================================================================
+
+\begin{frame}{Conclusiones}
+	\begin{enumerate}\small
+		\item El pipeline de 6 etapas permite extraer información
+		      \textbf{cuantitativa} de micrografías SEM
+		\item CLAHE es esencial para iluminación desigual
+		      (controlado por \texttt{clip\_limit})
+		\item Otsu: umbral \textbf{óptimo y automático},
+		      sin subjetividad
+		\item Operaciones morfológicas: indispensables para
+		      eliminar ruido residual
+		\item Regiones detectadas (153--2897) dependen de la
+		      resolución $\to$ reportar condiciones de adquisición
+		\item Calibración de escala: paso más crítico
+		      (5~px error $\to$ $\sim\!5\%$ error en mediciones)
+		\item Script automatizado: 5 imágenes $\to$ 30 archivos,
+		      reproducible y trazable
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Resumen Visual: Pipeline Completo}
+	\centering
+	\includegraphics[width=\textwidth,height=0.62\textheight,keepaspectratio]{fatigue3_00_resumen.png}
+
+	\vspace{0.2cm}
+	\begin{tikzpicture}
+		\node[draw=aerogreen,very thick,rounded corners,fill=aerogreen!10,
+			text width=10cm,align=center,font=\small\bfseries] {
+			De la micrografía SEM al diagnóstico cuantitativo:\\
+			6 etapas automatizadas + calibración + medición
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{}
+	\centering
+	\vspace{2cm}
+	{\Huge\color{aerogreen}\bfseries ¿Preguntas?}\\[1cm]
+	{\large P05 -- Análisis de Imagen Digital y Fractografía SEM}\\[0.5cm]
+	{\small Técnicas de Medida -- Ingeniería Aeronáutica}
+\end{frame}
+
+\end{document}

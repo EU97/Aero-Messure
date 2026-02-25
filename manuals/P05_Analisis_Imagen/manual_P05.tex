@@ -1,0 +1,1633 @@
+% =============================================================================
+% Manual P05 – Análisis de Imagen Digital y Fractografía SEM
+% Técnicas de Medida – Ingeniería Aeronáutica
+% Compilar con: latexmk -xelatex -interaction=nonstopmode manual_P05.tex
+% =============================================================================
+\documentclass[12pt,a4paper]{article}
+
+% ---- Encoding & Language ----
+\usepackage{fontspec}
+\usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+% ---- Page Layout ----
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\setlength{\headheight}{14.5pt}
+
+% ---- Math & Physics ----
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}, group-separator={.}}
+
+% ---- Graphics & Color ----
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% ---- TikZ ----
+\usepackage{tikz}
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,decorations.pathmorphing,
+                decorations.markings,patterns,fit,backgrounds}
+
+% ---- Tables ----
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{longtable}
+
+% ---- Code Listings ----
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray}
+}
+
+% ---- Hyperlinks ----
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,
+            urlcolor=blue!50!black]{hyperref}
+
+% ---- Bibliography ----
+\usepackage{csquotes}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references_P05.bib}
+
+% ---- Headers & Footers ----
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Técnicas de Medida -- Ingeniería Aeronáutica}
+\fancyhead[R]{\small P05: Análisis de Imagen}
+\fancyfoot[C]{\thepage}
+
+% ---- Custom Colors ----
+\definecolor{aeroblue}{RGB}{0,51,102}
+\definecolor{aerored}{RGB}{153,0,0}
+\definecolor{aerogreen}{RGB}{0,102,51}
+\definecolor{aeroyellow}{RGB}{255,204,0}
+
+% =============================================================================
+\begin{document}
+
+\begin{titlepage}
+	\centering
+	\vspace*{1cm}
+	{\color{aeroblue}\rule{\linewidth}{2pt}}\\[0.4cm]
+	{\Large\bfseries\color{aeroblue} TÉCNICAS DE MEDIDA}\\[0.3cm]
+	{\color{aeroblue}\rule{\linewidth}{1pt}}\\[1.5cm]
+	{\huge\bfseries P05 -- Análisis de Imagen Digital\\[0.3cm]
+	y Fractografía SEM}\\[1cm]
+	{\large Manual de Laboratorio}\\[0.5cm]
+	{\large\itshape Ingeniería Aeronáutica}\\[2cm]
+	% SEM + image processing schematic
+	\begin{tikzpicture}[scale=0.85,>=Stealth]
+		% SEM column
+		\draw[fill=gray!20,draw=aeroblue,thick] (-0.6,3.0) rectangle (0.6,4.2);
+		\node[aeroblue,font=\tiny\bfseries] at (0,3.6) {Cañón $e^-$};
+		% Lens
+		\draw[aeroblue,thick] (-1.0,2.4) arc (180:360:1.0 and 0.15);
+		\draw[aeroblue,thick] (-1.0,2.4) arc (180:0:1.0 and 0.15);
+		% Beam
+		\draw[blue!50,line width=1.5pt] (0,3.0) -- (0,0.3);
+		% Sample
+		\draw[fill=orange!20,draw=black,thick] (-1.2,0) -- (1.2,0) -- (0.9,-0.4) -- (-0.9,-0.4) -- cycle;
+		\node[font=\tiny] at (0,-0.7) {Espécimen de fractura};
+		% Detector
+		\draw[fill=aerogreen!20,draw=aerogreen,thick] (1.8,1.0) circle (0.35);
+		\node[aerogreen,font=\tiny] at (1.8,0.5) {Detector};
+		\draw[->,dashed,gray] (0.2,0.2) -- (1.5,0.8);
+		% Arrow to processing
+		\draw[aeroblue,ultra thick,->] (2.5,1.0) -- (4.0,1.0);
+		\node[above,font=\tiny,aeroblue] at (3.25,1.1) {Imagen digital};
+		% Processing pipeline boxes
+		\draw[fill=aeroblue!10,draw=aeroblue,thick,rounded corners=3pt]
+		      (4.0,0.2) rectangle (5.6,1.8);
+		\node[aeroblue,font=\tiny\bfseries,align=center] at (4.8,1.0) {CLAHE\\Sobel\\Canny};
+		\draw[aeroblue,thick,->] (5.6,1.0) -- (6.2,1.0);
+		\draw[fill=aerored!10,draw=aerored,thick,rounded corners=3pt]
+		      (6.2,0.2) rectangle (7.8,1.8);
+		\node[aerored,font=\tiny\bfseries,align=center] at (7.0,1.0) {Otsu\\Morfología\\Etiquetado};
+		% Output
+		\draw[aerored,thick,->] (7.8,1.0) -- (8.5,1.0);
+		\node[right,font=\tiny] at (8.5,1.0) {Regiones};
+	\end{tikzpicture}\\[2cm]
+	{\large Laboratorio de Técnicas de Medida}
+	\vfill
+	{\color{aeroblue}\rule{\linewidth}{2pt}}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% =============================================================================
+\section{Introducción}
+\label{sec:intro}
+
+El análisis de superficies de fractura, o \textbf{fractografía}, mediante
+Microscopía Electrónica de Barrido (SEM) es una herramienta indispensable
+en la ingeniería aeronáutica para comprender los mecanismos de falla de los
+materiales, evaluar la integridad estructural de componentes y guiar el
+diseño de aleaciones más resistentes~\cite{asm_fractography,hull1999}.
+
+Las micrografías SEM proporcionan imágenes de alta resolución y gran
+profundidad de campo, revelando detalles topográficos que permiten
+identificar el origen de la falla, el modo de propagación de la grieta y
+las características microestructurales involucradas.  No obstante, la
+información contenida en una micrografía es, en primera instancia,
+\emph{cualitativa}.  Para extraer datos cuantitativos --- dimensiones de
+hoyuelos, densidad de estrías, distribución de tamaño de grano --- es
+necesario aplicar técnicas de \textbf{procesamiento digital de
+imágenes}~\cite{gonzalez2018,russ2016}.
+
+En esta práctica se combinan ambos enfoques: el estudiante procesará
+micrografías SEM de superficies de fractura por fatiga utilizando un
+\emph{pipeline} de análisis de imagen compuesto por ecualización adaptativa
+(CLAHE), detección de bordes (Sobel, Canny), umbralización (Otsu),
+operaciones morfológicas y etiquetado de regiones.  Adicionalmente, se
+realizarán mediciones dimensionales interactivas utilizando las barras de
+escala presentes en las imágenes.  El conjunto de técnicas permite simular
+el proceso que un ingeniero de materiales realizaría para diagnosticar la
+causa raíz de la falla de un componente aeronáutico.
+
+% =============================================================================
+\section{Objetivos de Aprendizaje}
+\label{sec:objetivos}
+
+Al finalizar esta práctica el estudiante será capaz de:
+
+\begin{enumerate}
+	\item Comprender la importancia de la microscopía electrónica de barrido
+	      (SEM) para el análisis fractográfico en ingeniería aeronáutica.
+	\item Interpretar metadatos de adquisición SEM: voltaje ($\mathrm{EHT}$),
+	      distancia de trabajo ($\mathrm{WD}$), magnificación y detector.
+	\item Aplicar la ecualización adaptativa de histograma (CLAHE) para
+	      mejorar el contraste local en micrografías con iluminación desigual.
+	\item Calcular y utilizar los operadores de detección de bordes de Sobel
+	      y de Canny, comprendiendo sus fundamentos matemáticos.
+	\item Aplicar la umbralización global de Otsu y justificar su validez
+	      minimizando la varianza intra-clase.
+	\item Realizar operaciones morfológicas (apertura, cierre, erosión,
+	      dilatación) para refinar máscaras binarias.
+	\item Etiquetar regiones conectadas y extraer descriptores de forma
+	      (área, perímetro, excentricidad, eje mayor).
+	\item Calibrar la escala espacial (píxeles/\si{\micro\m}) y medir
+	      dimensiones de características microestructurales.
+	\item Diagnosticar modos de fractura (dúctil, frágil, fatiga) basándose
+	      en evidencia topográfica y datos cuantitativos.
+	\item Evaluar los riesgos asociados a la operación del SEM y al manejo
+	      de muestras.
+\end{enumerate}
+
+% =============================================================================
+\section{Fundamentos Teóricos}
+\label{sec:teoria}
+
+\subsection{Microscopía Electrónica de Barrido (SEM)}
+
+A diferencia de la microscopía óptica, el SEM utiliza un haz de electrones
+focalizado para barrer la superficie de la muestra.  La interacción del haz
+con los átomos de la superficie genera señales --- electrones secundarios
+(SE), electrones retrodispersados (BSE), rayos~X característicos --- que
+son detectadas y transformadas en una imagen
+digital~\cite{goldstein2018}.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=0.80,>=Stealth]
+		% Column
+		\draw[fill=gray!15,draw=black,thick] (-0.8,4.5) rectangle (0.8,5.5);
+		\node[font=\small] at (0,5.0) {Cañón $e^-$};
+		% Condenser lens
+		\draw[thick,aeroblue] (-1.2,3.8) arc (180:360:1.2 and 0.18);
+		\draw[thick,aeroblue] (-1.2,3.8) arc (180:0:1.2 and 0.18);
+		\node[right,font=\tiny,aeroblue] at (1.3,3.8) {Lente condensadora};
+		% Objective lens
+		\draw[thick,aeroblue] (-1.0,2.2) arc (180:360:1.0 and 0.15);
+		\draw[thick,aeroblue] (-1.0,2.2) arc (180:0:1.0 and 0.15);
+		\node[right,font=\tiny,aeroblue] at (1.1,2.2) {Lente objetivo};
+		% Scan coils
+		\draw[fill=aeroyellow!30,draw=black] (-0.5,3.0) rectangle (-0.2,3.4);
+		\draw[fill=aeroyellow!30,draw=black] ( 0.2,3.0) rectangle ( 0.5,3.4);
+		\node[font=\tiny] at (0,2.7) {Bobinas de barrido};
+		% Beam
+		\draw[blue!60,line width=1.5pt] (0,4.5) -- (0,0.3);
+		% Sample
+		\draw[fill=orange!15,draw=black,thick]
+			(-1.5,0) -- (1.5,0) -- (1.2,-0.5) -- (-1.2,-0.5) -- cycle;
+		\node[font=\small] at (0,-0.8) {Muestra};
+		% SE detector
+		\draw[fill=aerogreen!20,draw=aerogreen,thick] (2.5,1.2) ellipse (0.4 and 0.3);
+		\node[aerogreen,font=\tiny,below] at (2.5,0.85) {Detector SE};
+		\draw[->,dashed,aerogreen] (0.3,0.2) -- (2.1,1.0);
+		% BSE arrow
+		\draw[->,dashed,aerored] (0.1,0.2) -- (-2.0,1.5);
+		\node[aerored,font=\tiny] at (-2.5,1.5) {BSE};
+		% X-ray arrow
+		\draw[->,dashed,blue!50] (-0.1,0.2) -- (-2.2,0.5);
+		\node[blue!50,font=\tiny] at (-2.6,0.5) {Rayos~X};
+	\end{tikzpicture}
+	\caption{Esquema simplificado de un microscopio electrónico de barrido.
+		El haz de electrones barre la muestra; las señales SE, BSE y rayos~X
+		se detectan para formar la imagen.}
+	\label{fig:sem_esquema}
+\end{figure}
+
+Las ventajas del SEM para fractografía incluyen~\cite{goldstein2018}:
+
+\begin{itemize}
+	\item \textbf{Alta resolución:} hasta $\sim\!\SI{1}{\nano\m}$ con
+	      detectores de campo cercano (FE-SEM).
+	\item \textbf{Gran profundidad de campo:} produce imágenes con apariencia
+	      tridimensional, ideal para superficies de fractura irregulares.
+	\item \textbf{Análisis composicional:} combinado con EDS/EDX permite
+	      identificar elementos químicos en inclusiones o precipitados.
+	\item \textbf{Amplio rango de magnificación:} desde $\sim\!10\times$
+	      hasta $>300\,000\times$.
+\end{itemize}
+
+\subsubsection{Parámetros de adquisición}
+
+Cada micrografía SEM incluye metadatos de adquisición relevantes para la
+interpretación:
+
+\begin{table}[H]
+	\centering
+	\caption{Parámetros de adquisición SEM y su influencia en la imagen.}
+	\label{tab:parametros_sem}
+	\begin{tabularx}{\textwidth}{l l X}
+		\toprule
+		\textbf{Parámetro} & \textbf{Unidad}           & \textbf{Efecto}              \\
+		\midrule
+		EHT (voltaje)      & \si{\kilo\volt}           & Mayor EHT $\to$ mayor
+		penetración, mejor resolución, mayor daño por radiación.                      \\
+		WD (dist.\ trabajo) & \si{\mm}                  & Menor WD $\to$ mejor
+		resolución; mayor WD $\to$ mayor profundidad de campo.                        \\
+		Mag (magnificación)  & $\times$                  & Define el campo de visión
+		y la resolución espacial efectiva.                                             \\
+		Signal A (detector)  & SE / BSE                  & SE: topografía; BSE:
+		contraste composicional (número atómico).                                     \\
+		Escala (scale bar)   & \si{\micro\m}             & Relación entre $N$ píxeles
+		y la longitud real, fundamental para metrología.                               \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\subsection{Mecanismos de Fractura en Materiales Aeroespaciales}
+
+La fractografía permite clasificar el modo de falla de un componente
+estructural.  Los tres mecanismos principales son~\cite{asm_fractography,
+anderson2017,dowling2013}:
+
+\subsubsection{Fractura dúctil}
+
+Se produce con deformación plástica significativa.  A nivel microscópico se
+manifiesta por \textbf{hoyuelos} (\emph{dimples}): cavidades formadas por
+la nucleación, crecimiento y coalescencia de micro-vacíos en torno a
+inclusiones o precipitados.
+
+\begin{equation}
+	\text{Energía absorbida:}\quad G_{\mathrm{dúctil}} \gg G_{\mathrm{frágil}}
+	\label{eq:energia_fractura}
+\end{equation}
+
+La forma de los hoyuelos contiene información sobre el estado de
+tensiones~\cite{hull1999}:
+
+\begin{itemize}
+	\item \textbf{Equiaxiales}: tracción uniaxial pura.
+	\item \textbf{Alargados/parabólicos}: estado de cortante o tracción
+	      oblicua.
+	\item \textbf{Pequeños y densos}: alta ductilidad del material base.
+\end{itemize}
+
+\subsubsection{Fractura frágil}
+
+Ocurre con poca o ninguna deformación plástica.  Las superficies suelen
+ser relativamente planas~\cite{anderson2017}:
+
+\begin{itemize}
+	\item \textbf{Clivaje transgranular}: la grieta sigue planos
+	      cristalográficos de baja energía superficial, generando \emph{facetas
+	      planas} con \emph{marcas de río} que convergen hacia el origen.
+	\item \textbf{Fractura intergranular}: la grieta se propaga a lo largo de
+	      los límites de grano.  Indica fragilización por segregación de
+	      impurezas, hidrógeno, o tratamiento térmico inadecuado.
+\end{itemize}
+
+\subsubsection{Fractura por fatiga}
+
+Es la falla progresiva bajo cargas cíclicas, responsable de la
+mayoría de las fallas en servicio de componentes
+aeronáuticos~\cite{suresh1998,dowling2013}:
+
+\begin{equation}
+	\frac{da}{dN} = C\,(\Delta K)^m \qquad\text{(Ley de Paris)}
+	\label{eq:paris}
+\end{equation}
+
+donde $a$ es la longitud de grieta, $N$ el número de ciclos, $\Delta K$ el
+rango del factor de intensidad de tensiones, y $C$, $m$ constantes del
+material.  Las superficies de fractura por fatiga muestran:
+
+\begin{itemize}
+	\item \textbf{Estrías de fatiga}: marcas finas y paralelas; cada estría
+	      corresponde a un ciclo de carga.  El espaciado entre estrías
+	      ($\approx da/dN$) aumenta con $\Delta K$.
+	\item \textbf{Marcas de playa} (\emph{beach marks}): bandas
+	      macroscópicas concéntricas que registran cambios en la amplitud de
+	      carga o interrupciones del servicio.
+	\item \textbf{Origen de la grieta}: zona frecuentemente asociada a
+	      defectos superficiales, concentradores de tensión o inclusiones.
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=0.85,>=Stealth]
+		% Ductile fracture
+		\begin{scope}[shift={(0,0)}]
+			\draw[thick] (0,0) rectangle (3.2,2.5);
+			\node[above,font=\small\bfseries] at (1.6,2.5) {Fractura Dúctil};
+			% Dimples
+			\foreach \x/\y/\r in {0.5/1.2/0.25, 1.0/0.8/0.3, 1.5/1.5/0.2,
+				2.0/1.0/0.35, 2.5/1.8/0.2, 1.2/1.9/0.15, 2.2/0.5/0.25,
+				0.7/0.4/0.2, 1.8/1.3/0.18, 2.7/1.2/0.22} {
+				\draw[gray,fill=gray!20] (\x,\y) ellipse ({\r} and {\r*0.7});
+			}
+			\node[font=\tiny,aeroblue] at (1.6,0.1) {Hoyuelos (dimples)};
+		\end{scope}
+		% Brittle fracture
+		\begin{scope}[shift={(4.2,0)}]
+			\draw[thick] (0,0) rectangle (3.2,2.5);
+			\node[above,font=\small\bfseries] at (1.6,2.5) {Fractura Frágil};
+			% Cleavage facets
+			\draw[gray] (0.3,0.2) -- (1.0,1.8) -- (1.5,0.5) -- cycle;
+			\draw[gray] (1.0,1.8) -- (2.2,2.0) -- (1.5,0.5) -- cycle;
+			\draw[gray] (1.5,0.5) -- (2.2,2.0) -- (2.8,0.8) -- cycle;
+			\draw[gray] (2.2,2.0) -- (2.9,2.3) -- (2.8,0.8) -- cycle;
+			\draw[gray] (0.3,0.2) -- (1.5,0.5) -- (0.5,2.2) -- cycle;
+			% River marks
+			\draw[aerored,thin,->] (0.8,1.0) -- (1.2,1.2);
+			\draw[aerored,thin,->] (1.3,0.8) -- (1.7,1.0);
+			\draw[aerored,thin,->] (2.0,1.2) -- (2.4,1.5);
+			\node[font=\tiny,aerored] at (1.6,0.1) {Facetas + marcas de río};
+		\end{scope}
+		% Fatigue
+		\begin{scope}[shift={(8.4,0)}]
+			\draw[thick] (0,0) rectangle (3.2,2.5);
+			\node[above,font=\small\bfseries] at (1.6,2.5) {Fatiga};
+			% Striations
+			\foreach \y in {0.3,0.55,0.8,1.05,1.3,1.55,1.8,2.05,2.3} {
+				\draw[gray,thin] (0.2,\y) .. controls (1.0,{\y+0.15}) and
+					(2.2,{\y-0.1}) .. (3.0,\y);
+			}
+			% Origin marker
+			\fill[aerored] (0.2,1.3) circle (0.08);
+			\draw[aerored,->] (0.2,1.3) -- (0.8,1.3);
+			\node[font=\tiny,aerogreen] at (1.6,0.1) {Estrías de fatiga};
+		\end{scope}
+	\end{tikzpicture}
+	\caption{Representación esquemática de los tres mecanismos de fractura
+		principales observados en micrografías SEM.}
+	\label{fig:modos_fractura}
+\end{figure}
+
+\subsection{Conceptos de Imagen Digital}
+
+Una imagen digital en escala de grises es una función
+$I : \{0,\ldots,M-1\} \times \{0,\ldots,N-1\} \to [0,L-1]$, donde
+$M \times N$ es la resolución en píxeles y $L$ el número de niveles de
+gris (típicamente $L = 256$ para 8~bits)~\cite{gonzalez2018}.
+
+\subsubsection{Histograma}
+
+El histograma $h(k)$ cuenta el número de píxeles con intensidad $k$:
+
+\begin{equation}
+	h(k) = \#\{(x,y) : I(x,y) = k\}, \quad k = 0, 1, \ldots, L-1
+	\label{eq:histograma}
+\end{equation}
+
+Su forma revela el contraste de la imagen: un histograma estrecho indica
+bajo contraste; uno bimodal sugiere dos poblaciones (fondo y objeto)
+separables por umbralización.
+
+\subsection{Pipeline de Procesamiento de Imagen}
+
+El análisis automatizado implementado en el script sigue un \emph{pipeline}
+secuencial de seis etapas (Figura~\ref{fig:pipeline}).  Cada etapa
+transforma la imagen para extraer progresivamente la información
+morfológica relevante.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[node distance=1.3cm,>=Stealth,
+		block/.style={rectangle,draw=aeroblue,thick,fill=aeroblue!8,
+			text width=4.5cm,align=center,minimum height=0.8cm,
+			font=\small,rounded corners=3pt},
+		result/.style={rectangle,draw=aerored,thick,fill=aerored!8,
+			text width=4.5cm,align=center,minimum height=0.8cm,
+			font=\small,rounded corners=3pt}]
+		\node[block] (load)   {1. Carga en gris + normalización};
+		\node[block,below=of load]  (clahe) {2. CLAHE (ecualización adaptativa)};
+		\node[block,below=of clahe] (edges)
+			{3. Detección de bordes (Sobel / Canny)};
+		\node[block,below=of edges] (otsu)  {4. Umbralización de Otsu};
+		\node[block,below=of otsu]  (morph) {5. Morfología (Opening, disk=2)};
+		\node[result,below=of morph] (label)
+			{6. Etiquetado de regiones conectadas};
+		% Arrows
+		\foreach \a/\b in {load/clahe,clahe/edges,edges/otsu,otsu/morph,morph/label} {
+			\draw[->,aeroblue,thick] (\a) -- (\b);
+		}
+		% Side annotations
+		\node[right=1.5cm of load,font=\tiny,text width=3cm]
+			{$I(x,y)\in[0,1]$ float};
+		\node[right=1.5cm of clahe,font=\tiny,text width=3cm]
+			{Contraste local mejorado};
+		\node[right=1.5cm of edges,font=\tiny,text width=3cm]
+			{Mapa de gradientes / bordes binarios};
+		\node[right=1.5cm of otsu,font=\tiny,text width=3cm]
+			{Máscara binaria (objeto/fondo)};
+		\node[right=1.5cm of morph,font=\tiny,text width=3cm]
+			{Ruido eliminado, regiones limpias};
+		\node[right=1.5cm of label,font=\tiny,text width=3cm,aerored]
+			{$N$ regiones con descriptores de forma};
+	\end{tikzpicture}
+	\caption{Pipeline de procesamiento de imagen implementado en el script
+		\texttt{P05\_Analisis\_Imagen.py}.}
+	\label{fig:pipeline}
+\end{figure}
+
+\subsection{Ecualización Adaptativa: CLAHE}
+\label{subsec:clahe}
+
+La ecualización clásica de histograma redistribuye los niveles de gris
+para maximizar el contraste global.  Sin embargo, en micrografías SEM con
+iluminación desigual (e.g., sombras por topografía), puede sobre-amplificar
+regiones ya brillantes.
+
+La \textbf{CLAHE} (\emph{Contrast Limited Adaptive Histogram
+Equalization})~\cite{zuiderveld1994} resuelve este problema dividiendo la
+imagen en regiones locales (\emph{tiles}) y ecualizando cada una de forma
+independiente, con un límite de contraste (\texttt{clip\_limit}) que evita
+la amplificación excesiva del ruido:
+
+\begin{equation}
+	\boxed{I_{\mathrm{CLAHE}}(x,y)
+		= T_{\mathrm{tile}(x,y)}\!\bigl[I(x,y)\bigr]}
+	\label{eq:clahe}
+\end{equation}
+
+donde $T_{\mathrm{tile}}$ es la función de transferencia de ecualización
+calculada para el \emph{tile} local, con redistribución del exceso de
+contraste por encima de \texttt{clip\_limit}.  Transiciones entre
+\emph{tiles} se suavizan mediante interpolación bilineal.
+
+En esta práctica se utiliza \texttt{clip\_limit}~$= 0{,}03$ (normalizado):
+
+\begin{lstlisting}[language=Python,caption={Aplicación de CLAHE con
+  scikit-image.}]
+from skimage import exposure
+img_clahe = exposure.equalize_adapthist(
+    img_gray, clip_limit=0.03)
+\end{lstlisting}
+
+\subsection{Operador de Sobel}
+\label{subsec:sobel}
+
+El filtro de Sobel~\cite{sobel1968} estima el gradiente de la imagen
+mediante la convolución con dos kernels $3\times3$ que calculan las
+derivadas parciales en las direcciones $x$ e~$y$:
+
+\begin{equation}
+	G_x = \begin{bmatrix} -1 & 0 & +1 \\ -2 & 0 & +2 \\ -1 & 0 & +1 \end{bmatrix}
+	\ast I, \qquad
+	G_y = \begin{bmatrix} +1 & +2 & +1 \\ 0 & 0 & 0 \\ -1 & -2 & -1 \end{bmatrix}
+	\ast I
+	\label{eq:sobel_kernels}
+\end{equation}
+
+La magnitud del gradiente combina ambas componentes:
+
+\begin{equation}
+	\boxed{|\nabla I| = \sqrt{G_x^2 + G_y^2}}
+	\label{eq:sobel_mag}
+\end{equation}
+
+Valores altos de $|\nabla I|$ corresponden a transiciones abruptas de
+intensidad (bordes).  Sobel es sensible al ruido; por ello se aplica
+sobre la imagen CLAHE (ya con contraste mejorado).
+
+\subsection{Detector de Bordes de Canny}
+\label{subsec:canny}
+
+El algoritmo de Canny~\cite{canny1986} es un detector de bordes óptimo
+que busca maximizar la detección, minimizar las falsas respuestas y
+producir bordes de un solo píxel de ancho.  Consta de cuatro pasos:
+
+\begin{enumerate}
+	\item \textbf{Suavizado Gaussiano:} eliminación de ruido con un kernel
+	      $G_\sigma$ de desviación estándar $\sigma$.
+	      \begin{equation}
+	      	G_\sigma(x,y) = \frac{1}{2\pi\sigma^2}
+	      	\exp\!\left(-\frac{x^2 + y^2}{2\sigma^2}\right)
+	      	\label{eq:gauss_kernel}
+	      \end{equation}
+	\item \textbf{Gradiente:} cálculo de $|\nabla I|$ y orientación
+	      $\theta = \arctan(G_y/G_x)$.
+	\item \textbf{Supresión no máxima:} se conservan solo los píxeles cuyo
+	      gradiente es máximo local en la dirección de $\theta$.
+	\item \textbf{Histéresis con doble umbral:} un umbral alto
+	      $T_{\mathrm{high}}$ confirma bordes fuertes; un umbral bajo
+	      $T_{\mathrm{low}}$ extiende los bordes conectados.
+\end{enumerate}
+
+En esta práctica se emplea $\sigma = 2{,}0$, que suaviza suficiente para
+micrografías SEM con textura granular fina.
+
+\subsection{Umbralización de Otsu}
+\label{subsec:otsu}
+
+El método de Otsu~\cite{otsu1979} calcula automáticamente el umbral
+$t^*$ que separa la imagen en dos clases (fondo $C_0$ y objeto $C_1$)
+\textbf{minimizando la varianza intra-clase} (o, equivalentemente,
+\textbf{maximizando la varianza inter-clase}).
+
+\paragraph{Formulación matemática.}  Sea $p_i = h(i)/N_\mathrm{total}$
+la probabilidad del nivel de gris~$i$.  Para un umbral~$t$:
+
+\begin{align}
+	\omega_0(t) & = \sum_{i=0}^{t} p_i, &
+	\omega_1(t) & = \sum_{i=t+1}^{L-1} p_i
+	\label{eq:otsu_omega}
+\end{align}
+
+\begin{align}
+	\mu_0(t) & = \frac{1}{\omega_0}\sum_{i=0}^{t} i\,p_i, &
+	\mu_1(t) & = \frac{1}{\omega_1}\sum_{i=t+1}^{L-1} i\,p_i
+	\label{eq:otsu_mu}
+\end{align}
+
+La varianza inter-clase es:
+
+\begin{equation}
+	\sigma_B^2(t) = \omega_0(t)\,\omega_1(t)\,
+	\bigl[\mu_0(t) - \mu_1(t)\bigr]^2
+	\label{eq:otsu_sigma}
+\end{equation}
+
+El umbral óptimo es:
+
+\begin{equation}
+	\boxed{t^* = \arg\max_{0 \le t < L}\;\sigma_B^2(t)}
+	\label{eq:otsu_opt}
+\end{equation}
+
+La imagen binarizada se obtiene como
+$B(x,y) = \mathbf{1}[I(x,y) > t^*]$.
+
+\subsection{Operaciones Morfológicas}
+\label{subsec:morfologia}
+
+Las operaciones morfológicas procesan imágenes binarias utilizando un
+\textbf{elemento estructurante} (\emph{structuring element}, SE); en
+esta práctica, un disco de radio~2 (\texttt{disk(2)}).  Las operaciones
+básicas son~\cite{soille2004}:
+
+\paragraph{Erosión:}
+\begin{equation}
+	(I \ominus SE)(x,y)
+	= \min_{(s,t)\in SE}\; I(x+s,\,y+t)
+	\label{eq:erosion}
+\end{equation}
+
+\paragraph{Dilatación:}
+\begin{equation}
+	(I \oplus SE)(x,y)
+	= \max_{(s,t)\in SE}\; I(x+s,\,y+t)
+	\label{eq:dilatacion}
+\end{equation}
+
+\paragraph{Apertura (Opening):} erosión seguida de dilatación.  Elimina
+pequeños objetos (ruido) preservando la forma de los objetos grandes:
+
+\begin{equation}
+	\boxed{I \circ SE = (I \ominus SE) \oplus SE}
+	\label{eq:opening}
+\end{equation}
+
+\paragraph{Cierre (Closing):} dilatación seguida de erosión.  Rellena
+pequeños agujeros en regiones:
+
+\begin{equation}
+	I \bullet SE = (I \oplus SE) \ominus SE
+	\label{eq:closing}
+\end{equation}
+
+\subsection{Etiquetado de Regiones Conectadas}
+\label{subsec:etiquetado}
+
+Sobre la imagen binarizada y limpiada morfológicamente, se aplica el
+\textbf{etiquetado de componentes conexos}: cada grupo de píxeles
+``1'' que comparte vecindad (4- u 8-conectividad) se asigna a una
+etiqueta única $\ell \in \{1, 2, \ldots, N_\mathrm{reg}\}$.
+
+Para cada región etiquetada se calculan propiedades geométricas
+(descriptores de forma)~\cite{russ2016}:
+
+\begin{table}[H]
+	\centering
+	\caption{Descriptores de forma calculados por \texttt{regionprops}.}
+	\label{tab:descriptores}
+	\begin{tabularx}{\textwidth}{l l X}
+		\toprule
+		\textbf{Descriptor}          & \textbf{Unidades}     & \textbf{Interpretación}                \\
+		\midrule
+		Área ($A_r$)                 & px$^2$                & Tamaño de la región; proporcional
+		al área real mediante la escala.                                                              \\
+		Perímetro ($P_r$)            & px                    & Longitud del borde de la región.       \\
+		Excentricidad ($e$)          & $[0,1)$               & $0$: circular; cercano a $1$:
+		muy alargada.                                                                                 \\
+		Eje mayor ($d_\mathrm{max}$) & px                    & Longitud del eje mayor de la elipse
+		equivalente; indicador del tamaño máximo.                                                     \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\subsection{Calibración de Escala}
+\label{subsec:calibracion}
+
+Las barras de escala impresas en las micrografías SEM establecen la
+relación entre píxeles y longitud real.  El procedimiento de calibración
+es:
+
+\begin{enumerate}
+	\item Hacer clic en los dos extremos de la barra de escala (puntos
+	      $P_1$ y $P_2$).
+	\item Calcular la distancia en píxeles:
+	      \begin{equation}
+	      	d_\mathrm{px}
+	      	= \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+	      	\label{eq:dist_px}
+	      \end{equation}
+	\item Ingresar la longitud real $d_\mathrm{real}$ (en \si{\micro\m})
+	      indicada por la barra.
+	\item Calcular la relación de escala:
+	      \begin{equation}
+	      	\boxed{s = \frac{d_\mathrm{px}}{d_\mathrm{real}}
+	      	\quad\left[\frac{\mathrm{px}}{\si{\micro\m}}\right]}
+	      	\label{eq:escala}
+	      \end{equation}
+\end{enumerate}
+
+Toda medición posterior se convierte a unidades reales dividiendo la
+distancia en píxeles por~$s$.  Un error de $\pm n$ píxeles en la
+selección de la barra produce un error relativo:
+
+\begin{equation}
+	\varepsilon_s = \frac{2n}{d_\mathrm{px}} \times 100\%
+	\label{eq:error_escala}
+\end{equation}
+
+% =============================================================================
+\section{Escenarios y Datos de la Práctica}
+\label{sec:escenarios}
+
+\subsection{Conjunto de datos}
+
+Se dispone de cinco micrografías SEM de superficies de fractura por fatiga
+almacenadas en \texttt{files/p5/}:
+
+\begin{table}[H]
+	\centering
+	\caption{Micrografías SEM disponibles para el análisis.}
+	\label{tab:imagenes}
+	\begin{tabular}{l r l l}
+		\toprule
+		\textbf{Archivo}    & \textbf{Tamaño} & \textbf{Resolución}
+		                    & \textbf{Observaciones}                              \\
+		\midrule
+		\texttt{fatigue3.png} & \SI{195}{\kilo\byte}
+		                    & Moderada                                            & Estrías bien definidas \\
+		\texttt{fatigue4.png} & \SI{68}{\kilo\byte}
+		                    & Baja                                                & Buen contraste         \\
+		\texttt{fatigue5.png} & \SI{2.3}{\mega\byte}
+		                    & Alta                                                & Imagen de gran tamaño  \\
+		\texttt{fatigue6.png} & \SI{1.9}{\mega\byte}
+		                    & Alta                                                & Superficie compleja    \\
+		\texttt{fatigue7.png} & \SI{964}{\kilo\byte}
+		                    & Media-alta                                          & Textura fina           \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Cada micrografía muestra diferentes zonas o condiciones de una superficie
+de fractura por fatiga.  Las diferencias de tamaño reflejan distintas
+magnificaciones y condiciones de adquisición.
+
+\subsection{Salidas del análisis}
+
+El script genera, para cada imagen, 6 archivos en
+\texttt{Practicas/P05\_Analisis\_Imagen/data/images/}:
+
+\begin{table}[H]
+	\centering
+	\caption{Ficheros de salida generados por imagen procesada.}
+	\label{tab:salidas}
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Patrón de nombre}                     & \textbf{Contenido}               \\
+		\midrule
+		\texttt{\{nombre\}\_00\_resumen.png}          & Figura compuesta 3$\times$2
+		(histograma, CLAHE, Sobel, Canny, Otsu, Opening)                                 \\
+		\texttt{\{nombre\}\_01\_clahe.png}             & Imagen tras CLAHE                \\
+		\texttt{\{nombre\}\_02\_sobel.png}             & Mapa del filtro Sobel            \\
+		\texttt{\{nombre\}\_03\_canny.png}             & Bordes detectados por Canny      \\
+		\texttt{\{nombre\}\_04\_otsu.png}              & Binarización de Otsu             \\
+		\texttt{\{nombre\}\_05\_opening.png}           & Máscara morfológica (apertura)   \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+En total, el procesamiento de las 5 imágenes genera \textbf{30 ficheros}
+de resultados.
+
+% =============================================================================
+\section{Metodología de Cálculo}
+\label{sec:metodologia}
+
+\subsection{Paso 1: Carga y normalización}
+
+La imagen se carga en escala de grises y se normaliza al rango $[0,1]$
+(tipo \texttt{float64}):
+
+\begin{equation}
+	I_\mathrm{norm}(x,y) = \frac{I_\mathrm{raw}(x,y)}{L - 1}
+	\label{eq:normalizacion}
+\end{equation}
+
+\subsection{Paso 2: Mejora de contraste (CLAHE)}
+
+Se aplica la ecualización adaptativa (§\ref{subsec:clahe}) con
+\texttt{clip\_limit}~$= 0{,}03$.  La imagen resultante se convierte a
+\texttt{uint8} [$0,255$] para los pasos de detección de bordes, que
+esperan niveles de gris enteros:
+
+\begin{equation}
+	I_\mathrm{u8}(x,y) = \mathrm{round}\bigl(255 \cdot I_\mathrm{CLAHE}(x,y)\bigr)
+	\label{eq:uint8}
+\end{equation}
+
+\subsection{Paso 3: Detección de bordes}
+
+Se aplican dos detectores complementarios sobre $I_\mathrm{u8}$:
+
+\begin{itemize}
+	\item \textbf{Sobel} (ec.~\ref{eq:sobel_mag}): produce un mapa
+	      continuo de intensidad de bordes.  Útil para visualización
+	      cualitativa.
+	\item \textbf{Canny} (§\ref{subsec:canny}, $\sigma = 2{,}0$): produce
+	      una imagen binaria con bordes de un píxel de ancho.  Adecuado
+	      para la detección precisa de contornos de estrías.
+\end{itemize}
+
+\subsection{Paso 4: Segmentación (Otsu)}
+
+La umbralización de Otsu (ec.~\ref{eq:otsu_opt}) segmenta la imagen
+CLAHE en \emph{objeto} y \emph{fondo}, generando una máscara binaria
+$B(x,y) \in \{0, 1\}$.
+
+\subsection{Paso 5: Limpieza morfológica (Opening)}
+
+La apertura con disco de radio~2 (ec.~\ref{eq:opening}) elimina regiones
+espurias de menos de $\sim\!\pi(2)^2 \approx 12{,}6$~px$^2$, manteniendo
+las regiones significativas correspondientes a características reales de
+la superficie de fractura.
+
+\subsection{Paso 6: Etiquetado y cuantificación}
+
+El algoritmo de etiquetado de componentes conexos asigna una etiqueta
+única a cada región.  Los descriptores de forma (Tabla~\ref{tab:descriptores})
+se calculan automáticamente mediante \texttt{regionprops\_table} de
+scikit-image~\cite{scikit_image}.
+
+\subsection{Diagrama de flujo del procesamiento}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[node distance=1.2cm,>=Stealth,
+		block/.style={rectangle,draw=aeroblue,thick,fill=aeroblue!8,
+			text width=5.8cm,align=center,minimum height=0.85cm,
+			font=\small,rounded corners=3pt}]
+		\node[block] (glob) {Buscar imágenes: \texttt{glob(*.png)}};
+		\node[block,below=of glob] (load) {Cargar en gris + normalizar $[0,1]$};
+		\node[block,below=of load] (clahe) {CLAHE (clip\_limit\,=\,0,03)};
+		\node[block,below=of clahe] (u8) {Convertir a uint8 $[0,255]$};
+		\node[block,below=of u8] (sobel) {Sobel $\to$ guardar \_02};
+		\node[block,below=of sobel] (canny) {Canny ($\sigma=2$) $\to$ guardar \_03};
+		\node[block,below=of canny] (otsu) {Otsu $\to$ guardar \_04};
+		\node[block,below=of otsu] (morph) {Opening (disk=2) $\to$ guardar \_05};
+		\node[block,below=of morph] (label) {Etiquetado $\to$ $N$ regiones};
+		\node[block,below=of label] (comp) {Construir figura compuesta \_00};
+		% Arrows
+		\foreach \a/\b in {glob/load,load/clahe,clahe/u8,u8/sobel,
+			sobel/canny,canny/otsu,otsu/morph,morph/label,label/comp} {
+			\draw[->,aeroblue,thick] (\a) -- (\b);
+		}
+		% Loop
+		\draw[aerored,thick,->] (comp.east) -- ++(1.5,0) |- (load.east)
+			node[pos=0.25,right,font=\tiny,aerored] {siguiente imagen};
+	\end{tikzpicture}
+	\caption{Diagrama de flujo detallado del script de análisis de imagen.}
+	\label{fig:diagrama_detallado}
+\end{figure}
+
+% =============================================================================
+\section{Ejemplo Resuelto: Análisis de \texttt{fatigue3.png}}
+\label{sec:ejemplo}
+
+\subsection{Ejecución del pipeline}
+
+Se ejecuta el script desde la raíz del repositorio:
+
+\begin{lstlisting}[language=bash]
+python Practicas/P05_Analisis_Imagen/src/P05_Analisis_Imagen.py
+\end{lstlisting}
+
+Para \texttt{fatigue3.png}, la salida del etiquetado reporta:
+
+\begin{verbatim}
+--- Análisis de Regiones (sobre Otsu+Opening) ---
+Número de objetos encontrados: 418
+\end{verbatim}
+
+\subsection{Interpretación de las etapas}
+
+\begin{enumerate}
+	\item \textbf{Histograma original}: la distribución de intensidades se
+	      concentra en el rango medio-bajo, indicando una imagen relativamente
+	      oscura con contraste limitado.
+	\item \textbf{CLAHE}: mejora significativamente la visibilidad de
+	      detalles finos (estrías, bordes de hoyuelos) sin sobre-saturar las
+	      zonas brillantes.
+	\item \textbf{Sobel}: revela la textura de la superficie; las zonas con
+	      mayor gradiente corresponden a transiciones entre facetas y bordes
+	      de estrías.
+	\item \textbf{Canny ($\sigma = 2{,}0$)}: produce contornos nítidos de
+	      un solo píxel, delineando los bordes de las características
+	      fractográficas principales.
+	\item \textbf{Otsu}: segmenta la imagen en regiones claras (elevaciones)
+	      y oscuras (surcos/hoyuelos).  El umbral óptimo se calcula
+	      automáticamente.
+	\item \textbf{Opening (disk=2)}: elimina el ruido de píxeles aislados,
+	      dejando \textbf{418 regiones} conectadas que corresponden a
+	      características morfológicas reales.
+\end{enumerate}
+
+\subsection{Resultados comparativos}
+
+\begin{table}[H]
+	\centering
+	\caption{Número de regiones detectadas para cada micrografía.}
+	\label{tab:regiones}
+	\begin{tabular}{l S[table-format=4.0] l}
+		\toprule
+		\textbf{Imagen}     & {$N_\mathrm{regiones}$} & \textbf{Observación}          \\
+		\midrule
+		fatigue3.png        & 418                     & Moderada densidad de rasgos   \\
+		fatigue4.png        & 153                     & Baja densidad; buen contraste \\
+		fatigue5.png        & 2066                    & Alta resolución, muy detallada \\
+		fatigue6.png        & 2897                    & Superficie extremadamente compleja \\
+		fatigue7.png        & 549                     & Textura fina, densidad media     \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\textbf{Análisis:} Las imágenes de alta resolución (\texttt{fatigue5},
+\texttt{fatigue6}) producen un número significativamente mayor de regiones
+debido a que el algoritmo resuelve más detalles topográficos.  Esto
+ilustra la dependencia de las métricas cuantitativas con la magnificación
+y la resolución de adquisición --- un punto fundamental en metrología de
+imágenes~\cite{russ2016}.
+
+\subsection{Evaluación de Riesgo de los Escenarios Base}
+\label{sec:riesgo_base}
+
+El entorno de trabajo con SEM y muestras metalográficas presenta riesgos
+específicos que deben evaluarse.
+
+\begin{table}[H]
+	\centering
+	\caption{Evaluación de riesgo para los escenarios de la práctica.}
+	\label{tab:riesgo_base}
+	\small
+	\begin{tabularx}{\textwidth}{l c c c c X}
+		\toprule
+		\textbf{Escenario}     & \textbf{P} & \textbf{S} & \textbf{$R$}
+		                       & \textbf{Nivel}
+		                       & \textbf{Controles}                                        \\
+		\midrule
+		\rowcolor{aeroyellow!15}
+		Operación del SEM (alto voltaje)
+		                       & 2          & 4          & 8
+		                       & \textcolor{aeroyellow!80!black}{\textbf{Medio}}
+		                       & Formación, interlock de cámara, puesta a tierra            \\
+		\rowcolor{aerogreen!10}
+		Preparación de muestras (pulidora)
+		                       & 2          & 3          & 6
+		                       & \textcolor{aeroyellow!80!black}{\textbf{Medio}}
+		                       & Gafas de seguridad, guantes, SOPs                         \\
+		\rowcolor{aerogreen!10}
+		Manipulación de reactivos (ataque metalográfico)
+		                       & 2          & 3          & 6
+		                       & \textcolor{aeroyellow!80!black}{\textbf{Medio}}
+		                       & Campana extractora, guantes, MSDS                         \\
+		\rowcolor{aerogreen!10}
+		Procesamiento digital (ergonomía)
+		                       & 1          & 1          & 1
+		                       & \textcolor{aerogreen}{\textbf{Bajo}}
+		                       & Pausas, ergonomía de estación                              \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+% =============================================================================
+\section{Casos de Estudio por Equipos}
+\label{sec:equipos}
+
+Cada equipo de trabajo desarrollará uno de los siguientes escenarios
+utilizando el script y/o el notebook de análisis.  Deben:
+
+\begin{enumerate}
+	\item Ejecutar el pipeline completo sobre la imagen asignada.
+	\item Realizar la calibración de escala interactiva (notebook).
+	\item Medir al menos 15 características dimensionales.
+	\item Diagnosticar el modo de fractura predominante.
+	\item Completar la evaluación de riesgo
+	      (Tabla~\ref{tab:risk_template}).
+	\item Comparar resultados con al menos otro equipo.
+\end{enumerate}
+
+\begin{table}[H]
+	\centering
+	\caption{Plantilla de evaluación de riesgo (a completar por cada equipo).}
+	\label{tab:risk_template}
+	\small
+	\begin{tabularx}{\textwidth}{l c X}
+		\toprule
+		\textbf{Factor}                   & \textbf{Valor (1--5)} & \textbf{Justificación}                                           \\
+		\midrule
+		Probabilidad ($P$)                &                       & (MuyBajo=1, Bajo=2, Medio=3, Alto=4, MuyAlto=5)                  \\
+		Severidad ($S$)                   &                       & (Insignificante=1, Menor=2, Moderado=3, Mayor=4, Catastrófico=5) \\
+		\midrule
+		Riesgo $R = P \times S$           &                       &                                                                  \\
+		Nivel de riesgo                   &                       & Bajo ($<5$) / Medio (5--12) / Alto ($>12$)                       \\
+		\midrule
+		Controles requeridos              & {--}                  & (Listar: EPP, ingeniería, administrativos)                       \\
+		Posición en la matriz (fila, col) & {--}                  & (Marcar en Figura~\ref{fig:risk_matrix})                         \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+% ---- EQUIPO 1 ----
+\subsection{Equipo~1: Análisis dimensional de estrías de fatiga}
+\label{sec:eq1}
+
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+	\textbf{Imagen asignada:} \texttt{fatigue3.png}
+
+	\textbf{Contexto:} Se sospecha que el componente falló por fatiga de alto
+	ciclo.  Las estrías de fatiga son evidencia directa del avance de la
+	grieta.  El espaciado entre estrías permite estimar $da/dN$.
+
+	\textbf{Tareas:}
+	\begin{enumerate}
+		\item Ejecutar el pipeline completo y documentar los 6 resultados.
+		\item Calibrar la escala con la barra del SEM.
+		\item Medir el espaciado entre 15--20 estrías consecutivas.
+		\item Calcular el espaciado promedio $\bar{s}$ y la desviación
+		      estándar $\sigma_s$.
+		\item Estimar el rango del factor de intensidad de tensiones $\Delta K$
+		      usando la relación empírica $da/dN \approx \bar{s}$ y la ley
+		      de Paris (ec.~\ref{eq:paris}) con $C = 6{,}9 \times 10^{-12}$
+		      y $m = 3$ (unidades SI).
+		\item Comparar el valor de $\Delta K$ con el umbral de propagación
+		      $\Delta K_\mathrm{th} \approx \SI{5}{\MPa\sqrt{\m}}$ para
+		      aleaciones de aluminio aeronáuticas.
+	\end{enumerate}
+\end{minipage}}
+
+\textbf{Evaluación de riesgo:} Complete la Tabla~\ref{tab:risk_template}
+considerando los riesgos de operación del SEM y preparación metalográfica.
+
+\subsubsection*{Problemas Adicionales -- Equipo~1}
+
+\begin{enumerate}
+	\item[\textbf{P1.1}] Si el error en la calibración de la barra de escala
+	      es de $\pm$5~píxeles y la barra mide 200~píxeles, ¿cuál es el error
+	      porcentual en las mediciones de espaciado? ¿Cómo se propaga a
+	      $\Delta K$?
+
+	\item[\textbf{P1.2}] Compare el número de regiones detectadas por Otsu
+	      usando \texttt{clip\_limit}~$= 0{,}01$ vs.\ $0{,}05$.  ¿El CLAHE
+	      mejora la segmentación?
+
+	\item[\textbf{P1.3}] Proponga un criterio cuantitativo (basado en los
+	      descriptores de forma) para distinguir automáticamente estrías de
+	      fatiga de hoyuelos.  Sugerencia: considere la excentricidad y la
+	      relación área/perímetro.
+\end{enumerate}
+
+% ---- EQUIPO 2 ----
+\subsection{Equipo~2: Comparación de modos de fractura}
+\label{sec:eq2}
+
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+	\textbf{Imágenes asignadas:} \texttt{fatigue4.png} y \texttt{fatigue7.png}
+
+	\textbf{Contexto:} Dos zonas del mismo componente fracturado muestran
+	morfologías diferentes.  Se requiere determinar si representan fractura
+	dúctil, frágil o mixta.
+
+	\textbf{Tareas:}
+	\begin{enumerate}
+		\item Procesar ambas imágenes con el pipeline.
+		\item Para cada imagen: identificar si predominan hoyuelos (dúctil)
+		      o facetas planas (frágil).
+		\item Calibrar y medir el diámetro de al menos 15 hoyuelos (si los hay)
+		      o el tamaño de 15 facetas.
+		\item Construir un histograma con las mediciones y calcular media y
+		      desviación estándar.
+		\item Comparar los descriptores de forma (excentricidad media, área
+		      media) entre ambas imágenes.
+		\item Emitir un diagnóstico del modo de fractura para cada zona.
+	\end{enumerate}
+\end{minipage}}
+
+\textbf{Evaluación de riesgo:} Complete la Tabla~\ref{tab:risk_template}.
+
+\subsubsection*{Problemas Adicionales -- Equipo~2}
+
+\begin{enumerate}
+	\item[\textbf{P2.1}] Si una zona muestra hoyuelos equiaxiales y otra
+	      hoyuelos alargados, ¿qué puede inferir sobre el estado de tensiones
+	      en cada zona?
+
+	\item[\textbf{P2.2}] Genere las imágenes Canny con $\sigma = 1{,}0$ y
+	      $\sigma = 3{,}0$.  ¿Cómo afecta $\sigma$ a la detección de bordes
+	      finos (estrías) vs.\ bordes gruesos (facetas)?
+
+	\item[\textbf{P2.3}] Proponga una modificación al pipeline para detectar
+	      fractura intergranular (límites de grano).  ¿Qué operaciones
+	      adicionales serían necesarias?
+\end{enumerate}
+
+% ---- EQUIPO 3 ----
+\subsection{Equipo~3: Efecto de la resolución y magnificación}
+\label{sec:eq3}
+
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+	\textbf{Imágenes asignadas:} \texttt{fatigue5.png} (alta resolución) y
+	\texttt{fatigue4.png} (baja resolución)
+
+	\textbf{Contexto:} La magnificación afecta la cantidad de detalle
+	resuelto y, por tanto, las métricas cuantitativas.  Se debe cuantificar
+	este efecto.
+
+	\textbf{Tareas:}
+	\begin{enumerate}
+		\item Procesar ambas imágenes con parámetros idénticos.
+		\item Comparar el número de regiones detectadas ($N$).
+		\item Comparar la distribución de áreas de las regiones (histograma).
+		\item Calcular la relación $\mathrm{px}/\si{\micro\m}$ para cada
+		      imagen y discutir cómo la resolución afecta la precisión de las
+		      mediciones.
+		\item Discutir si es válido comparar mediciones absolutas (en
+		      \si{\micro\m}) entre imágenes de distinta magnificación.
+	\end{enumerate}
+\end{minipage}}
+
+\textbf{Evaluación de riesgo:} Complete la Tabla~\ref{tab:risk_template}.
+
+\subsubsection*{Problemas Adicionales -- Equipo~3}
+
+\begin{enumerate}
+	\item[\textbf{P3.1}] Si \texttt{fatigue5.png} tiene una resolución de
+	      $0{,}1$~\si{\micro\m}/px y \texttt{fatigue4.png} de
+	      $0{,}5$~\si{\micro\m}/px, ¿cuál es la menor característica medible
+	      en cada caso?  (Criterio: 3 píxeles mínimo.)
+
+	\item[\textbf{P3.2}] Redimensione \texttt{fatigue5.png} al 25\% de su
+	      tamaño original con \texttt{cv2.resize} y reprocese.  ¿Cuántas
+	      regiones se detectan?  ¿Cuánto cambia respecto al original?
+
+	\item[\textbf{P3.3}] Proponga un protocolo experimental (magnificaciones,
+	      número de imágenes, zonas) para obtener estadísticas representativas
+	      de una superficie de fractura completa.
+\end{enumerate}
+
+% ---- EQUIPO 4 ----
+\subsection{Equipo~4: Optimización de parámetros del pipeline}
+\label{sec:eq4}
+
+\noindent\fbox{\begin{minipage}{0.96\textwidth}
+	\textbf{Imagen asignada:} \texttt{fatigue6.png} (la más compleja)
+
+	\textbf{Contexto:} Los parámetros del pipeline (clip\_limit, $\sigma$
+	de Canny, tamaño de disco morfológico) afectan los resultados.  Se
+	busca optimizar estos parámetros para maximizar la calidad de la
+	segmentación.
+
+	\textbf{Tareas:}
+	\begin{enumerate}
+		\item Procesar con parámetros por defecto (clip\_limit\,=\,0,03;
+		      $\sigma = 2{,}0$; disk\,=\,2).
+		\item Variar \texttt{clip\_limit} $\in \{0{,}01;\; 0{,}03;\; 0{,}05;\;
+		      0{,}10\}$ y registrar $N_\mathrm{regiones}$.
+		\item Variar $\sigma_\mathrm{Canny} \in \{1{,}0;\; 2{,}0;\; 3{,}0;\;
+		      5{,}0\}$ y registrar $N_\mathrm{regiones}$.
+		\item Variar disk $\in \{1, 2, 3, 5\}$ y registrar
+		      $N_\mathrm{regiones}$.
+		\item Generar una tabla resumen y gráficas de sensibilidad.
+		\item Proponer la combinación óptima justificada.
+	\end{enumerate}
+\end{minipage}}
+
+\textbf{Evaluación de riesgo:} Complete la Tabla~\ref{tab:risk_template}.
+
+\subsubsection*{Problemas Adicionales -- Equipo~4}
+
+\begin{enumerate}
+	\item[\textbf{P4.1}] ¿Existe un valor de disk suficientemente grande que
+	      elimine \emph{todas} las regiones?  Calcúlelo teóricamente usando la
+	      distribución de áreas.
+
+	\item[\textbf{P4.2}] Implemente la operación de \emph{closing} (cierre)
+	      después de opening.  ¿Cómo cambia el número de regiones y la forma
+	      de los objetos?
+
+	\item[\textbf{P4.3}] Compare los resultados de Otsu con un umbral manual
+	      fijo (e.g., $t = 128$).  ¿En qué condiciones Otsu falla?
+\end{enumerate}
+
+% =============================================================================
+\section{Evaluación de Riesgos}
+\label{sec:riesgos}
+
+\subsection{Matriz de Riesgos}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[scale=0.85]
+		\foreach \x in {0,...,4} {
+			\foreach \y in {0,...,4} {
+				\pgfmathsetmacro{\risk}{(\x+1)*(\y+1)}
+				\pgfmathparse{\risk < 5 ? "aerogreen!40" :
+					(\risk < 13 ? "aeroyellow!60" : "aerored!50")}
+				\edef\fillcol{\pgfmathresult}
+				\fill[\fillcol] (\x,\y) rectangle (\x+1,\y+1);
+				\draw[gray] (\x,\y) rectangle (\x+1,\y+1);
+				\node at (\x+0.5,\y+0.5)
+					{\pgfmathprintnumber[fixed,precision=0]{\risk}};
+			}
+		}
+		\foreach \x/\l in {0/MuyBajo,1/Bajo,2/Medio,3/Alto,4/MuyAlto} {
+			\node[font=\tiny,rotate=45,anchor=west] at (\x+0.5,-0.1) {\l};
+		}
+		\foreach \y/\l in {0/Insignificante,1/Menor,2/Moderado,3/Mayor,
+			4/Catastrófico} {
+			\node[font=\tiny,anchor=east] at (-0.1,\y+0.5) {\l};
+		}
+		\node[font=\small\bfseries,rotate=90] at (-1.5,2.5) {Severidad};
+		\node[font=\small\bfseries] at (2.5,-1.2) {Probabilidad};
+		% Scenario markers
+		\fill[aerored,opacity=0.8] (1.5,3.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (1.5,3.5) {SEM};
+		\fill[blue!70,opacity=0.8] (1.5,2.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (1.5,2.5) {Prep.};
+		\fill[orange,opacity=0.8] (1.5,2.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (1.5,2.5) {Reac.};
+		\fill[aerogreen!70,opacity=0.8] (0.5,0.5) circle (0.25);
+		\node[white,font=\tiny\bfseries] at (0.5,0.5) {PC};
+		% Legend
+		\fill[aerogreen!40] (5.5,3.5) rectangle (6.0,4.0);
+		\node[right,font=\tiny] at (6.0,3.75) {Bajo ($<5$)};
+		\fill[aeroyellow!60] (5.5,2.8) rectangle (6.0,3.3);
+		\node[right,font=\tiny] at (6.0,3.05) {Medio (5--12)};
+		\fill[aerored!50] (5.5,2.1) rectangle (6.0,2.6);
+		\node[right,font=\tiny] at (6.0,2.35) {Alto ($>12$)};
+	\end{tikzpicture}
+	\caption{Matriz de riesgos $5\times5$ para operaciones de análisis de
+		imagen con SEM\@.  SEM: zona amarilla; preparación metalográfica y
+		reactivos: zona amarilla; procesamiento digital: zona verde.}
+	\label{fig:risk_matrix}
+\end{figure}
+
+\subsection{Riesgos identificados}
+
+\begin{table}[H]
+	\centering
+	\caption{Identificación y control de riesgos en la práctica de análisis
+		de imagen.}
+	\label{tab:riesgos}
+	\small
+	\begin{tabularx}{\textwidth}{l c c c X}
+		\toprule
+		\textbf{Riesgo}       & \textbf{P} & \textbf{S} & \textbf{R}
+		                      & \textbf{Medidas de control}                       \\
+		\midrule
+		Alta tensión del SEM
+		                      & 2          & 4          & 8
+		                      & Interlock de cámara, formación obligatoria,
+		puesta a tierra, nunca abrir durante operación.                           \\
+		Preparación muestras
+		                      & 2          & 3          & 6
+		                      & Gafas de protección, guantes, fijación correcta
+		de la muestra en la pulidora.                                              \\
+		Reactivos metalográficos
+		                      & 2          & 3          & 6
+		                      & Campana de extracción, guantes de nitrilo,
+		hojas MSDS disponibles, lavaojos.                                         \\
+		Ergonomía digital
+		                      & 1          & 1          & 1
+		                      & Pausas cada 45~min, iluminación adecuada,
+		posición ergonómica del monitor.                                           \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\subsection{Jerarquía de controles}
+
+\begin{enumerate}
+	\item \textbf{Eliminación/Sustitución}: cuando sea posible, usar réplicas
+	      poliméricas de la superficie de fractura para evitar manipulación
+	      directa de piezas metálicas afiladas.
+	\item \textbf{Controles de ingeniería}: interlock de puerta del SEM,
+	      campanas de extracción, protectores en pulidoras.
+	\item \textbf{Controles administrativos}: SOPs para operación del SEM,
+	      formación obligatoria, supervisión del responsable de laboratorio,
+	      registro de uso del equipo.
+	\item \textbf{EPP}: gafas de seguridad para preparación de muestras,
+	      guantes de nitrilo para reactivos, bata de laboratorio.
+\end{enumerate}
+
+% =============================================================================
+\section{Herramientas de Software}
+\label{sec:software}
+
+Carpeta \texttt{Practicas/P05\_Analisis\_Imagen/}:
+
+\subsection{Script principal \texttt{P05\_Analisis\_Imagen.py}}
+
+El script \texttt{src/P05\_Analisis\_Imagen.py} (\textasciitilde258 líneas)
+ejecuta el pipeline completo de análisis en modo \emph{batch} sobre todas
+las imágenes encontradas en \texttt{files/p5/}:
+
+\begin{table}[H]
+	\centering
+	\caption{Funciones principales del script \texttt{P05\_Analisis\_Imagen.py}.}
+	\label{tab:funciones}
+	\small
+	\begin{tabularx}{\textwidth}{l l X}
+		\toprule
+		\textbf{Función}        & \textbf{Firma}          & \textbf{Comportamiento}           \\
+		\midrule
+		\texttt{cargar\_imagen\_gris}
+		                        & \texttt{(path)}
+		& Carga PNG/JPG en gris, normaliza a float $[0,1]$.                                     \\
+		\texttt{procesar\_clahe}
+		                        & \texttt{(img, clip)}
+		& Aplica CLAHE con \texttt{clip\_limit} dado.                                           \\
+		\texttt{procesar\_sobel}
+		                        & \texttt{(img)}
+		& Filtro Sobel $\to$ mapa de gradientes.                                                 \\
+		\texttt{procesar\_canny}
+		                        & \texttt{(img, $\sigma$)}
+		& Detector Canny $\to$ bordes binarios.                                                  \\
+		\texttt{procesar\_otsu}
+		                        & \texttt{(img)}
+		& Umbral de Otsu $\to$ máscara binaria.                                                  \\
+		\texttt{procesar\_morfologia}
+		                        & \texttt{(img, op, disk)}
+		& Opening/closing/erosion/dilation con disco indicado.                                   \\
+		\texttt{procesar\_etiquetado}
+		                        & \texttt{(img\_bin)}
+		& Etiquetado de regiones $\to$ propiedades (área, perímetro,
+		excentricidad, eje mayor).                                                                \\
+		\texttt{\_save\_individual}
+		                        & \texttt{(img, cmap, title, file)}
+		& Crea, guarda y cierra una figura individual para cada paso.                            \\
+		\texttt{run\_full\_analysis}
+		                        & \texttt{(img, base)}
+		& Ejecuta los 6 pasos + figura compuesta + etiquetado.                                  \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\begin{lstlisting}[language=Python,caption={Uso del script desde la línea de
+  comandos.}]
+# Activar entorno virtual
+.venv\Scripts\Activate.ps1
+
+# Ejecutar desde la raiz del repositorio
+python Practicas\P05_Analisis_Imagen\src\P05_Analisis_Imagen.py
+
+# Resultados en: Practicas/P05_Analisis_Imagen/data/images/
+# 30 archivos PNG (6 por imagen x 5 imagenes)
+\end{lstlisting}
+
+\subsection{Notebook Jupyter}
+
+\texttt{notebooks/P05\_Analisis\_Imagen.ipynb} reproduce el análisis de
+forma interactiva e incluye funcionalidad adicional:
+
+\begin{itemize}
+	\item \textbf{Widget de selección}: menú desplegable para elegir la
+	      imagen a analizar.
+	\item \textbf{Calibración interactiva}: mediante la clase
+	      \texttt{CalculadoraDistancia} (clics en la barra de escala del SEM).
+	\item \textbf{Medición interactiva}: clics sobre la micrografía para
+	      medir distancias en \si{\micro\m} utilizando la escala calibrada.
+	\item \textbf{Análisis automático}: al seleccionar una imagen, se ejecuta
+	      el pipeline completo y se muestran los resultados \emph{inline}.
+	\item \textbf{Guardado idéntico}: genera los mismos 6 archivos por imagen
+	      que el script \texttt{.py}.
+\end{itemize}
+
+\subsection{Datos de salida}
+
+\texttt{data/images/} almacena los resultados procesados:
+\begin{itemize}
+	\item 5 $\times$ \texttt{\_00\_resumen.png}: figura compuesta
+	      $3\times2$.
+	\item 5 $\times$ \texttt{\_01\_clahe.png} a
+	      \texttt{\_05\_opening.png}: etapas individuales.
+	\item Total: 30 archivos PNG.
+\end{itemize}
+
+% =============================================================================
+\section{Procedimiento Experimental}
+\label{sec:procedimiento}
+
+\begin{enumerate}
+	\item \textbf{Preparación de la muestra} (si se realiza en laboratorio):
+	\begin{enumerate}
+		\item Seleccionar el espécimen de fractura.
+		\item Montar en porta-muestras del SEM con cinta conductora de
+		      carbono.
+		\item Recubrir con oro-paladio si el material no es conductor
+		      (sputtering, $\sim\!\SI{10}{\nm}$).
+	\end{enumerate}
+
+	\item \textbf{Adquisición SEM}:
+	\begin{enumerate}
+		\item Insertar la muestra en la cámara y evacuar.
+		\item Seleccionar EHT (típicamente 5--20~kV), WD y detector (SE
+		      para topografía).
+		\item Adquirir micrografías a distintas magnificaciones.
+		\item Verificar que la barra de escala esté visible y sea legible.
+	\end{enumerate}
+
+	\item \textbf{Análisis de imagen digital}:
+	\begin{enumerate}
+		\item Ejecutar el script \texttt{P05\_Analisis\_Imagen.py} o abrir
+		      el notebook.
+		\item Verificar que las 5 imágenes se procesan correctamente
+		      (30 archivos de salida).
+		\item En el notebook: calibrar la escala con la barra del SEM.
+		\item Realizar las mediciones dimensionales requeridas por el caso
+		      del equipo.
+		\item Documentar capturas de pantalla de cada etapa del pipeline.
+	\end{enumerate}
+
+	\item \textbf{Diagnóstico fractográfico}:
+	\begin{enumerate}
+		\item Identificar el modo de fractura predominante.
+		\item Correlacionar las observaciones cualitativas con los datos
+		      cuantitativos (número de regiones, dimensiones de
+		      características).
+		\item Emitir un diagnóstico preliminar.
+	\end{enumerate}
+\end{enumerate}
+
+% =============================================================================
+\section{Cuestionario}
+\label{sec:cuestionario}
+
+\begin{enumerate}
+	\item Explique por qué la calibración precisa de la escala es fundamental
+	      para cualquier medición cuantitativa.  ¿Qué error porcentual se
+	      introduce si la selección de la barra tiene un error de
+	      $\pm$5~píxeles sobre una barra de 200~píxeles?
+
+	\item Describa la diferencia entre el filtro Sobel y el detector de
+	      Canny.  ¿En qué situaciones cada uno es más apropiado para el
+	      análisis fractográfico?
+
+	\item El método de Otsu minimiza la varianza intra-clase.  Escriba la
+	      expresión de la varianza inter-clase $\sigma_B^2(t)$ y explique por
+	      qué maximizarla es equivalente a minimizar la varianza intra-clase.
+
+	\item ¿Por qué el SEM requiere que la muestra sea conductora o esté
+	      recubierta?  ¿Qué artefactos aparecen en la imagen si la muestra
+	      no conduce?
+
+	\item La operación de apertura (opening) elimina objetos pequeños.
+	      Demuestre matemáticamente que $I \circ SE \subseteq I$ (la apertura
+	      nunca agrega píxeles blancos).
+
+	\item Si se observan hoyuelos muy pequeños y equiaxiales, ¿qué infiere
+	      sobre la ductilidad del material?  Compare con hoyuelos grandes
+	      y alargados.
+
+	\item ¿Por qué es importante analizar la fractura a diferentes
+	      magnificaciones?  ¿Qué información proporciona cada escala?
+
+	\item El voltaje de aceleración (EHT) del SEM afecta la penetración
+	      del haz.  ¿Cómo influye en el contraste de la imagen resultante?
+	      ¿Es preferible alto o bajo EHT para fractografía superficial?
+
+	\item Si sospecha fatiga pero no identifica estrías claras,
+	      ¿qué otras características buscaría?  ¿Qué imágenes adicionales
+	      solicitaría al operador del SEM?
+
+	\item Proponga un método cuantitativo, basado en los descriptores de
+	      forma de las regiones etiquetadas, para clasificar automáticamente
+	      una superficie como ``predominantemente dúctil'' o
+	      ``predominantemente frágil''.
+\end{enumerate}
+
+% =============================================================================
+\section{Formato del Informe}
+\label{sec:informe}
+
+Formato AIAA con las siguientes secciones obligatorias:
+
+\begin{enumerate}
+	\item \textbf{Resumen}: objetivo, metodología (pipeline de 6 etapas,
+	      calibración, mediciones), resultados principales (modo de fractura
+	      diagnosticado, dimensiones medidas).
+	\item \textbf{Introducción}: importancia de la fractografía SEM,
+	      objetivos de la práctica.
+	\item \textbf{Fundamento Teórico}: principios SEM, mecanismos de
+	      fractura, algoritmos de procesamiento.
+	\item \textbf{Metodología}: descripción del pipeline, parámetros
+	      utilizados, procedimiento de calibración y medición.
+	\item \textbf{Resultados}: capturas de las 6 etapas del pipeline,
+	      tabla de regiones, mediciones dimensionales, histogramas.
+	\item \textbf{Discusión}: diagnóstico fractográfico, respuestas al
+	      cuestionario, efecto de los parámetros del pipeline.
+	\item \textbf{Conclusiones}: resumen de hallazgos, validez del
+	      diagnóstico, recomendaciones.
+	\item \textbf{Referencias}: formato IEEE.
+	\item \textbf{Apéndice~A}: imágenes generadas por el script/notebook.
+\end{enumerate}
+
+% =============================================================================
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+\begin{enumerate}
+	\item El pipeline de 6 etapas (carga, CLAHE, Sobel/Canny, Otsu,
+	      opening, etiquetado) permite procesar sistemáticamente micrografías
+	      SEM de superficies de fractura, extrayendo información tanto
+	      cualitativa como cuantitativa.
+
+	\item La ecualización adaptativa CLAHE es esencial para micrografías
+	      con iluminación desigual, mejorando el contraste local sin
+	      amplificar el ruido globalmente (controlado por
+	      \texttt{clip\_limit}).
+
+	\item El método de Otsu proporciona un umbral de segmentación óptimo
+	      y automático, evitando la selección manual que introduce
+	      subjetividad.  Su validez depende de que el histograma sea
+	      bimodal.
+
+	\item Las operaciones morfológicas (apertura con disco) son
+	      indispensables para eliminar ruido residual y obtener regiones
+	      que representen características reales de la superficie.
+
+	\item El número de regiones detectadas varía significativamente con
+	      la resolución de la imagen (153 a 2897 regiones), lo que
+	      demuestra la importancia de reportar siempre las condiciones de
+	      magnificación y los parámetros del análisis.
+
+	\item La calibración mediante la barra de escala del SEM es el paso
+	      más crítico para la fiabilidad de las mediciones dimensionales;
+	      un error de 5~píxeles puede introducir un error del 5\% en las
+	      mediciones.
+
+	\item Las herramientas de software (\texttt{P05\_Analisis\_Imagen.py}
+	      y notebook) automatizan el flujo completo --- desde la detección
+	      de imágenes hasta la generación de 30 archivos de resultados ---
+	      garantizando reproducibilidad y trazabilidad del análisis.
+\end{enumerate}
+
+% =============================================================================
+\printbibliography[title={Referencias}]
+
+% =============================================================================
+\appendix
+
+\section{Referencia del Pipeline de Procesamiento}
+\label{sec:appendix_pipeline}
+
+\begin{table}[H]
+	\centering
+	\caption{Resumen de parámetros del pipeline y sus efectos.}
+	\label{tab:parametros_pipeline}
+	\small
+	\begin{tabularx}{\textwidth}{l l l X}
+		\toprule
+		\textbf{Etapa} & \textbf{Parámetro} & \textbf{Valor}
+		& \textbf{Efecto al aumentar}                                           \\
+		\midrule
+		CLAHE          & \texttt{clip\_limit}     & 0,03
+		& Mayor amplificación del contraste local; riesgo de ruido.            \\
+		Canny          & $\sigma$                  & 2,0
+		& Mayor suavizado previo $\to$ menos bordes detectados, más gruesos.   \\
+		Morfología     & disk size                  & 2
+		& Elimina objetos más grandes; reduce $N_\mathrm{regiones}$.           \\
+		Otsu           & ---                        & Automático
+		& Umbral óptimo $t^*$; no tiene parámetro de usuario.                  \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\section{Referencia Rápida de Funciones Python}
+\label{sec:appendix_python}
+
+\begin{table}[H]
+	\centering
+	\caption{Referencia rápida: funciones de \texttt{P05\_Analisis\_Imagen.py}.}
+	\label{tab:ref_python}
+	\small
+	\begin{tabularx}{\textwidth}{l X}
+		\toprule
+		\textbf{Función} & \textbf{Uso rápido}                              \\
+		\midrule
+		\texttt{cargar\_imagen\_gris(path)}
+		& $\rightarrow$ \texttt{ndarray} float $[0,1]$                       \\
+		\texttt{procesar\_clahe(img, 0.03)}
+		& $\rightarrow$ Imagen con contraste mejorado                        \\
+		\texttt{procesar\_sobel(img)}
+		& $\rightarrow$ Mapa de gradientes float                             \\
+		\texttt{procesar\_canny(img, 2.0)}
+		& $\rightarrow$ Imagen binaria de bordes                             \\
+		\texttt{procesar\_otsu(img)}
+		& $\rightarrow$ Máscara binaria (bool)                               \\
+		\texttt{procesar\_morfologia(img, 'opening', 2)}
+		& $\rightarrow$ Máscara refinada                                     \\
+		\texttt{procesar\_etiquetado(img\_bin)}
+		& $\rightarrow$ \texttt{(label\_image, props\_table)}                \\
+		\texttt{run\_full\_analysis(img, 'fatigue3')}
+		& Ejecuta pipeline + guarda 6 PNG + imprime $N$ regiones            \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\section{Formulario Matemático}
+\label{sec:appendix_formulas}
+
+\begin{table}[H]
+	\centering
+	\caption{Resumen de ecuaciones principales.}
+	\small
+	\begin{tabularx}{\textwidth}{l X l}
+		\toprule
+		\textbf{Ecuación}       & \textbf{Expresión}
+		& \textbf{Ref.}                                                   \\
+		\midrule
+		Sobel                   & $|\nabla I| = \sqrt{G_x^2 + G_y^2}$
+		& \eqref{eq:sobel_mag}                                            \\
+		Gaussiano (Canny)       & $G_\sigma = \frac{1}{2\pi\sigma^2}\exp(-\tfrac{r^2}{2\sigma^2})$
+		& \eqref{eq:gauss_kernel}                                         \\
+		Otsu                    & $t^* = \arg\max\;\omega_0\omega_1(\mu_0-\mu_1)^2$
+		& \eqref{eq:otsu_opt}                                             \\
+		Opening                 & $I \circ SE = (I\ominus SE)\oplus SE$
+		& \eqref{eq:opening}                                              \\
+		Calibración             & $s = d_\mathrm{px}/d_\mathrm{real}$
+		& \eqref{eq:escala}                                               \\
+		Error de escala         & $\varepsilon_s = 2n/d_\mathrm{px}\times100\%$
+		& \eqref{eq:error_escala}                                         \\
+		Ley de Paris            & $da/dN = C(\Delta K)^m$
+		& \eqref{eq:paris}                                                \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\end{document}
