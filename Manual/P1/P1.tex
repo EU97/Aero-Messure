@@ -1,0 +1,251 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+% --- ESTILOS TIKZ ---
+\tikzset{
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20, font=\small},
+    process/.style={rectangle, minimum width=4cm, minimum height=1.5cm, text width=3.8cm, text centered, draw=black, fill=orange!15, font=\small},
+    decision/.style={diamond, aspect=2.2, minimum width=3.5cm, minimum height=1cm, text centered, draw=black, fill=green!15, font=\small},
+    arrow/.style={thick,->,>=stealth}
+}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+	\centering
+	{\LARGE Universidad Autónoma de Nuevo León}\\[0.5cm]
+	{\Large Facultad de Ingeniería Mecánica y Eléctrica}\\[2cm]
+
+	{\Large Laboratorio de Técnicas de Medida en Aeronáutica}\\[1cm]
+
+	{\Huge Práctica 1}\\[0.5cm]
+	{\Large Protección Ocular Frente a Radiación Láser}\\[2cm]
+
+	Elaborado para el ciclo escolar:\\
+	2026\\[2cm]
+
+	\vfill
+
+	Resumen Ejecutivo\\
+	Esta práctica se centra en la evaluación analítica de riesgos asociados a fuentes láser de alta potencia empleadas en anemometría (LDA) y velocimetría (PIV). A través del análisis de hojas de especificaciones y modelos matemáticos de exposición, el estudiante determinará la Densidad Óptica (OD) requerida para garantizar la integridad ocular del personal de laboratorio, aplicando normativas internacionales ANSI Z136.1 e IEC 60825-1.
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% --- NOMENCLATURA ---
+\section*{Nomenclatura}
+\begin{description}
+	\item[$\lambda$] Longitud de onda [nm]
+	\item[$P$] Potencia de emisión (onda continua) [W]
+	\item[$E$] Energía por pulso [J]
+	\item[$H_0$] Exposición potencial en la córnea [W/cm$^2$ o J/cm$^2$]
+	\item[$MPE$] Exposición Máxima Permisible [W/cm$^2$ o J/cm$^2$]
+	\item[$OD$] Densidad Óptica (Optical Density)
+	\item[$VLT$] Transmisión de Luz Visible [\%]
+	\item[$a$] Diámetro del haz [cm]
+	\item[$\tau$] Duración del pulso [s]
+\end{description}
+
+\section{Introducción}
+Los láseres son herramientas fundamentales en la ingeniería aeronáutica para técnicas de medición avanzadas como LDA y PIV. Sin embargo, la naturaleza concentrada y coherente de esta radiación representa un riesgo significativo para la visión. Esta práctica introduce los principios de seguridad láser mediante el análisis técnico de escenarios simulados, capacitando al estudiante para evaluar cuantitativamente los requisitos de protección ocular (EPO).
+
+\section{Objetivos de Aprendizaje}
+\begin{itemize}[label=-]
+	\item Identificar peligros asociados a la radiación láser en entornos de investigación aeronáutica.
+	\item Interpretar especificaciones técnicas de fuentes láser y equipos de protección.
+	\item Calcular la Exposición Potencial ($H_0$) y la Densidad Óptica ($OD$) mínima requerida.
+	\item Seleccionar justificadamente el equipo de protección ocular para diversos escenarios experimentales.
+\end{itemize}
+
+\section{Fundamento Teórico}
+
+\subsection{Clasificación de Seguridad Láser}
+Los estándares ANSI Z136.1 e IEC 60825-1 clasifican los sistemas según su peligrosidad:
+\begin{itemize}
+	\item Clase 1/1M: Seguros bajo condiciones normales.
+	\item Clase 2/2M: Láseres visibles de baja potencia ($<1$ mW), protegidos por el reflejo de parpadeo.
+	\item Clase 3R/3B: Riesgo potencial por visión directa; la clase 3B requiere controles significativos.
+	\item Clase 4: Alta potencia ($>500$ mW), peligrosos por reflexión directa, especular y difusa. Obligatoriedad de EPO.
+\end{itemize}
+
+\subsection{Densidad Óptica (OD)}
+La OD es una medida logarítmica de la atenuación proporcionada por un filtro. Se define como:
+\begin{equation}
+	OD = \log_{10} \left( \frac{H_0}{MPE} \right)
+\end{equation}
+Donde una OD de $N$ reduce la intensidad incidente en un factor de $10^N$.
+
+\newpage
+\section{Esquemas de Referencia y Metodología}
+
+\subsection{Interacción Láser-Tejido Ocular}
+La longitud de onda determina qué estructura del ojo absorbe la energía. El mayor riesgo para la retina se encuentra en el rango visible e infrarrojo cercano (400-1400 nm).
+
+\begin{figure}[htbp]
+	\centering
+	\begin{tikzpicture}[scale=0.8]
+		% Representación simplificada del ojo
+		\draw[thick] (0,0) circle (2);
+		\draw[thick] (1.8,-0.8) arc (-20:20:2.5); % Cornea
+		\node at (0,-2.3) {Estructura Ocular};
+
+		% Rayo Laser
+		\draw[red, ultra thick, ->] (4,0) -- (1.9,0);
+		\draw[red, thick, dashed] (1.9,0) -- (0.8,0); % Pasa por lente
+		\draw[red!50, thick, ->] (0.8,0) -- (-1.9,0); % Impacto en retina
+
+		\node at (4.5,0.3) {Haz Láser};
+		\node at (-2.5,0) {Retina};
+		\node at (2.2,1) {Córnea};
+		\node at (-4, -1) [text width=4cm, align=center, font=\scriptsize] {Concentración de irradiancia hasta $10^5$ veces en la retina.};
+	\end{tikzpicture}
+	\caption{Concentración de energía láser por las estructuras oculares.}
+\end{figure}
+
+\subsection{Metodología de Análisis de Datos}
+Para cada escenario láser, el estudiante debe seguir el flujo de decisión para determinar la protección adecuada:
+
+\begin{figure}[htbp]
+	\centering
+	\begin{tikzpicture}[node distance=1.8cm, auto]
+		\node (start) [startstop] {Parámetros Láser ($\lambda$, $P/E$, $a$)};
+		\node (h0) [process, below=of start] {Calcular Exposición $H_0 = \frac{Energía}{Área}$};
+		\node (mpe) [process, below=of h0] {Identificar MPE (Tabla Referencia)};
+		\node (od) [process, below=of mpe] {Calcular $OD_{req} = \log_{10}(\frac{H_0}{MPE})$};
+		\node (sel) [decision, below=of od, yshift=-0.2cm] {¿Gafa $OD_{spec} \ge OD_{req}$?};
+		\node (fine) [startstop, right=of sel, xshift=2cm] {Selección Final (Max VLT)};
+
+		\draw [arrow] (start) -- (h0);
+		\draw [arrow] (h0) -- (mpe);
+		\draw [arrow] (mpe) -- (od);
+		\draw [arrow] (od) -- (sel);
+		\draw [arrow] (sel) -- node[anchor=south] {Sí} (fine);
+		\draw [arrow] (sel.west) -- ++(-1,0) |- node[anchor=east, pos=0.25] {No} (od.west);
+	\end{tikzpicture}
+	\caption{Flujo de selección de equipo de protección ocular.}
+\end{figure}
+
+\newpage
+\section{Casos de Estudio y Datasets}
+
+\subsection{Fuentes Láser Aeronáuticas}
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lccc}
+		\toprule
+		Parámetro          & Láser 1 (PIV)                 & Láser 2 (LDA)                 & Láser 3 (Metrología)          \\
+		\midrule
+		Tipo               & Nd:YAG (Pulsado)              & Argón Ion (CW)                & Diodo (CW)                    \\
+		$\lambda$ [nm]     & 532                           & 514.5                         & 635                           \\
+		Potencia / Energía & 200 mJ/pulso                  & 1.5 W                         & 4.5 mW                        \\
+		Diámetro haz ($a$) & 5 mm                          & 1.2 mm                        & 3 mm                          \\
+		MPE de Ref.        & $5.0 \times 10^{-7}$ J/cm$^2$ & $2.5 \times 10^{-3}$ W/cm$^2$ & $2.5 \times 10^{-3}$ W/cm$^2$ \\
+		\bottomrule
+	\end{tabular}
+	\caption{Especificaciones técnicas de los escenarios de estudio.}
+\end{table}
+
+\subsection{Catálogo de Equipos de Protección (EPO)}
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lllc}
+		\toprule
+		ID Gafa & Color Lente     & OD Especificada                         & VLT (\%) \\
+		\midrule
+		EPO-001 & Naranja         & OD 5+ @ 190-540 nm                      & 40\%     \\
+		EPO-002 & Verde           & OD 2+ @ 630-670 nm; OD 4+ @ 800-1100 nm & 55\%     \\
+		EPO-003 & Azul Cobalto    & OD 7+ @ 190-400 nm; OD 6+ @ 532 nm      & 15\%     \\
+		EPO-005 & Multi-$\lambda$ & OD 7 @ 190-534 nm; OD 5 @ 821-900 nm    & 30\%     \\
+		\bottomrule
+	\end{tabular}
+	\caption{Hojas de especificaciones de gafas de protección disponibles.}
+\end{table}
+
+\section{Actividades a Realizar}
+\begin{enumerate}
+	\item Cálculo de Exposición ($H_0$): Determine el área del haz ($A$) y la densidad de energía/potencia en la córnea para los tres láseres.
+	\item Determinación de OD Requerida: Calcule la $OD_{req}$ para cada escenario.
+	\item Selección de EPO: Justifique qué gafa del catálogo es la óptima para cada láser, priorizando la Transmisión de Luz Visible (VLT) una vez cumplida la OD.
+	\item Análisis de Exposición Prolongada: Recalcule la OD para el Láser 2 (LDA) asumiendo una exposición accidental de 10s ($MPE = 1.0 \times 10^{-3}$ W/cm$^2$).
+\end{enumerate}
+
+\section{Cuestionario de Reflexión Electrónica}
+\begin{enumerate}
+	\item ¿Cómo influye el diámetro del haz ($a$) en la seguridad ocular si la potencia total se mantiene constante?
+	\item Explique por qué el bit de paridad en un bus ARINC 429 es insuficiente ante una falla de hardware en el sensor láser, y cómo la OD previene daños físicos irreversibles.
+	\item ¿Qué compromisos técnicos existen entre una OD alta y una VLT baja en un entorno de laboratorio aeronáutico?
+\end{enumerate}
+
+\newpage
+\appendix
+\section{Herramienta de Verificación (Python)}
+El siguiente script permite automatizar los cálculos de densidad óptica para la validación de los resultados analíticos.
+
+\begin{lstlisting}
+import math
+
+def calcular_od(H0, HMPE):
+    if HMPE <= 0:
+        return "Error: HMPE invalido"
+    if H0 < HMPE:
+        return 0.0 # Seguro sin proteccion
+    return math.log10(H0 / HMPE)
+
+# Ejemplo para Laser 1 (PIV)
+a_cm = 0.5 
+Area = math.pi * (a_cm / 2)**2
+Energia_J = 0.2
+H0_piv = Energia_J / Area
+MPE_piv = 5.0e-7
+
+print(f"OD Requerida Laser 1: {calcular_od(H0_piv, MPE_piv):.2f}")
+\end{lstlisting}
+
+\section{Referencias}
+\begin{enumerate}
+	\item ANSI Z136.1 - American National Standard for Safe Use of Lasers.
+	\item IEC 60825-1 - Safety of laser products – Equipment classification.
+	\item Niemz, M. H. (2007). Laser-Tissue Interactions: Fundamentals and Applications.
+\end{enumerate}
+
+\end{document}

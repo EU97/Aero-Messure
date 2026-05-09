@@ -1,0 +1,269 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+% --- ESTILOS TIKZ ---
+\tikzset{
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20, font=\small},
+    process/.style={rectangle, minimum width=4cm, minimum height=1.5cm, text width=4cm, text centered, draw=black, fill=orange!15, font=\small},
+    decision/.style={diamond, aspect=2.2, minimum width=3.8cm, minimum height=1cm, text centered, draw=black, fill=green!15, font=\small},
+    arrow/.style={thick,->,>=stealth}
+}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \centering
+    {\LARGE Universidad Autónoma de Nuevo León}\\[0.5cm]
+    {\Large Facultad de Ingeniería Mecánica y Eléctrica}\\[2cm]
+    
+    {\Large Laboratorio de Técnicas de Medida en Aeronáutica}\\[1cm]
+    
+    {\Huge Práctica 4}\\[0.5cm]
+    {\Large Anemometría Láser Doppler (LDA): Perfil de Velocidades en Túnel de Viento}\\[2cm]
+    
+    Elaborado para el ciclo escolar:\\
+    2026\\[2cm]
+    
+    \vfill
+    
+    Resumen Ejecutivo\\
+    Esta práctica aborda el uso de la técnica LDA para la caracterización no intrusiva de campos de flujo. El estudiante procesará conjuntos de datos masivos obtenidos en diversas coordenadas axiales y transversales de un túnel de viento. El análisis se centra en la construcción de perfiles de velocidad media y el cálculo de la intensidad de turbulencia, permitiendo evaluar la calidad del flujo libre y el desarrollo de estelas o capas límite bajo diferentes condiciones de Reynolds.
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% --- NOMENCLATURA ---
+\section*{Nomenclatura}
+\begin{description}
+    \item[$f_D$] Frecuencia Doppler detectada [Hz]
+    \item[$\lambda$] Longitud de onda del láser [nm]
+    \item[$\delta_f$] Espaciado entre franjas de interferencia [$\mu$m]
+    \item[$U_\perp$] Componente de velocidad perpendicular a las franjas [m/s]
+    \item[$\bar{u}$] Velocidad media temporal [m/s]
+    \item[$e^2$] Intensidad de turbulencia (parámetro adimensional)
+    \item[$z/D$] Posición axial adimensionalizada
+    \item[$r/R$] Posición transversal adimensionalizada
+\end{description}
+
+\section{Introducción}
+La Anemometría Láser Doppler (LDA) representa el estándar de oro en la medición de velocidad de flujos aeroespaciales debido a su naturaleza no intrusiva y alta resolución espacial. Al no requerir sondas físicas en el flujo, evita la generación de ondas de choque o perturbaciones en la capa límite. En esta práctica, el estudiante actuará como ingeniero de post-procesamiento, analizando la estructura de perfiles de velocidad en un túnel de viento para diagnosticar la uniformidad del flujo y la evolución de estructuras turbulentas.
+
+\section{Objetivos de Aprendizaje}
+\begin{itemize}[label=-]
+    \item Comprender los principios físicos del efecto Doppler y la generación de franjas de interferencia.
+    \item Procesar datos crudos de velocidad instantánea para derivar parámetros estadísticos ($\bar{u}$, $e^2$).
+    \item Construir perfiles transversales de velocidad y turbulencia en diferentes secciones axiales ($z/D$).
+    \item Comparar el efecto de la velocidad del flujo libre en la forma de los perfiles normalizados.
+    \item Interpretar los resultados en el contexto de la calidad del túnel de viento y el desarrollo de estelas.
+\end{itemize}
+
+\section{Fundamento Teórico}
+
+\subsection{El Principio de Medición Óptica}
+El sistema LDA mide la velocidad de partículas trazadoras que atraviesan un volumen de medición formado por el cruce de dos haces láser. La intersección crea un patrón de interferencia. La frecuencia Doppler $f_D$ es proporcional a la velocidad de la partícula:
+\begin{equation}
+    U_\perp = f_D \cdot \delta_f, \quad \delta_f = \frac{\lambda}{2 \sin(\kappa)}
+\end{equation}
+Donde $\kappa$ es el semiángulo de cruce de los haces.
+
+\subsection{Intensidad de Turbulencia ($e^2$)}
+Para caracterizar las fluctuaciones del flujo, se utiliza un parámetro que relaciona las desviaciones cuadráticas con la fluctuación máxima observada:
+\begin{equation}
+    e^2 = \frac{\sqrt{\sum_{i=1}^N | \bar{u}^2 - u_i^2 |}}{\max_i | \bar{u} - u_i |}
+\end{equation}
+Un valor bajo de $e^2$ indica un flujo laminar o una corriente libre de alta calidad, mientras que valores elevados sugieren la presencia de turbulencia desarrollada o estelas de objetos.
+
+\section{Metodología de Análisis de Datos}
+
+\subsection{Arquitectura del Sistema de Medición}
+El esquema ilustra la disposición típica de un sistema LDA en configuración de retro-dispersión para el mapeo de perfiles transversales.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Laser unit
+        \draw[fill=gray!10] (-5,-1) rectangle (-3,1);
+        \node at (-4,0) [font=\tiny, align=center] {Láser /\\ Fotodetector};
+        
+        % Beams
+        \draw[red, thick] (-3,0.5) -- (1,0);
+        \draw[red, thick] (-3,-0.5) -- (1,0);
+        
+        % Measurement Volume
+        \draw[fill=yellow!20, draw=orange] (1,0) ellipse (0.3 and 0.5);
+        \node at (1.5,0.8) [font=\tiny] {Volumen de Medida};
+        
+        % Wind tunnel test section
+        \draw[thick] (-1, -1.5) -- (3, -1.5);
+        \draw[thick] (-1, 1.5) -- (3, 1.5);
+        \node at (1, 2) [font=\small] {Sección de Pruebas};
+        
+        % Traverse system
+        \draw[<->, thick] (1,-1) -- (1,1);
+        \node at (1.5, -0.5) [font=\tiny, rotate=90] {Barrido Transversal ($r/R$)};
+    \end{tikzpicture}
+    \caption{Esquema de posicionamiento LDA para la obtención de perfiles de velocidad.}
+\end{figure}
+
+\subsection{Flujo de Procesamiento Algorítmico}
+El tratamiento de datos requiere la automatización mediante el script proporcionado en el apéndice.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[node distance=1.7cm, auto]
+        \node (input) [startstop] {4 Sets de Datos (FX01 a FX04)};
+        \node (pos) [process, below=of input] {Lectura de \texttt{Posiciones.txt} (Mapeo $r/R$)};
+        \node (raw) [process, below=of pos] {Extracción de Velocidad (Penúltima Columna)};
+        \node (stats) [process, below=of raw] {Cálculo de $\bar{u}$ y $e^2$ por punto};
+        \node (plot) [process, below=of stats] {Generación de Perfiles $U$ vs $r/R$};
+        \node (comp) [decision, below=of plot, yshift=-0.2cm] {¿Análisis de Estelas?};
+        \node (end) [startstop, right=of comp, xshift=2cm] {Informe AIAA};
+        
+        \draw [arrow] (input) -- (pos);
+        \draw [arrow] (pos) -- (raw);
+        \draw [arrow] (raw) -- (stats);
+        \draw [arrow] (stats) -- (plot);
+        \draw [arrow] (plot) -- (comp);
+        \draw [arrow] (comp) -- node[anchor=south] {Sí} (end);
+        \draw [arrow] (comp.west) -- ++(-1,0) |- node[anchor=east, pos=0.25] {No} (plot.west);
+    \end{tikzpicture}
+    \caption{Secuencia de análisis estadístico de datos LDA.}
+\end{figure}
+
+\newpage
+\section{Casos de Estudio y Datasets}
+
+\subsection{Organización de las Campañas de Medida}
+El experimento contempla dos variables: la posición axial ($z/D$) y la velocidad de flujo libre ($U_\infty$).
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{cccc}
+        \toprule
+        Set de Datos & Carpeta & Posición Axial ($z/D$) & Velocidad Túnel \\
+        \midrule
+        1 & FX01G00 & 10 & Baja ($U_1$) \\
+        2 & FX02G00 & 10 & Alta ($U_2$) \\
+        3 & FX03G00 & 50 & Baja ($U_1$) \\
+        4 & FX04G00 & 50 & Alta ($U_2$) \\
+        \bottomrule
+    \end{tabular}
+    \caption{Condiciones experimentales para el análisis de perfiles.}
+\end{table}
+
+\subsection{Estructura del Dataset por Posición}
+Cada carpeta contiene archivos \texttt{.txt} donde la penúltima columna almacena la velocidad instantánea. El archivo \texttt{Posiciones.txt} es el índice que vincula cada archivo con su coordenada $r/R$.
+
+\section{Actividades a Realizar}
+\begin{enumerate}
+    \item Configuración del Script: Ajuste las rutas en el archivo \texttt{analizador\_lda\_p4.py} para que coincidan con su estructura de carpetas.
+    \item Procesamiento Estadístico: Ejecute el análisis para obtener la velocidad media y la intensidad de turbulencia en cada una de las 21 posiciones transversales de cada set.
+    \item Graficación Comparativa: Superponga los 4 perfiles de velocidad media en un solo gráfico y los 4 de turbulencia en otro.
+    \item Análisis de Simetría: Evalúe si los perfiles son simétricos respecto al eje central ($r/R = 0$).
+\end{enumerate}
+
+\section{Análisis de Resultados y Graficación}
+En el reporte AIAA se deben incluir y discutir las siguientes visualizaciones:
+\begin{enumerate}
+    \item Perfiles de Velocidad: Identifique el "flatness" (achatamiento) de la región central. ¿A qué distancia de la pared empieza a decaer la velocidad?
+    \item Distribución de Turbulencia: Grafique $e^2$ vs $r/R$. Discuta por qué los picos de turbulencia coinciden con las zonas de mayor gradiente de velocidad ($\partial u / \partial r$).
+    \item Efecto del Reynolds: Al aumentar la velocidad del túnel (de Set 1 a Set 2), ¿el perfil de velocidad normalizado ($u/U_\infty$) mantiene su forma? Justifique basándose en la teoría de flujos auto-similares.
+\end{enumerate}
+
+\section{Preguntas de Discusión Electrónica y Física}
+\begin{enumerate}
+    \item ¿Cómo afecta la densidad de partículas trazadoras (seeding) a la precisión del promedio estadístico calculado por el script?
+    \item En el sistema óptico, ¿por qué es necesario que los dos haces tengan exactamente la misma longitud de onda y polarización?
+    \item Explique por qué el parámetro $e^2$ utiliza el valor máximo de la fluctuación en el denominador. ¿Cómo ayuda esto a normalizar la turbulencia frente a ruidos espurios de alta amplitud?
+    \item Si se utilizara un tubo de Pitot en lugar de LDA, ¿cómo afectaría el tamaño físico de la sonda a la resolución del perfil cerca de la pared ($r/R \to 1$)?
+\end{enumerate}
+
+\section{Lineamientos del Reporte (AIAA)}
+El informe debe presentar una comparación detallada entre las posiciones $z/D=10$ y $z/D=50$, analizando el ensanchamiento de la estela o el crecimiento de la capa límite.
+
+\newpage
+\appendix
+\section{Apéndice: Script de Análisis (\texttt{analizador\_lda\_p4.py})}
+Este script automatiza la lectura de los 4 sets y la generación de perfiles comparativos.
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+# CONSTANTES
+RADIO_REF = 26.0 # mm
+
+def analizar_lda(filepath):
+    try:
+        # Carga de datos asumiendo formato de columnas
+        df = pd.read_csv(filepath, sep='\s+', header=None)
+        u_instantanea = df.iloc[:, -2].values # Penultima columna
+        
+        u_bar = np.mean(u_instantanea)
+        
+        # Calculo de Intensidad de Turbulencia e^2
+        if len(u_instantanea) > 0:
+            numerador = np.sqrt(np.sum(np.abs(u_bar**2 - u_instantanea**2)))
+            denominador = np.max(np.abs(u_bar - u_instantanea))
+            e2 = numerador / denominador if denominador != 0 else 0
+        else:
+            u_bar, e2 = 0, 0
+            
+        return u_bar, e2
+    except Exception as e:
+        return None, None
+
+# El script debe iterar sobre las carpetas FX01G00 a FX04G00 
+# y graficar los resultados comparativos.
+\end{lstlisting}
+
+\section{Referencias}
+\begin{enumerate}
+    \item Albrecht, H.-E. et al. (2003). Laser Doppler and Phase Doppler Measurement Techniques. Springer.
+    \item Barlow, J. B., Rae, W. H., \& Pope, A. (1999). Low-Speed Wind Tunnel Testing.
+    \item White, F. M. (2016). Fluid Mechanics. McGraw-Hill.
+\end{enumerate}
+
+\end{document}

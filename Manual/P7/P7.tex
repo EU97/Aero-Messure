@@ -1,0 +1,250 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+% --- ESTILOS TIKZ ---
+\tikzset{
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20, font=\small},
+    process/.style={rectangle, minimum width=4.2cm, minimum height=1.5cm, text width=4cm, text centered, draw=black, fill=orange!15, font=\small},
+    decision/.style={diamond, aspect=2.2, minimum width=3.8cm, minimum height=1cm, text centered, draw=black, fill=green!15, font=\small},
+    arrow/.style={thick,->,>=stealth}
+}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \centering
+    {\LARGE Universidad Autónoma de Nuevo León}\\[0.5cm]
+    {\Large Facultad de Ingeniería Mecánica y Eléctrica}\\[2cm]
+    
+    {\Large Laboratorio de Técnicas de Medida en Aeronáutica}\\[1cm]
+    
+    {\Huge Práctica 7}\\[0.5cm]
+    {\Large Termografía Infrarroja y Diagnóstico Térmico}\\[2cm]
+    
+    Elaborado para el ciclo escolar:\\
+    2026\\[2cm]
+    
+    \vfill
+    
+    Resumen Ejecutivo\\
+    Esta práctica se enfoca en el uso de la termografía infrarroja como herramienta de diagnóstico sin contacto para la integridad de sistemas aeronáuticos. El estudiante analizará termogramas digitales para identificar anomalías en motores, estructuras de materiales compuestos y sistemas de aviónica. El enfoque analítico se centra en la interpretación de escalas de temperatura aparente, la influencia de la emisividad en la precisión de la medida y la caracterización estadística de distribuciones térmicas mediante histogramas de intensidad.
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% --- NOMENCLATURA ---
+\section*{Nomenclatura}
+\begin{description}
+    \item[$\epsilon$] Emisividad (adimensional, $0 < \epsilon < 1$)
+    \item[$\lambda$] Longitud de onda de radiación [$\mu$m]
+    \item[$W_{obj}$] Radiación emitida por el objeto [W/m$^2$]
+    \item[$W_{ref}$] Radiación reflejada del entorno [W/m$^2$]
+    \item[$W_{total}$] Radiación total detectada por la cámara [W/m$^2$]
+    \item[$T_{refl}$] Temperatura reflejada aparente [$^\circ$C o K]
+    \item[ROI] Región de Interés (Region of Interest)
+    \item[LWIR] Infrarrojo de onda larga ($8 - 14\,\mu$m)
+\end{description}
+
+\section{Introducción}
+La termografía infrarroja es una técnica esencial en la ingeniería aeronáutica que permite visualizar y cuantificar patrones de temperatura superficial de forma no intrusiva. Su capacidad para detectar gradientes térmicos sutiles es crucial para la inspección de delaminaciones en composites, la monitorización de puntos calientes en sistemas de potencia y la validación de sistemas de protección térmica (anti-ice). En esta práctica, el estudiante desarrollará habilidades para transformar imágenes térmicas en datos de diagnóstico fiables, considerando los factores ambientales y físicos que afectan la medición.
+
+\section{Objetivos de Aprendizaje}
+\begin{itemize}[label=-]
+    \item Comprender los principios físicos de la radiación de cuerpo negro y la ley de Stefan-Boltzmann.
+    \item Identificar componentes y parámetros de configuración en sistemas de adquisición termográfica.
+    \item Analizar cualitativamente termogramas para la identificación de fallos latentes.
+    \item Extraer datos cuantitativos de temperatura aparente utilizando escalas y paletas de colores.
+    \item Evaluar la distribución térmica en componentes críticos mediante el uso de histogramas y análisis de ROI.
+\end{itemize}
+
+\section{Fundamento Teórico}
+
+\subsection{Física de la Medición Infrarroja}
+Todo cuerpo con una temperatura superior al cero absoluto emite radiación electromagnética. La cámara termográfica capta la irradiancia total, la cual es una combinación de la emisión propia del objeto, las reflexiones del entorno y la transmisión a través del medio.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Objeto
+        \draw[thick, fill=orange!20] (0,0) rectangle (2,3);
+        \node at (1,1.5) {Objeto};
+        
+        % Radiación emitida
+        \draw[->, red, very thick] (2,2.5) -- (5,2.5) node[midway, above, font=\tiny] {$\epsilon \cdot W_{obj}$ (Emitida)};
+        
+        % Radiación reflejada
+        \draw[<-, blue, thick] (2,1.5) -- (4,0.5) node[pos=0.5, below right, font=\tiny] {$W_{amb}$};
+        \draw[->, blue, thick] (2,1.5) -- (5,1.5) node[midway, above, font=\tiny] {$(1-\epsilon) \cdot W_{ref}$ (Reflejada)};
+        
+        % Cámara
+        \draw[fill=gray!30] (5,1) rectangle (7,3);
+        \draw (5.5,1.5) circle (0.3);
+        \node at (6,0.5) {Cámara IR};
+        
+        \node at (3.5, -0.5) [font=\scriptsize, text width=8cm, align=center] {Balance de radiación: $W_{total} = \epsilon W_{obj} + (1-\epsilon) W_{ref}$ para objetos opacos.};
+    \end{tikzpicture}
+    \caption{Componentes de la radiación detectada por un sensor infrarrojo.}
+\end{figure}
+
+\subsection{Importancia de la Emisividad ($\epsilon$)}
+La emisividad describe la eficiencia con la que un material emite energía en comparación con un cuerpo negro ideal. Los materiales aeronáuticos, como el aluminio pulido, presentan emisividades bajas ($\epsilon < 0.1$), lo que dificulta la medición directa debido a la dominancia de las reflexiones externas. Por el contrario, los materiales compuestos y las superficies pintadas suelen tener emisividades altas ($\epsilon > 0.85$), facilitando el diagnóstico térmico.
+
+\section{Metodología de Análisis de Datos}
+
+\subsection{Flujo de Trabajo para el Análisis de Termogramas}
+El estudiante procesará los datasets siguiendo la secuencia lógica para asegurar una interpretación correcta de las anomalías detectadas:
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[node distance=1.8cm, auto]
+        \node (start) [startstop] {Carga de Termograma (JPG)};
+        \node (eval) [process, below=of start] {Identificación de Escala y Rango ($T_{min} - T_{max}$)};
+        \node (roi) [process, below=of eval] {Selección de ROIs (Puntos Críticos vs Referencia)};
+        \node (hist) [process, below=of roi] {Generación de Histograma de Intensidad};
+        \node (diag) [decision, below=of hist, yshift=-0.2cm] {¿Anomalía Térmica?};
+        \node (rep) [startstop, right=of diag, xshift=2cm] {Informe AIAA};
+        
+        \draw [arrow] (start) -- (eval);
+        \draw [arrow] (eval) -- (roi);
+        \draw [arrow] (roi) -- (hist);
+        \draw [arrow] (hist) -- (diag);
+        \draw [arrow] (diag) -- node[anchor=south] {Sí} (rep);
+        \draw [arrow] (diag.west) -- ++(-1,0) |- node[anchor=east, pos=0.25] {No} (roi.west);
+    \end{tikzpicture}
+    \caption{Metodología para el diagnóstico de componentes mediante análisis térmico.}
+\end{figure}
+
+\newpage
+\section{Casos de Estudio y Datasets}
+
+\subsection{Descripción del Conjunto de Imágenes}
+Se proporcionan seis archivos de imagen que representan diferentes escenarios de interés aeronáutico y civil para la comparación de firmas térmicas.
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{llcc}
+        \toprule
+        Archivo & Escenario & Rango de Escala [$^\circ$C] & Parámetro Crítico \\
+        \midrule
+        Imagen1.jpg & Aeronave con motor en operación & N/A & Huella térmica motor \\
+        Imagen2.jpg & Diferenciación biológica (Mano) & 21.9 - 33.8 & Gradiente en extremidades \\
+        Imagen5.jpg & Sistemas de fluidos calientes & Variable & Disipación convectiva \\
+        Imagen6.jpg & Inspección de cableado/uniones & 25.2 - 40.7 & Punto caliente localizado \\
+        \bottomrule
+    \end{tabular}
+    \caption{Datasets de referencia para la evaluación termográfica.}
+\end{table}
+
+\section{Actividades a Realizar}
+\begin{enumerate}
+    \item Visualización de Patrones: Cargue las imágenes y describa cualitativamente las zonas de mayor emisión. Relacione el color con la temperatura aparente según la paleta.
+    \item Extracción de Datos de Escala: En las imágenes con escala visible (Imagen 2 y 6), calcule la sensibilidad de la paleta (grados por unidad de intensidad lumínica).
+    \item Análisis de ROI: Seleccione dos regiones en Imagen 6: una zona sobre el punto caliente y otra de referencia en el fondo. Estime la diferencia de temperatura ($\Delta T$).
+    \item Caracterización Estadística: Utilice el script de Python para generar el histograma de Imagen 5. Identifique si existen dos picos de temperatura (distribución bimodal) que separen el fluido del recipiente.
+\end{enumerate}
+
+\section{Análisis de Resultados y Graficación}
+En el reporte técnico se deben documentar y discutir las siguientes situaciones:
+\begin{enumerate}
+    \item Interpretación de Histogramas: Explique la forma del histograma obtenido. ¿Qué indica una distribución ancha frente a una distribución estrecha en términos de uniformidad térmica?
+    \item Sensibilidad a la Emisividad: Discuta cómo cambiaría la temperatura reportada en Imagen 1 si el fuselaje fuera de aluminio pulido sin pintura. ¿Sería la temperatura real mayor o menor a la mostrada?
+    \item Identificación de Fallos: Basándose en el Caso de Estudio del ala de composite, describa cómo una delaminación (aire atrapado) altera la firma térmica superficial debido a su baja conductividad.
+\end{enumerate}
+
+\section{Preguntas de Discusión Electrónica y Física}
+\begin{enumerate}
+    \item ¿Por qué las lentes de las cámaras termográficas se fabrican de Germanio o Silicio en lugar de vidrio convencional?
+    \item Explique el concepto de "Temperatura Reflejada" y cómo un ingeniero debe compensarla al medir superficies metálicas en un hangar iluminado.
+    \item En la inspección de paneles solares de satélites, ¿qué ventaja ofrece la termografía sobre el uso de termopares discretos?
+    \item Discuta las limitaciones de las imágenes en formato JPG para el análisis cuantitativo frente a los archivos radiométricos de 14 bits.
+\end{enumerate}
+
+\section{Lineamientos del Reporte (AIAA)}
+El reporte debe presentar el análisis detallado de al menos tres imágenes, incluyendo la justificación física de los patrones observados. Se debe incluir la tabla de resultados de ROIs y una discusión sobre la aplicación de esta técnica en el mantenimiento preventivo de motores de reacción (inspección de álabes y cámaras de combustión).
+
+\newpage
+\appendix
+\section{Apéndice: Script de Análisis Térmico (\texttt{analisis\_termico.py})}
+Este script permite cargar termogramas JPG, recortar regiones de interés y analizar su distribución de intensidad.
+
+\begin{lstlisting}[language=Python]
+import matplotlib.pyplot as plt
+from PIL import Image
+import numpy as np
+
+def analizar_roi_termico(path, coords=None):
+    # Carga de imagen y conversion a escala de grises (Luminancia)
+    img = Image.open(path).convert('L')
+    img_array = np.array(img)
+    
+    if coords:
+        # Recorte de ROI (left, upper, right, lower)
+        roi = img_array[coords[1]:coords[3], coords[0]:coords[2]]
+    else:
+        roi = img_array
+
+    # Visualizacion
+    plt.figure(figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    plt.imshow(roi, cmap='hot')
+    plt.title('Visualizacion ROI')
+    plt.axis('off')
+    
+    plt.subplot(1, 2, 2)
+    plt.hist(roi.flatten(), bins=256, color='red', alpha=0.7, density=True)
+    plt.title('Histograma de Intensidad Termica')
+    plt.xlabel('Nivel de Gris (0-255)')
+    plt.ylabel('Frecuencia')
+    plt.show()
+
+# Ejemplo: analizar_roi_termico('Imagen5.jpg', (100, 100, 300, 300))
+\end{lstlisting}
+
+\section{Referencias}
+\begin{enumerate}
+    \item Meola, C. (2012). Infrared Thermography in the Evaluation of Aerospace Composite Materials. Woodhead Publishing.
+    \item ASTM E1933: Standard Practice for Measuring and Compensating for Emissivity Using Infrared Imaging Radiometers.
+    \item Vollmer, M., \& Möllmann, K. P. (2017). Infrared Thermal Imaging: Fundamentals, Research and Applications.
+\end{enumerate}
+
+\end{document}

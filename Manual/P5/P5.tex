@@ -1,0 +1,252 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[spanish, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{spanish}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Configuración de la fuente Noto Sans
+\babelfont{rm}{Noto Sans}
+
+% Paquetes técnicos
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[siunitx, american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{caption}
+
+% --- ESTILO DE CÓDIGO ---
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\tiny,
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green!60!black},
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    backgroundcolor=\color{gray!5}
+}
+
+% --- ESTILOS TIKZ ---
+\tikzset{
+    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20, font=\small},
+    process/.style={rectangle, minimum width=4cm, minimum height=1.5cm, text width=4cm, text centered, draw=black, fill=orange!15, font=\small},
+    decision/.style={diamond, aspect=2.2, minimum width=3.5cm, minimum height=1cm, text centered, draw=black, fill=green!15, font=\small},
+    arrow/.style={thick,->,>=stealth}
+}
+
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \centering
+    {\LARGE Universidad Autónoma de Nuevo León}\\[0.5cm]
+    {\Large Facultad de Ingeniería Mecánica y Eléctrica}\\[2cm]
+    
+    {\Large Laboratorio de Técnicas de Medida en Aeronáutica}\\[1cm]
+    
+    {\Huge Práctica 5}\\[0.5cm]
+    {\Large Análisis de Imagen Digital y Fractografía mediante SEM}\\[2cm]
+    
+    Elaborado para el ciclo escolar:\\
+    2026\\[2cm]
+    
+    \vfill
+    
+    Resumen Ejecutivo\\
+    Esta sesión experimental aborda la aplicación de técnicas de análisis de imagen digital para la inspección de superficies de fractura en materiales aeronáuticos. Utilizando micrografías obtenidas por Microscopía Electrónica de Barrido (SEM), el estudiante realizará diagnósticos cualitativos de modos de falla y mediciones cuantitativas microestructurales. El enfoque analítico simula los protocolos de investigación de accidentes y análisis de falla de componentes críticos como trenes de aterrizaje y álabes de turbina.
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% --- NOMENCLATURA ---
+\section*{Nomenclatura}
+\begin{description}
+    \item[SEM] Microscopía Electrónica de Barrido (Scanning Electron Microscopy)
+    \item[EHT] Voltaje de aceleración del haz de electrones [kV]
+    \item[Mag] Magnificación o aumento óptico
+    \item[WD] Distancia de trabajo (Working Distance) [mm]
+    \item[$\mu$m] Micrómetro (un mil millonésimo de metro)
+    \item[VLT] Transmisión de Luz Visible (en filtros ópticos)
+    \item[EDS] Espectroscopía de energía dispersiva
+\end{description}
+
+\section{Introducción}
+El análisis de superficies de fractura, o fractografía, es una disciplina fundamental en la ingeniería aeronáutica para determinar la causa raíz de las fallas mecánicas. Las micrografías SEM ofrecen una alta resolución y gran profundidad de campo, permitiendo visualizar la topografía a escala microscópica. En esta práctica, el estudiante procesará imágenes digitales para identificar mecanismos de propagación de grietas y dimensionar características como hoyuelos, facetas de clivaje o estrías de fatiga.
+
+\section{Objetivos de Aprendizaje}
+\begin{itemize}[label=-]
+    \item Comprender el rol del análisis fractográfico en la seguridad y mantenimiento aeronáutico.
+    \item Interpretar metadatos de adquisición SEM y calibrar escalas espaciales en entornos digitales.
+    \item Aplicar algoritmos de pre-procesamiento para mejorar el contraste de superficies rugosas.
+    \item Diagnosticar modos de fractura (Dúctil vs Frágil) basándose en evidencia topográfica.
+    \item Realizar metrología cuantitativa de micro-vacíos y precipitados utilizando scripts de análisis.
+\end{itemize}
+
+\section{Fundamento Teórico}
+
+\subsection{Microscopía Electrónica de Barrido (SEM)}
+A diferencia de la microscopía óptica, el SEM utiliza un haz de electrones focalizado que barre la superficie de la muestra. La interacción de los electrones con la materia genera señales (electrones secundarios y retrodispersados) que se convierten en una imagen digital con una profundidad de campo superior, ideal para superficies irregulares de fractura.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[scale=0.8]
+        % Columna de electrones
+        \draw[thick, fill=gray!20] (-1,4) rectangle (1,5);
+        \node at (0,4.5) [font=\tiny] {Cañón $e^-$};
+        
+        % Lentes
+        \draw[thick] (-1.5,3) arc (180:360:1.5 and 0.2);
+        \draw[thick] (-1.5,3) arc (180:0:1.5 and 0.2);
+        \node at (2,3) [font=\tiny] {Lente Electromagnética};
+        
+        % Haz
+        \draw[blue!50, line width=1.5pt] (0,4) -- (0,0);
+        
+        % Muestra
+        \draw[thick, fill=orange!20] (-1.5,-0.5) -- (1.5,-0.5) -- (1,-1) -- (-1,-1) -- cycle;
+        \node at (0,-1.3) [font=\tiny] {Espécimen de Fractura};
+        
+        % Detector
+        \draw[thick, fill=green!10] (2,1) circle (0.5);
+        \node at (2,0.3) [font=\tiny] {Detector};
+        \draw[->, dashed] (0.2,0.1) -- (1.6,0.8);
+        
+        \node at (0,-2.5) [font=\scriptsize, text width=8cm, align=center] {Representación del principio de adquisición SEM mediante escaneo de haz.};
+    \end{tikzpicture}
+    \caption{Componentes básicos de un microscopio electrónico de barrido.}
+\end{figure}
+
+\subsection{Mecanismos de Fractura en Materiales Aeroespaciales}
+\begin{itemize}
+    \item Fractura Dúctil: Manifestada microscópicamente por hoyuelos (dimples), producto de la coalescencia de micro-vacíos. Indica alta absorción de energía.
+    \item Fractura Frágil: Caracterizada por facetas de clivaje planas y "patrones de río". Ocurre con mínima deformación plástica.
+    \item Fatiga: Reconocible por estrías paralelas que indican el avance del frente de grieta por cada ciclo de carga.
+\end{itemize}
+
+\section{Metodología de Análisis de Imagen}
+
+\subsection{Flujo de Trabajo para Metrología Digital}
+El estudiante procesará los especímenes siguiendo una secuencia lógica para garantizar la fiabilidad de las mediciones:
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[node distance=1.8cm, auto]
+        \node (start) [startstop] {Carga de Micrografía (JPG)};
+        \node (cal) [process, below=of start] {Calibración: Selección de Barra de Escala ($\mu$m/píxel)};
+        \node (pre) [process, below=of cal] {Pre-procesamiento: Ajuste de Brillo y Contraste};
+        \node (qual) [process, below=of pre] {Identificación de Rasgos (Dimples, Estrías)};
+        \node (quant) [process, below=of qual] {Medición Dimensional de Características};
+        \node (end) [startstop, right=of quant, xshift=2cm] {Informe AIAA};
+        
+        \draw [arrow] (start) -- (cal);
+        \draw [arrow] (cal) -- (pre);
+        \draw [arrow] (pre) -- (qual);
+        \draw [arrow] (qual) -- (quant);
+        \draw [arrow] (quant) -- (end);
+    \end{tikzpicture}
+    \caption{Metodología de análisis fractográfico asistido por computadora.}
+\end{figure}
+
+\section{Casos de Estudio y Datasets}
+
+\subsection{Descripción del Conjunto de Datos}
+Se analizarán 8 especímenes distribuidos en dos cuadrículas de imágenes (\texttt{fatigue.jpg} y \texttt{fatrigue2.jpg}). Cada espécimen contiene una barra de escala que debe ser utilizada como patrón de calibración.
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ccccc}
+        \toprule
+        Espécimen ID & Archivo Origen & Ubicación & Mag. Nominal & Escala [$\mu$m] \\
+        \midrule
+        0 & fatigue.jpg & Sup. Izq. &  &  \\
+        1 & fatigue.jpg & Sup. Der. &  &  \\
+        4 & fatrigue2.jpg & Sup. Izq. &  &  \\
+        7 & fatrigue2.jpg & Inf. Der. &  &  \\
+        \bottomrule
+    \end{tabular}
+    \caption{Matriz de inspección para los especímenes de fractura.}
+\end{table}
+
+\section{Actividades a Realizar}
+\begin{enumerate}
+    \item Procesamiento con Script: Utilice \texttt{analisis\_sem.py} para cargar cada uno de los 8 especímenes.
+    \item Calibración de Precisión: Realice los dos clics requeridos en los extremos de la barra de escala para establecer la relación espacial.
+    \item Diagnóstico Cualitativo: Identifique si la superficie presenta hoyuelos (ductilidad) o facetas de clivaje (fragilidad). Marque estos rasgos en sus capturas.
+    \item Análisis Estadístico: Realice al menos 15 mediciones del diámetro de hoyuelos en zonas representativas para calcular el valor promedio y la dispersión.
+\end{enumerate}
+
+\section{Análisis de Resultados y Graficación}
+En el reporte se deben documentar y discutir las siguientes situaciones:
+\begin{enumerate}
+    \item Efecto de la Magnificación: Compare una característica medida a bajo y alto aumento. ¿Cómo varía la precisión de la medición al aumentar la resolución de píxel por micrómetro?
+    \item Distribución de Tamaño de Rasgo: Genere un histograma con las mediciones cuantitativas realizadas. Discuta si la distribución es uniforme o si existen zonas de fractura mixta.
+    \item Verificación de Escala: Explique qué error porcentual se introduciría en la medición si la selección de la barra de escala tuviera un error de 5 píxeles.
+\end{enumerate}
+
+\section{Preguntas de Discusión Electrónica y de Materiales}
+\begin{enumerate}
+    \item ¿Por qué el bombardeo de electrones en el SEM requiere que la muestra sea conductora o esté recubierta con una capa de oro/carbono?
+    \item En la instrumentación del SEM, ¿cómo influye el voltaje de aceleración (EHT) en la penetración del haz y el contraste de la imagen digital resultante?
+    \item Si se detecta una fractura intergranular, ¿qué puede inferirse sobre la composición química en los límites de grano o el historial de tratamiento térmico del componente?
+    \item Explique por qué el análisis de imagen 2D tiene limitaciones para representar la rugosidad volumétrica real de una fractura por impacto.
+\end{enumerate}
+
+\section{Lineamientos del Reporte (AIAA)}
+El reporte técnico debe presentar la evidencia fotográfica de cada espécimen analizado, señalando con flechas los puntos de origen de falla identificados. Se debe incluir la tabla de mediciones promediadas y la conclusión sobre el mecanismo de falla más probable para el componente aeronáutico simulado.
+
+\newpage
+\appendix
+\section{Apéndice: Script de Análisis (\texttt{analisis\_sem.py})}
+Script interactivo para la calibración y medición dimensional en micrografías SEM.
+
+\begin{lstlisting}[language=Python]
+import matplotlib.pyplot as plt
+from PIL import Image, ImageEnhance
+import numpy as np
+
+def calibrar_escala(imagen):
+    print("Seleccione los dos extremos de la barra de escala.")
+    fig, ax = plt.subplots()
+    ax.imshow(np.array(imagen))
+    puntos = plt.ginput(2, timeout=-1)
+    plt.close()
+    
+    dist_pix = np.sqrt((puntos[1][0]-puntos[0][0])**2 + (puntos[1][1]-puntos[0][1])**2)
+    valor_real = float(input("Ingrese longitud real en micrometros: "))
+    return valor_real / dist_pix
+
+def medir(imagen, um_per_pixel):
+    fig, ax = plt.subplots()
+    ax.imshow(np.array(imagen))
+    print("Haga clic en 2 puntos para medir rasgo.")
+    puntos = plt.ginput(2, timeout=-1)
+    plt.close()
+    
+    dist_pix = np.sqrt((puntos[1][0]-puntos[0][0])**2 + (puntos[1][1]-puntos[0][1])**2)
+    print(f"Medida: {dist_pix * um_per_pixel:.2f} um")
+
+# El script principal permite navegar entre los 8 especimenes
+\end{lstlisting}
+
+\section{Referencias}
+\begin{enumerate}
+    \item ASM Handbook, Volume 12: Fractography. ASM International.
+    \item Hull, D. (1999). Fractography: Observing, Measuring and Interpreting Fracture Surface Topography. Cambridge University Press.
+    \item Niemz, M. H. (2007). Laser-Tissue Interactions: Fundamentals and Applications.
+\end{enumerate}
+
+\end{document}
