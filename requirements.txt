@@ -17,3 +17,5 @@ tabulate
 ipympl
 plotly
 kaleido
+ipykernel
+ipython

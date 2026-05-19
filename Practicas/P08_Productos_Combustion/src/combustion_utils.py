@@ -188,23 +188,88 @@ def load_data(data_dir: Path) -> pd.DataFrame:
         print_status(f"Consolidado guardado: {out_csv}")
     else:
         print_status("No se encontraron archivos de datos. Generando ejemplo sintético.")
-        np.random.seed(7)
-        n = 600
-        t = pd.date_range("2025-01-01 12:00:00", periods=n, freq="S")
-        # Perfíl simple representativo para demostración
-        O2 = 5 + 1.0*np.sin(np.linspace(0, 6*np.pi, n)) + 0.2*np.random.randn(n)
-        CO2 = 10 + 0.8*np.cos(np.linspace(0, 6*np.pi, n)) + 0.2*np.random.randn(n)
-        CO = 20 + 100*np.exp(-0.5*(np.linspace(-2,2,n))**2) + 5*np.random.randn(n)  # ppm con pico
-        NOx = 50 + 40*np.exp(-0.5*(np.linspace(1.2,-1.2,n))**2) + 5*np.random.randn(n)  # ppm con pico desplazado
-        T = 200 + 20*np.sin(np.linspace(0, 4*np.pi, n)) + 2*np.random.randn(n)  # °C
-        P = 101.3 + 0.1*np.random.randn(n)  # kPa
+        # ----------------------------------------------------------------
+        # Datos sintéticos realistas para quemador de laboratorio CH4/aire
+        # Basado en valores típicos de literatura:
+        #   - O2/CO2 calculados desde estequiometría seca (CH4, nu_O2=2)
+        #   - CO: 8-500 ppm (dependencia exponencial con λ, picos transitorios)
+        #   - NOx: 15-150 ppm (pico térmico cerca de λ=1.05, tipo Gaussian)
+        #   - T_salida: 200-440 °C (transitorio de arranque + función de λ)
+        #   - Ruido de analizador: ±0.1 % vol para O2/CO2, ±2 ppm para CO/NOx
+        # Referencias:
+        #   Baukal (2013) "The John Zink Combustion Handbook", CRC Press.
+        #   Wünning & Wünning (1997) Prog. Energy Combust. Sci. 23, 81-94.
+        #   EN 15502-1 / EN 483 (valores límite de emisiones quemadores gas).
+        # ----------------------------------------------------------------
+        np.random.seed(42)
+        n = 720  # 12 min a 1 Hz
+
+        t = pd.date_range("2025-01-01 10:00:00", periods=n, freq="s")
+
+        # --- Perfil de λ: fases operativas realistas ---
+        # Puntos de control (lambda en cada nodo)
+        lam_nodes = np.array([1.50, 1.45, 1.30, 1.25, 1.10, 1.08,
+                               1.12, 1.35, 1.40, 1.12, 1.10, 1.45, 1.65])
+        # Límites de cada segmento (índices)
+        seg = np.array([0, 60, 120, 200, 280, 350, 380,
+                        440, 480, 530, 620, 680, 720])
+        lam_base = np.empty(n)
+        for i in range(len(seg) - 1):
+            lam_base[seg[i]:seg[i+1]] = np.linspace(
+                lam_nodes[i], lam_nodes[i+1], seg[i+1] - seg[i])
+
+        # Deriva lenta (variación natural del flujo de aire) + ruido de medida
+        lam_drift = 0.018 * np.sin(np.linspace(0, 4 * np.pi, n))
+        lam_noise = 0.012 * np.random.randn(n)
+        lam = (lam_base + lam_drift + lam_noise).clip(1.001, 2.0)
+
+        # --- O2 y CO2 (gases secos) desde estequiometría CH4 ---
+        # CH4: nu_O2 = 2, AIR_N2_PER_O2 = 3.7619
+        # Moles gas seco / mol CH4: CO2(1) + N2(7.5238·λ) + O2(2·(λ-1))
+        denom = 9.5238 * lam - 1.0          # = 1 + 7.5238·λ + 2(λ-1)
+        O2_th  = 2.0 * (lam - 1.0) / denom * 100.0
+        CO2_th = 1.0 / denom * 100.0
+
+        # Ruido de analizador NDIR (±0.1 % vol para O2/CO2)
+        O2  = (O2_th  + 0.10 * np.random.randn(n)).clip(0.0, 21.0)
+        CO2 = (CO2_th + 0.08 * np.random.randn(n)).clip(0.0, 15.0)
+
+        # --- CO (ppm): dependencia exponencial con λ + picos transitorios ---
+        # Referencia: CO ~ 8 ppm en combustión limpia (λ≥1.2),
+        #             sube a cientos de ppm cuando λ→1 (mezcla sub-estequiométrica)
+        CO_base = 12.0 * np.exp(-9.0 * (lam - 1.0)) + 6.0
+        # Picos durante cambios bruscos de carga (transitorios reales)
+        CO_spike = np.zeros(n)
+        for t_spike, amp in [(215, 420), (365, 520), (495, 380)]:
+            w = np.arange(-8, 22)
+            idx_s = np.clip(t_spike + w, 0, n - 1)
+            CO_spike[idx_s] += amp * np.exp(-0.5 * (w / 6.0) ** 2)
+        CO_noise = np.maximum(0.5, CO_base * 0.06) * np.random.randn(n)
+        CO = (CO_base + CO_spike + CO_noise).clip(0.0)
+
+        # --- NOx (ppm): pico térmico cerca de λ=1.05 ---
+        # Referencia: quemadores atmosféricos CH4, 20-150 ppm (Baukal 2013)
+        NOx_base = 125.0 * np.exp(-0.5 * ((lam - 1.05) / 0.18) ** 2) + 12.0
+        NOx_noise = np.maximum(1.0, NOx_base * 0.04) * np.random.randn(n)
+        NOx = (NOx_base + NOx_noise).clip(0.0)
+
+        # --- Temperatura de salida de gases (°C) ---
+        # Quemador lab CH4: T_salida ~ 280-440 °C según λ y carga
+        # T_estacionaria decrece con λ (más aire → más dilución)
+        T_steady = 390.0 / lam + 30.0    # λ=1.0→420°C, λ=1.3→330°C, λ=1.5→290°C
+        # Transitorio de arranque (constante de tiempo ~80 s)
+        T_warmup = 1.0 - np.exp(-np.arange(n) / 80.0)
+        T = T_steady * T_warmup + 22.0 * (1.0 - T_warmup) + 2.5 * np.random.randn(n)
+
+        # --- Presión (kPa): atmosférica con pequeñas fluctuaciones de tiro ---
+        P = 101.3 + 0.25 * np.sin(np.linspace(0, 8 * np.pi, n)) + 0.07 * np.random.randn(n)
 
         raw = pd.DataFrame({
             "time": t,
-            "O2": O2.clip(0, 20),
-            "CO2": CO2.clip(0, 20),
-            "CO": CO.clip(0),
-            "NOx": NOx.clip(0),
+            "O2": O2,
+            "CO2": CO2,
+            "CO": CO,
+            "NOx": NOx,
             "T": T,
             "P": P,
             "source_file": "synthetic_example.csv",
